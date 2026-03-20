@@ -68,14 +68,7 @@ wss.on(`connection`, (ws) => {
     if (current_word.length === 2) {
       let cmd = current_word[0]
       let arg = parseInt(current_word[1])
-
-      let allowed_zones =
-      [
-        `G`, `M`, `P`, `C`,
-        `A`, `R`, `T`, `Z`,
-        `Q`, `X`, `B`, `D`,
-        `K`, `F`, `E`,
-      ]
+      let allowed_zones = [`G`, `M`, `X`, `E`, `A`]
 
       if (allowed_zones.includes(cmd) && !isNaN(arg) && arg >= 1 && arg <= 9) {
         let old_zone = ws.zone
