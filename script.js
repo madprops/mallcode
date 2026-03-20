@@ -1,19 +1,19 @@
 let MORSE_CODE = {
-  ".-": "A", "-...": "B", "-.-.": "C", "-..": "D", ".": "E",
-  "..-.": "F", "--.": "G", "....": "H", "..": "I", ".---": "J",
-  "-.-": "K", ".-..": "L", "--": "M", "-.": "N", "---": "O",
-  ".--.": "P", "--.-": "Q", ".-.": "R", "...": "S", "-": "T",
-  "..-": "U", "...-": "V", ".--": "W", "-..-": "X", "-.--": "Y",
-  "--..": "Z", ".----": "1", "..---": "2", "...--": "3",
-  "....-": "4", ".....": "5", "-....": "6", "--...": "7",
-  "---..": "8", "----.": "9", "-----": "0",
+  [`.-`]: `A`, [`-...`]: `B`, [`-.-.`]: `C`, [`-..`]: `D`, [`.`]: `E`,
+  [`..-.`]: `F`, [`--.`]: `G`, [`....`]: `H`, [`..`]: `I`, [`.---`]: `J`,
+  [`-.-`]: `K`, [`.-..`]: `L`, [`--`]: `M`, [`-.`]: `N`, [`---`]: `O`,
+  [`.--.`]: `P`, [`--.-`]: `Q`, [`.-.`]: `R`, [`...`]: `S`, [`-`]: `T`,
+  [`..-`]: `U`, [`...-`]: `V`, [`.--`]: `W`, [`-..-`]: `X`, [`-.--`]: `Y`,
+  [`--..`]: `Z`, [`.----`]: `1`, [`..---`]: `2`, [`...--`]: `3`,
+  [`....-`]: `4`, [`.....`]: `5`, [`-....`]: `6`, [`--...`]: `7`,
+  [`---..`]: `8`, [`----.`]: `9`, [`-----`]: `0`
 }
 
 let audio_context = window.AudioContext || window.webkitAudioContext
 let audio_ctx
 let oscillator
 let gain_node
-let max_press_duration = 3000
+let max_press_duration = 1500
 let max_press_timeout = null
 let last_input_time = 0
 let input_throttle_ms = 40
@@ -43,6 +43,7 @@ ws.onmessage = (event) => {
   if (event.data === `DOWN`) {
     handle_press(null, false)
   }
+
   else if (event.data === `UP`) {
     handle_release(null, false)
   }
@@ -60,19 +61,13 @@ let particles_geometry = new THREE.BufferGeometry()
 let particles_count = 3000
 let pos_array = new Float32Array(particles_count * 3)
 
-for (let i = 0; i < particles_count * 3; i++) {
-  pos_array[i] = (Math.random() - 0.5) * 150
+for (let i = 0; i < (particles_count * 3); i++) {
+  pos_array[i] = ((Math.random() - 0.5) * 150)
 }
 
 particles_geometry.setAttribute(`position`, new THREE.BufferAttribute(pos_array, 3))
 
-let particles_material = new THREE.PointsMaterial({
-  size: 0.15,
-  color: 0x4488ff,
-  transparent: true,
-  opacity: 0.6,
-  blending: THREE.AdditiveBlending
-})
+let particles_material = new THREE.PointsMaterial({size: 0.15, color: 0x4488ff, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending})
 
 let particle_mesh = new THREE.Points(particles_geometry, particles_material)
 scene.add(particle_mesh)
@@ -90,10 +85,12 @@ function create_text_texture(text, is_word = false, is_sequence = false) {
     ctx.font = `bold 120px sans-serif`
     ctx.fillStyle = `#ffaa00`
   }
+
   else if (is_sequence) {
     ctx.font = `bold 100px sans-serif`
-    ctx.fillStyle = `#ff5555` // Updated to a reddish color
+    ctx.fillStyle = `#ff5555`
   }
+
   else {
     ctx.font = `bold 180px sans-serif`
     ctx.fillStyle = `#ffffff`
@@ -109,26 +106,18 @@ function create_text_texture(text, is_word = false, is_sequence = false) {
 
 function spawn_sprite(text, type) {
   let texture = create_text_texture(text, type === `word`, type === `sequence`)
-  let material = new THREE.SpriteMaterial({
-    map: texture,
-    transparent: true,
-    blending: THREE.AdditiveBlending
-  })
+  let material = new THREE.SpriteMaterial({map: texture, transparent: true, blending: THREE.AdditiveBlending})
   let sprite = new THREE.Sprite(material)
 
   if (type === `sequence`) {
     sprite.scale.set(40, 10, 1)
-    sprite.position.set(0, -8, 15) // Changed Y from -15 to -8
+    sprite.position.set(0, -8, 15)
   }
+
   else {
     sprite.scale.set(40, 10, 1)
-    sprite.position.set((Math.random() - 0.5) * 20, (Math.random() - 0.5) * 10, type === `word` ? 20 : 0)
-    sprite.userData = {
-      velocity: new THREE.Vector3((Math.random() - 0.5) * 0.05, Math.random() * 0.05 + 0.02, 0.05),
-      life: 1.0,
-      decay: type === `word` ? 0.004 : 0.008,
-      age: 0
-    }
+    sprite.position.set(((Math.random() - 0.5) * 20), ((Math.random() - 0.5) * 10), type === `word` ? 20 : 0)
+    sprite.userData = {velocity: new THREE.Vector3(((Math.random() - 0.5) * 0.05), (Math.random() * 0.05) + 0.02, 0.05), life: 1.0, decay: type === `word` ? 0.004 : 0.008, age: 0}
     sprites.push(sprite)
   }
 
@@ -140,7 +129,9 @@ let is_pressed = false
 let press_start_time = 0
 let current_sequence = ``
 let current_word = ``
-let unit_duration = 120
+
+// Slower baseline speed for beginners
+let unit_duration = 250
 let letter_timeout = null
 let word_timeout = null
 
@@ -168,6 +159,7 @@ function resolve_letter() {
     current_word += letter
     spawn_sprite(letter, `letter`)
   }
+
   else {
     spawn_sprite(`?`, `letter`)
   }
@@ -175,8 +167,8 @@ function resolve_letter() {
   current_sequence = ``
   update_sequence_display()
 
-  // Wait 4 more units to complete the 7-unit word gap (we already waited 3)
-  word_timeout = setTimeout(resolve_word, unit_duration * 4)
+  // Extended word gap (Farnsworth timing) for easier reading
+  word_timeout = setTimeout(resolve_word, unit_duration * 8)
 }
 
 function resolve_word() {
@@ -189,6 +181,14 @@ function resolve_word() {
 }
 
 function handle_press(e, is_local = true) {
+  if (e && (e.type === `keydown`)) {
+    if (e.ctrlKey || e.metaKey || e.altKey) {
+      return
+    }
+
+    e.preventDefault()
+  }
+
   if (e && e.repeat) {
     return
   }
@@ -199,7 +199,6 @@ function handle_press(e, is_local = true) {
 
   let now = performance.now()
 
-  // Anti-spam: block inputs that happen faster than humanly possible (switch bounce / macros)
   if (is_local && ((now - last_input_time) < input_throttle_ms)) {
     return
   }
@@ -219,13 +218,20 @@ function handle_press(e, is_local = true) {
   gain_node.gain.setTargetAtTime(0.5, audio_ctx.currentTime, 0.01)
   particle_mesh.material.size = 0.5
 
-  // Anti-stuck: Force a local release if the tone plays for too long
   max_press_timeout = setTimeout(() => {
     handle_release(null, true)
   }, max_press_duration)
 }
 
 function handle_release(e, is_local = true) {
+  if (e && (e.type === `keyup`)) {
+    if (e.ctrlKey || e.metaKey || e.altKey) {
+      return
+    }
+
+    e.preventDefault()
+  }
+
   if (!is_pressed) {
     return
   }
@@ -233,9 +239,6 @@ function handle_release(e, is_local = true) {
   let now = performance.now()
   is_pressed = false
   clearTimeout(max_press_timeout)
-
-  // We don't throttle the release to ensure the socket doesn't get stuck in a DOWN state,
-  // but we do update the timestamp so the next press is measured from here.
   last_input_time = now
 
   if ((is_local !== false) && (ws.readyState === WebSocket.OPEN)) {
@@ -246,20 +249,22 @@ function handle_release(e, is_local = true) {
   gain_node.gain.setTargetAtTime(0, audio_ctx.currentTime, 0.01)
   particle_mesh.material.size = 0.15
 
-  if (duration < unit_duration * 2) {
+  if (duration < (unit_duration * 1.5)) {
     current_sequence += `.`
     let estimated_unit = duration
-    unit_duration = unit_duration * 0.7 + estimated_unit * 0.3
+    unit_duration = (unit_duration * 0.7) + (estimated_unit * 0.3)
   }
+
   else {
     current_sequence += `-`
     let estimated_unit = duration / 3
-    unit_duration = unit_duration * 0.7 + estimated_unit * 0.3
+    unit_duration = (unit_duration * 0.7) + (estimated_unit * 0.3)
   }
 
-  unit_duration = Math.max(50, Math.min(250, unit_duration))
+  unit_duration = Math.max(150, Math.min(500, unit_duration))
   update_sequence_display()
-  letter_timeout = setTimeout(resolve_letter, unit_duration * 3)
+
+  letter_timeout = setTimeout(resolve_letter, unit_duration * 4)
 }
 
 window.addEventListener(`mousedown`, handle_press)
