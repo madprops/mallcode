@@ -9,6 +9,9 @@ const Shared = require(`./shared.js`)
 const MORSE_CODE = Shared.MORSE_CODE
 const ZONE_SETTINGS = Shared.ZONE_SETTINGS
 
+const zone_locks = {}
+let next_client_id = 1
+
 // Serve static files (like script.js and style.css) from the current directory
 app.use(express.static(__dirname))
 
@@ -42,6 +45,7 @@ function broadcast_zone_count(zone) {
 }
 
 wss.on(`connection`, (ws) => {
+  ws.id = next_client_id++
   ws.zone = `G1`
   let is_pressed = false
   let press_start_time = 0
@@ -95,6 +99,17 @@ wss.on(`connection`, (ws) => {
   // When a user transmits a morse code signal
   ws.on(`message`, (message) => {
     const signal = message.toString()
+
+    if (signal === `DOWN` || signal === `UP`) {
+      let lock = zone_locks[ws.zone]
+      let now = Date.now()
+
+      if (lock && lock.owner !== ws.id && lock.expires > now) {
+        return
+      }
+
+      zone_locks[ws.zone] = { owner: ws.id, expires: now + 3000 }
+    }
 
     // Decode morse per connection for server-side validation
     if (signal === `DOWN`) {

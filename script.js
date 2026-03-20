@@ -13,6 +13,7 @@ let online_count = 1
 let zone_info_el = document.getElementById(`zone-info`)
 let sound_enabled = true
 let sound_toggle_btn = document.getElementById(`sound-toggle`)
+let remote_lock_time = -3000
 
 sound_toggle_btn.addEventListener(`click`, () => {
   sound_enabled = !sound_enabled
@@ -48,9 +49,11 @@ let ws = new WebSocket(`${protocol}//${window.location.host}`)
 
 ws.onmessage = (event) => {
   if (event.data === `DOWN`) {
+    remote_lock_time = performance.now()
     handle_press(null, false)
   }
   else if (event.data === `UP`) {
+    remote_lock_time = performance.now()
     handle_release(null, false)
   }
   else if (event.data.startsWith(`ZONE:`)) {
@@ -236,6 +239,10 @@ function handle_press(e, is_local = true) {
   }
 
   let now = performance.now()
+
+  if (is_local && now - remote_lock_time < 3000) {
+    return
+  }
 
   if (is_local && now - last_input_time < input_throttle_ms) {
     return
