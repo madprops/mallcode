@@ -46,6 +46,12 @@ ws.onmessage = (event) => {
   else if (event.data === `UP`) {
     handle_release(null, false)
   }
+  else if (event.data.startsWith(`ZONE:`)) {
+    console.log(`Navigated to zone ${event.data.split(`:`)[1]}`)
+  }
+  else if (event.data.startsWith(`LINK:`)) {
+    window.open(event.data.substring(5), `_blank`)
+  }
 }
 
 let canvas = document.getElementById(`glcanvas`)
