@@ -39,6 +39,19 @@ function initAudio() {
 }
 
 /**
+ * WebSocket Multiplayer Setup
+ */
+const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const ws = new WebSocket(`${protocol}//${window.location.host}`);
+ws.onmessage = (event) => {
+    if (event.data === 'DOWN') {
+        handlePress(null, false);
+    } else if (event.data === 'UP') {
+        handleRelease(null, false);
+    }
+};
+
+/**
  * Three.js WebGL Setup
  */
 const canvas = document.getElementById('glcanvas');
@@ -202,9 +215,13 @@ function resolveWord() {
     currentWord = "";
 }
 
-function handlePress(e) {
+function handlePress(e, isLocal = true) {
     if (e && e.repeat) return; // Ignore hold-down keyboard repeats
     if (isPressed) return;
+
+    if (isLocal !== false && ws.readyState === WebSocket.OPEN) {
+        ws.send('DOWN');
+    }
 
     initAudio(); // Required due to browser autoplay policies
     isPressed = true;
@@ -217,9 +234,13 @@ function handlePress(e) {
     particleMesh.material.size = 0.5; // Visual flash
 }
 
-function handleRelease() {
+function handleRelease(e, isLocal = true) {
     if (!isPressed) return;
     isPressed = false;
+
+    if (isLocal !== false && ws.readyState === WebSocket.OPEN) {
+        ws.send('UP');
+    }
 
     const duration = performance.now() - pressStartTime;
     gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.01);
@@ -245,8 +266,8 @@ window.addEventListener('mousedown', handlePress);
 window.addEventListener('mouseup', handleRelease);
 window.addEventListener('keydown', handlePress);
 window.addEventListener('keyup', handleRelease);
-window.addEventListener('touchstart', (e) => { e.preventDefault(); handlePress(); }, { passive: false });
-window.addEventListener('touchend', (e) => { e.preventDefault(); handleRelease(); }, { passive: false });
+window.addEventListener('touchstart', (e) => { e.preventDefault(); handlePress(e); }, { passive: false });
+window.addEventListener('touchend', (e) => { e.preventDefault(); handleRelease(e); }, { passive: false });
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
