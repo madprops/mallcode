@@ -264,6 +264,7 @@ function handle_press(e, is_local = true) {
   if (sound_enabled) {
     gain_node.gain.setTargetAtTime(0.5, audio_ctx.currentTime, 0.01)
   }
+
   particle_mesh.material.size = 0.5
 
   max_press_timeout = setTimeout(() => {
