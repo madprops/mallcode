@@ -13,6 +13,10 @@ let audio_context = window.AudioContext || window.webkitAudioContext
 let audio_ctx
 let oscillator
 let gain_node
+let max_press_duration = 3000
+let max_press_timeout = null
+let last_input_time = 0
+let input_throttle_ms = 40
 
 function init_audio() {
   if (!audio_ctx) {
@@ -93,7 +97,7 @@ function create_text_texture(text, is_word = false, is_sequence = false) {
   }
   else if (is_sequence) {
     ctx.font = `bold 100px sans-serif`
-    ctx.fillStyle = `#66ccff`
+    ctx.fillStyle = `#ff5555` // Updated to a reddish color
   }
   else {
     ctx.font = `bold 180px sans-serif`
@@ -120,7 +124,7 @@ function spawn_sprite(text, type) {
 
   if (type === `sequence`) {
     sprite.scale.set(40, 10, 1)
-    sprite.position.set(0, -15, 15)
+    sprite.position.set(0, -8, 15) // Changed Y from -15 to -8
   }
   else {
     sprite.scale.set(40, 10, 1)
@@ -200,20 +204,33 @@ function handle_press(e, is_local = true) {
     return
   }
 
+  let now = performance.now()
+
+  // Anti-spam: block inputs that happen faster than humanly possible (switch bounce / macros)
+  if (is_local && ((now - last_input_time) < input_throttle_ms)) {
+    return
+  }
+
+  last_input_time = now
+  is_pressed = true
+  press_start_time = now
+
   if ((is_local !== false) && (ws.readyState === WebSocket.OPEN)) {
     ws.send(`DOWN`)
   }
 
-  // Required due to browser autoplay policies
   init_audio()
-  is_pressed = true
-  press_start_time = performance.now()
-
   clearTimeout(letter_timeout)
   clearTimeout(word_timeout)
+  clearTimeout(max_press_timeout)
 
   gain_node.gain.setTargetAtTime(0.5, audio_ctx.currentTime, 0.01)
   particle_mesh.material.size = 0.5
+
+  // Anti-stuck: Force a local release if the tone plays for too long
+  max_press_timeout = setTimeout(() => {
+    handle_release(null, true)
+  }, max_press_duration)
 }
 
 function handle_release(e, is_local = true) {
@@ -221,13 +238,20 @@ function handle_release(e, is_local = true) {
     return
   }
 
+  let now = performance.now()
   is_pressed = false
+
+  clearTimeout(max_press_timeout)
+
+  // We don't throttle the release to ensure the socket doesn't get stuck in a DOWN state,
+  // but we do update the timestamp so the next press is measured from here.
+  last_input_time = now
 
   if ((is_local !== false) && (ws.readyState === WebSocket.OPEN)) {
     ws.send(`UP`)
   }
 
-  let duration = performance.now() - press_start_time
+  let duration = now - press_start_time
   gain_node.gain.setTargetAtTime(0, audio_ctx.currentTime, 0.01)
   particle_mesh.material.size = 0.15
 
@@ -243,7 +267,6 @@ function handle_release(e, is_local = true) {
   }
 
   unit_duration = Math.max(50, Math.min(250, unit_duration))
-
   update_sequence_display()
 
   letter_timeout = setTimeout(resolve_letter, unit_duration * 3)
