@@ -27,11 +27,13 @@ app.get(`/assets/zone/:z/file/:u`, (req, res) => {
 
 function broadcast_zone_count(zone) {
   let count = 0
+
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN && client.zone === zone) {
       count++
     }
   })
+
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN && client.zone === zone) {
       client.send(`USERS:${count}`)
@@ -40,11 +42,11 @@ function broadcast_zone_count(zone) {
 }
 
 wss.on(`connection`, (ws) => {
+  ws.zone = `G1`
   let is_pressed = false
   let press_start_time = 0
   let current_sequence = ``
   let current_word = ``
-  ws.zone = `G1` // default zone
   let current_settings = ZONE_SETTINGS[1]
   let unit_duration = current_settings.unit_duration
   let letter_timeout = null
