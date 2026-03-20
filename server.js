@@ -181,5 +181,5 @@ wss.on(`connection`, (ws) => {
 let port = process.env.PORT || 3773
 
 server.listen(port, () => {
-  console.log(`Morse multiplayer server running on http://localhost:${PORT}`)
+  console.log(`Morse multiplayer server running on http://localhost:${port}`)
 })
