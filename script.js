@@ -3,8 +3,8 @@ let audio_context = window.AudioContext || window.webkitAudioContext
 let audio_ctx
 let oscillator
 let gain_node
-let current_zone = 1
-let current_settings = Shared.ZONE_SETTINGS[current_zone]
+let current_zone = `G1`
+let current_settings = Shared.ZONE_SETTINGS[1]
 let max_press_duration = current_settings.max_press
 let max_press_timeout = null
 let last_input_time = 0
@@ -54,21 +54,21 @@ ws.onmessage = (event) => {
     handle_release(null, false)
   }
   else if (event.data.startsWith(`ZONE:`)) {
-    let new_zone = parseInt(event.data.split(`:`)[1])
+    let new_zone = event.data.split(`:`)[1]
     console.log(`Navigated to zone ${new_zone}`)
     current_zone = new_zone
-    current_settings = Shared.ZONE_SETTINGS[current_zone]
+    current_settings = Shared.ZONE_SETTINGS[parseInt(current_zone.charAt(1))]
     max_press_duration = current_settings.max_press
     input_throttle_ms = current_settings.throttle
     unit_duration = current_settings.unit_duration
-    zone_info_el.innerText = `G${current_zone} (${online_count})`
+    zone_info_el.innerText = `${current_zone} (${online_count})`
   }
   else if (event.data.startsWith(`LINK:`)) {
     window.open(event.data.substring(5), `_blank`)
   }
   else if (event.data.startsWith(`USERS:`)) {
     online_count = parseInt(event.data.split(`:`)[1])
-    zone_info_el.innerText = `G${current_zone} (${online_count})`
+    zone_info_el.innerText = `${current_zone} (${online_count})`
   }
 }
 

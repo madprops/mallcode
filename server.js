@@ -44,8 +44,8 @@ wss.on(`connection`, (ws) => {
   let press_start_time = 0
   let current_sequence = ``
   let current_word = ``
-  ws.zone = 1 // default zone
-  let current_settings = ZONE_SETTINGS[ws.zone]
+  ws.zone = `G1` // default zone
+  let current_settings = ZONE_SETTINGS[1]
   let unit_duration = current_settings.unit_duration
   let letter_timeout = null
   let word_timeout = null
@@ -69,17 +69,27 @@ wss.on(`connection`, (ws) => {
       let cmd = current_word[0]
       let arg = parseInt(current_word[1])
 
-      if (cmd === `G` && !isNaN(arg) && arg >= 1 && arg <= 9) {
+      let allowed_zones =
+      [
+        `G`, `M`, `P`, `C`,
+        `A`, `R`, `T`, `Z`,
+        `Q`, `X`, `B`, `D`,
+        `K`, `F`, `E`,
+      ]
+
+      if (allowed_zones.includes(cmd) && !isNaN(arg) && arg >= 1 && arg <= 9) {
         let old_zone = ws.zone
-        ws.zone = arg
-        current_settings = ZONE_SETTINGS[ws.zone]
+        ws.zone = cmd + arg
+        current_settings = ZONE_SETTINGS[arg]
         unit_duration = current_settings.unit_duration
-        ws.send(`ZONE:${arg}`)
+        ws.send(`ZONE:${ws.zone}`)
+
         if (old_zone !== ws.zone) {
           broadcast_zone_count(old_zone)
           broadcast_zone_count(ws.zone)
         }
-      } else if (cmd === `U` && !isNaN(arg) && arg >= 1 && arg <= 9) {
+      }
+      else if (cmd === `U` && !isNaN(arg) && arg >= 1 && arg <= 9) {
         ws.send(`LINK:/assets/zone/${ws.zone}/file/${arg}`)
       }
     }
