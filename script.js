@@ -43,7 +43,6 @@ ws.onmessage = (event) => {
   if (event.data === `DOWN`) {
     handle_press(null, false)
   }
-
   else if (event.data === `UP`) {
     handle_release(null, false)
   }
@@ -66,9 +65,7 @@ for (let i = 0; i < (particles_count * 3); i++) {
 }
 
 particles_geometry.setAttribute(`position`, new THREE.BufferAttribute(pos_array, 3))
-
 let particles_material = new THREE.PointsMaterial({size: 0.15, color: 0x4488ff, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending})
-
 let particle_mesh = new THREE.Points(particles_geometry, particles_material)
 scene.add(particle_mesh)
 let sprites = []
@@ -113,7 +110,6 @@ function spawn_sprite(text, type) {
     sprite.scale.set(40, 10, 1)
     sprite.position.set(0, -8, 15)
   }
-
   else {
     sprite.scale.set(40, 10, 1)
     sprite.position.set(((Math.random() - 0.5) * 20), ((Math.random() - 0.5) * 10), type === `word` ? 20 : 0)
@@ -129,8 +125,6 @@ let is_pressed = false
 let press_start_time = 0
 let current_sequence = ``
 let current_word = ``
-
-// Slower baseline speed for beginners
 let unit_duration = 250
 let letter_timeout = null
 let word_timeout = null
@@ -159,7 +153,6 @@ function resolve_letter() {
     current_word += letter
     spawn_sprite(letter, `letter`)
   }
-
   else {
     spawn_sprite(`?`, `letter`)
   }
@@ -254,7 +247,6 @@ function handle_release(e, is_local = true) {
     let estimated_unit = duration
     unit_duration = (unit_duration * 0.7) + (estimated_unit * 0.3)
   }
-
   else {
     current_sequence += `-`
     let estimated_unit = duration / 3
@@ -263,7 +255,6 @@ function handle_release(e, is_local = true) {
 
   unit_duration = Math.max(150, Math.min(500, unit_duration))
   update_sequence_display()
-
   letter_timeout = setTimeout(resolve_letter, unit_duration * 4)
 }
 
