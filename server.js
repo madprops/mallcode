@@ -25,6 +25,20 @@ app.get(`/assets/zone/:z/file/:u`, (req, res) => {
   </body></html>`)
 })
 
+function broadcast_zone_count(zone) {
+  let count = 0
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN && client.zone === zone) {
+      count++
+    }
+  })
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN && client.zone === zone) {
+      client.send(`USERS:${count}`)
+    }
+  })
+}
+
 wss.on(`connection`, (ws) => {
   let is_pressed = false
   let press_start_time = 0
@@ -56,10 +70,15 @@ wss.on(`connection`, (ws) => {
       let arg = parseInt(current_word[1])
 
       if (cmd === `G` && !isNaN(arg) && arg >= 1 && arg <= 9) {
+        let old_zone = ws.zone
         ws.zone = arg
         current_settings = ZONE_SETTINGS[ws.zone]
         unit_duration = current_settings.unit_duration
         ws.send(`ZONE:${arg}`)
+        if (old_zone !== ws.zone) {
+          broadcast_zone_count(old_zone)
+          broadcast_zone_count(ws.zone)
+        }
       } else if (cmd === `U` && !isNaN(arg) && arg >= 1 && arg <= 9) {
         ws.send(`LINK:/assets/zone/${ws.zone}/file/${arg}`)
       }
@@ -110,6 +129,12 @@ wss.on(`connection`, (ws) => {
       }
     })
   })
+
+  ws.on(`close`, () => {
+    broadcast_zone_count(ws.zone)
+  })
+
+  broadcast_zone_count(ws.zone)
 })
 
 const PORT = process.env.PORT || 3773

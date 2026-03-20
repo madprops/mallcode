@@ -9,6 +9,8 @@ let max_press_duration = current_settings.max_press
 let max_press_timeout = null
 let last_input_time = 0
 let input_throttle_ms = current_settings.throttle
+let online_count = 1
+let zone_info_el = document.getElementById(`zone-info`)
 
 function init_audio() {
   if (!audio_ctx) {
@@ -46,9 +48,14 @@ ws.onmessage = (event) => {
     max_press_duration = current_settings.max_press
     input_throttle_ms = current_settings.throttle
     unit_duration = current_settings.unit_duration
+    zone_info_el.innerText = `G${current_zone} (${online_count} online)`
   }
   else if (event.data.startsWith(`LINK:`)) {
     window.open(event.data.substring(5), `_blank`)
+  }
+  else if (event.data.startsWith(`USERS:`)) {
+    online_count = parseInt(event.data.split(`:`)[1])
+    zone_info_el.innerText = `G${current_zone} (${online_count} online)`
   }
 }
 
