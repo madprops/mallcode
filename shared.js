@@ -1,5 +1,5 @@
 const Shared = {
-  MORSE_CODE: {
+  morse_code: {
     [`.-`]: `A`, [`-...`]: `B`, [`-.-.`]: `C`, [`-..`]: `D`, [`.`]: `E`,
     [`..-.`]: `F`, [`--.`]: `G`, [`....`]: `H`, [`..`]: `I`, [`.---`]: `J`,
     [`-.-`]: `K`, [`.-..`]: `L`, [`--`]: `M`, [`-.`]: `N`, [`---`]: `O`,
@@ -9,7 +9,7 @@ const Shared = {
     [`....-`]: `4`, [`.....`]: `5`, [`-....`]: `6`, [`--...`]: `7`,
     [`---..`]: `8`, [`----.`]: `9`, [`-----`]: `0`
   },
-  ZONE_SETTINGS: {
+  zone_settings: {
     1: { unit_duration: 350, letter_mult: 5.0, word_mult: 10, max_press: 2000, throttle: 60, forgiving: true }, // Slow/Forgiving
     2: { unit_duration: 300, letter_mult: 4.5, word_mult: 9, max_press: 1800, throttle: 50, forgiving: true },
     3: { unit_duration: 250, letter_mult: 4.0, word_mult: 8, max_press: 1500, throttle: 40, forgiving: true }, // Default
@@ -20,6 +20,7 @@ const Shared = {
     8: { unit_duration: 100, letter_mult: 3.0, word_mult: 7, max_press: 600, throttle: 15, forgiving: false },
     9: { unit_duration: 80,  letter_mult: 3.0, word_mult: 7, max_press: 500, throttle: 10, forgiving: false }, // Pro/Realistic
   },
+  default_zone: `G3`,
 }
 
 if (typeof module !== 'undefined' && module.exports) {

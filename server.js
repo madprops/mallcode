@@ -6,8 +6,8 @@ const app = express()
 const server = http.createServer(app)
 const wss = new WebSocket.Server({server})
 const Shared = require(`./shared.js`)
-const MORSE_CODE = Shared.MORSE_CODE
-const ZONE_SETTINGS = Shared.ZONE_SETTINGS
+const MORSE_CODE = Shared.morse_code
+const ZONE_SETTINGS = Shared.zone_settings
 
 const zone_locks = {}
 let next_client_id = 1
@@ -25,6 +25,19 @@ app.get(`/assets/zone/:z/file/:u`, (req, res) => {
   res.send(`<html><body style="font-family: sans-serif; text-align: center; margin-top: 20%;">
     <h1>Zone ${req.params.z}</h1>
     <h2>Asset u${req.params.u}</h2>
+  </body></html>`)
+})
+
+app.get(`/help`, (req, res) => {
+  res.send(`<html><body style="font-family: sans-serif; margin-top: 10%; display: flex; flex-direction: column; align-items: center;">
+    <h1>Information</h1>
+    <div style="max-width: 600px; text-align: left; line-height: 1.6;">
+      <h2>Zone Navigation</h2>
+      <p>You can move between different zones. The available zones are <strong>G</strong>, <strong>M</strong>, <strong>X</strong>, <strong>E</strong>, and <strong>A</strong>.</p>
+      <p>To navigate to a zone, input the letter followed by a speed number from 1 to 9 (e.g., <strong>E4</strong>, <strong>G1</strong>, <strong>X9</strong>).</p>
+      <h2>Opening Files</h2>
+      <p>Within any zone, you can open asset files by inputting <strong>U</strong> followed by a file number from 1 to 9 (e.g., <strong>U1</strong>, <strong>U5</strong>).</p>
+    </div>
   </body></html>`)
 })
 
@@ -46,7 +59,7 @@ function broadcast_zone_count(zone) {
 
 wss.on(`connection`, (ws) => {
   ws.id = next_client_id++
-  ws.zone = `G1`
+  ws.zone = Shared.default_zone
   let is_pressed = false
   let press_start_time = 0
   let current_sequence = ``
@@ -71,7 +84,10 @@ wss.on(`connection`, (ws) => {
   function resolve_word() {
     if (!current_word) return
 
-    if (current_word.length === 2) {
+    if (current_word === `HELP`) {
+      ws.send(`LINK:/help`)
+    }
+    else if (current_word.length === 2) {
       let cmd = current_word[0]
       let arg = parseInt(current_word[1])
       let allowed_zones = [`G`, `M`, `X`, `E`, `A`]

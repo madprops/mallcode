@@ -1,10 +1,10 @@
-let MORSE_CODE = Shared.MORSE_CODE
+let MORSE_CODE = Shared.morse_code
 let audio_context = window.AudioContext || window.webkitAudioContext
 let audio_ctx
 let oscillator
 let gain_node
-let current_zone = `G1`
-let current_settings = Shared.ZONE_SETTINGS[1]
+let current_zone = Shared.default_zone
+let current_settings = Shared.zone_settings[1]
 let max_press_duration = current_settings.max_press
 let max_press_timeout = null
 let last_input_time = 0
@@ -60,7 +60,7 @@ ws.onmessage = (event) => {
     let new_zone = event.data.split(`:`)[1]
     console.log(`Navigated to zone ${new_zone}`)
     current_zone = new_zone
-    current_settings = Shared.ZONE_SETTINGS[parseInt(current_zone.charAt(1))]
+    current_settings = Shared.zone_settings[parseInt(current_zone.charAt(1))]
     max_press_duration = current_settings.max_press
     input_throttle_ms = current_settings.throttle
     unit_duration = current_settings.unit_duration
