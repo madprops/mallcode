@@ -79,15 +79,13 @@ function create_text_texture(text, is_word = false, is_sequence = false) {
   ctx.clearRect(0, 0, text_canvas.width, text_canvas.height)
 
   if (is_word) {
-    ctx.font = `bold 120px sans-serif`
+    ctx.font = `bold 80px sans-serif`
     ctx.fillStyle = `#ffaa00`
   }
-
   else if (is_sequence) {
     ctx.font = `bold 100px sans-serif`
     ctx.fillStyle = `#ff5555`
   }
-
   else {
     ctx.font = `bold 180px sans-serif`
     ctx.fillStyle = `#ffffff`
@@ -98,6 +96,7 @@ function create_text_texture(text, is_word = false, is_sequence = false) {
   ctx.shadowColor = ctx.fillStyle
   ctx.shadowBlur = is_sequence ? 10 : 30
   ctx.fillText(text, text_canvas.width / 2, text_canvas.height / 2)
+
   return new THREE.CanvasTexture(text_canvas)
 }
 
@@ -111,13 +110,27 @@ function spawn_sprite(text, type) {
     sprite.position.set(0, -8, 15)
   }
   else {
-    sprite.scale.set(40, 10, 1)
+    if (type === `word`) {
+      sprite.scale.set(25, 6.25, 1)
+    }
+    else {
+      sprite.scale.set(12, 3, 1)
+    }
+
     sprite.position.set(((Math.random() - 0.5) * 20), ((Math.random() - 0.5) * 10), type === `word` ? 20 : 0)
-    sprite.userData = {velocity: new THREE.Vector3(((Math.random() - 0.5) * 0.05), (Math.random() * 0.05) + 0.02, 0.05), life: 1.0, decay: type === `word` ? 0.004 : 0.008, age: 0}
+    sprite.userData = {velocity: new THREE.Vector3(((Math.random() - 0.5) * 0.05), (Math.random() * 0.05) + 0.02, 0.05), life: 1.0, decay_rate: type === `word` ? 0.25 : 0.5, age: 0, growth: type === `word` ? 2 : 10}
     sprites.push(sprite)
   }
 
   scene.add(sprite)
+
+  while (sprites.length > 40) {
+    let old_sprite = sprites.shift()
+    scene.remove(old_sprite)
+    old_sprite.material.map.dispose()
+    old_sprite.material.dispose()
+  }
+
   return sprite
 }
 
@@ -174,7 +187,13 @@ function resolve_word() {
 }
 
 function handle_press(e, is_local = true) {
-  if (e && (e.type === `keydown`)) {
+  if (e && (e.type === `mousedown` || e.type === `touchstart`)) {
+    if (!document.hasFocus() || performance.now() - last_focus_time < 100) {
+      return
+    }
+  }
+
+  if (e && e.type === `keydown`) {
     if (e.ctrlKey || e.metaKey || e.altKey) {
       return
     }
@@ -192,7 +211,7 @@ function handle_press(e, is_local = true) {
 
   let now = performance.now()
 
-  if (is_local && ((now - last_input_time) < input_throttle_ms)) {
+  if (is_local && now - last_input_time < input_throttle_ms) {
     return
   }
 
@@ -200,7 +219,7 @@ function handle_press(e, is_local = true) {
   is_pressed = true
   press_start_time = now
 
-  if ((is_local !== false) && (ws.readyState === WebSocket.OPEN)) {
+  if (is_local !== false && ws.readyState === WebSocket.OPEN) {
     ws.send(`DOWN`)
   }
 
@@ -258,6 +277,11 @@ function handle_release(e, is_local = true) {
   letter_timeout = setTimeout(resolve_letter, unit_duration * 4)
 }
 
+window.addEventListener(`contextmenu`, (e) => {
+  e.preventDefault()
+  handle_press(e)
+})
+
 window.addEventListener(`mousedown`, handle_press)
 window.addEventListener(`mouseup`, handle_release)
 window.addEventListener(`keydown`, handle_press)
@@ -293,11 +317,12 @@ function animate() {
     let s = sprites[i]
     s.position.add(s.userData.velocity)
     s.userData.age += delta
-    s.userData.life -= s.userData.decay
+    let decay_amount = s.userData.decay_rate * delta
+    s.userData.life -= decay_amount
     let fade_in = Math.min(1.0, s.userData.age * 3.0)
     s.material.opacity = Math.max(0, fade_in * s.userData.life)
-    s.scale.x += s.userData.decay * 10
-    s.scale.y += s.userData.decay * 5
+    s.scale.x += decay_amount * s.userData.growth
+    s.scale.y += decay_amount * s.userData.growth * 0.25
 
     if (s.userData.life <= 0) {
       scene.remove(s)
@@ -309,5 +334,11 @@ function animate() {
 
   renderer.render(scene, camera)
 }
+
+let last_focus_time = 0
+
+window.addEventListener(`focus`, () => {
+  last_focus_time = performance.now()
+})
 
 animate()
