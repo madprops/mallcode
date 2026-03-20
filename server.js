@@ -166,10 +166,11 @@ wss.on(`connection`, (ws) => {
         zone_data[ws.zone] = {words: []}
       }
 
-      zone_data[ws.zone].words.push(current_word)
+      zone_data[ws.zone].words = zone_data[ws.zone].words.filter(w => w !== current_word)
+      zone_data[ws.zone].words.unshift(current_word)
 
       if (zone_data[ws.zone].words.length > 10) {
-        zone_data[ws.zone].words.shift()
+        zone_data[ws.zone].words.pop()
       }
 
       save_zone_data()

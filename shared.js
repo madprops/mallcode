@@ -20,7 +20,7 @@ const Shared = {
     8: { unit_duration: 100, letter_mult: 3.0, word_mult: 7, max_press: 600, throttle: 15, forgiving: false },
     9: { unit_duration: 80,  letter_mult: 3.0, word_mult: 7, max_press: 500, throttle: 10, forgiving: false }, // Pro/Realistic
   },
-  default_zone: `G3`,
+  default_zone: `G4`,
   lock_time: 3000,
 }
 

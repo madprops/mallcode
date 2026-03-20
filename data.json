@@ -1,9 +1,14 @@
 {
   "G3": {
     "words": [
+      "DOG",
       "ASS",
-      "MAN",
-      "ASS"
+      "MAN"
+    ]
+  },
+  "G4": {
+    "words": [
+      "DOG"
     ]
   }
 }
