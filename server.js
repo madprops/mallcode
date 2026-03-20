@@ -6,10 +6,8 @@ const app = express()
 const server = http.createServer(app)
 const wss = new WebSocket.Server({server})
 const Shared = require(`./shared.js`)
-const MORSE_CODE = Shared.morse_code
-const ZONE_SETTINGS = Shared.zone_settings
 
-const zone_locks = {}
+let zone_locks = {}
 let next_client_id = 1
 
 // Serve static files (like script.js and style.css) from the current directory
@@ -31,6 +29,7 @@ app.get(`/assets/zone/:z/file/:u`, (req, res) => {
 app.get(`/help`, (req, res) => {
   res.send(`<html><body style="font-family: sans-serif; margin-top: 10%; display: flex; flex-direction: column; align-items: center;">
     <h1>Information</h1>
+
     <div style="max-width: 600px; text-align: left; line-height: 1.6;">
       <h2>Zone Navigation</h2>
       <p>You can move between different zones. The available zones are <strong>G</strong>, <strong>M</strong>, <strong>X</strong>, <strong>E</strong>, and <strong>A</strong>.</p>
@@ -38,6 +37,7 @@ app.get(`/help`, (req, res) => {
       <h2>Opening Files</h2>
       <p>Within any zone, you can open asset files by inputting <strong>U</strong> followed by a file number from 1 to 9 (e.g., <strong>U1</strong>, <strong>U5</strong>).</p>
     </div>
+
   </body></html>`)
 })
 
@@ -64,14 +64,17 @@ wss.on(`connection`, (ws) => {
   let press_start_time = 0
   let current_sequence = ``
   let current_word = ``
-  let current_settings = ZONE_SETTINGS[1]
+  let current_settings = Shared.zone_settings[1]
   let unit_duration = current_settings.unit_duration
   let letter_timeout = null
   let word_timeout = null
 
   function resolve_letter() {
-    if (!current_sequence) return
-    let letter = MORSE_CODE[current_sequence]
+    if (!current_sequence) {
+      return
+    }
+
+    let letter = Shared.morse_code[current_sequence]
 
     if (letter) {
       current_word += letter
@@ -82,7 +85,9 @@ wss.on(`connection`, (ws) => {
   }
 
   function resolve_word() {
-    if (!current_word) return
+    if (!current_word) {
+      return
+    }
 
     if (current_word === `HELP`) {
       ws.send(`LINK:/help`)
@@ -95,7 +100,7 @@ wss.on(`connection`, (ws) => {
       if (allowed_zones.includes(cmd) && !isNaN(arg) && arg >= 1 && arg <= 9) {
         let old_zone = ws.zone
         ws.zone = cmd + arg
-        current_settings = ZONE_SETTINGS[arg]
+        current_settings = Shared.zone_settings[arg]
         unit_duration = current_settings.unit_duration
         ws.send(`ZONE:${ws.zone}`)
 
@@ -114,17 +119,17 @@ wss.on(`connection`, (ws) => {
 
   // When a user transmits a morse code signal
   ws.on(`message`, (message) => {
-    const signal = message.toString()
+    let signal = message.toString()
 
     if (signal === `DOWN` || signal === `UP`) {
       let lock = zone_locks[ws.zone]
       let now = Date.now()
 
-      if (lock && lock.owner !== ws.id && lock.expires > now) {
+      if (lock && (lock.owner !== ws.id) && (lock.expires > now)) {
         return
       }
 
-      zone_locks[ws.zone] = { owner: ws.id, expires: now + 3000 }
+      zone_locks[ws.zone] = {owner: ws.id, expires: now + Shared.lock_time}
     }
 
     // Decode morse per connection for server-side validation
@@ -160,7 +165,7 @@ wss.on(`connection`, (ws) => {
 
     // Broadcast the signal to all OTHER connected clients (no identifiers)
     wss.clients.forEach((client) => {
-      if (client !== ws && client.readyState === WebSocket.OPEN && client.zone === ws.zone) {
+      if ((client !== ws) && (client.readyState === WebSocket.OPEN) && (client.zone === ws.zone)) {
         client.send(signal)
       }
     })
@@ -173,8 +178,8 @@ wss.on(`connection`, (ws) => {
   broadcast_zone_count(ws.zone)
 })
 
-const PORT = process.env.PORT || 3773
+let port = process.env.PORT || 3773
 
-server.listen(PORT, () => {
+server.listen(port, () => {
   console.log(`Morse multiplayer server running on http://localhost:${PORT}`)
 })

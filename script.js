@@ -1,8 +1,7 @@
-let MORSE_CODE = Shared.morse_code
-let audio_context = window.AudioContext || window.webkitAudioContext
 let audio_ctx
 let oscillator
 let gain_node
+let audio_context = window.AudioContext || window.webkitAudioContext
 let current_zone = Shared.default_zone
 let current_settings = Shared.zone_settings[1]
 let max_press_duration = current_settings.max_press
@@ -13,7 +12,7 @@ let online_count = 1
 let zone_info_el = document.getElementById(`zone-info`)
 let sound_enabled = true
 let sound_toggle_btn = document.getElementById(`sound-toggle`)
-let remote_lock_time = -3000
+let remote_lock_time = -Shared.lock_time
 
 sound_toggle_btn.addEventListener(`click`, () => {
   sound_enabled = !sound_enabled
@@ -187,7 +186,7 @@ function resolve_letter() {
     return
   }
 
-  let letter = MORSE_CODE[current_sequence]
+  let letter = Shared.morse_code[current_sequence]
 
   if (letter) {
     current_word += letter
@@ -240,11 +239,11 @@ function handle_press(e, is_local = true) {
 
   let now = performance.now()
 
-  if (is_local && now - remote_lock_time < 3000) {
+  if (is_local && ((now - remote_lock_time) < Shared.lock_time)) {
     return
   }
 
-  if (is_local && now - last_input_time < input_throttle_ms) {
+  if (is_local && ((now - last_input_time) < input_throttle_ms)) {
     return
   }
 
@@ -252,7 +251,7 @@ function handle_press(e, is_local = true) {
   is_pressed = true
   press_start_time = now
 
-  if (is_local !== false && ws.readyState === WebSocket.OPEN) {
+  if ((is_local !== false) && (ws.readyState === WebSocket.OPEN)) {
     ws.send(`DOWN`)
   }
 

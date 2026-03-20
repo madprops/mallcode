@@ -21,6 +21,7 @@ const Shared = {
     9: { unit_duration: 80,  letter_mult: 3.0, word_mult: 7, max_press: 500, throttle: 10, forgiving: false }, // Pro/Realistic
   },
   default_zone: `G3`,
+  lock_time: 3000,
 }
 
 if (typeof module !== 'undefined' && module.exports) {
