@@ -11,6 +11,19 @@ let last_input_time = 0
 let input_throttle_ms = current_settings.throttle
 let online_count = 1
 let zone_info_el = document.getElementById(`zone-info`)
+let sound_enabled = true
+let sound_toggle_btn = document.getElementById(`sound-toggle`)
+
+sound_toggle_btn.addEventListener(`click`, () => {
+  sound_enabled = !sound_enabled
+  sound_toggle_btn.style.textDecoration = sound_enabled ? `none` : `line-through`
+
+  if (!sound_enabled && gain_node) {
+    gain_node.gain.setTargetAtTime(0, audio_ctx.currentTime, 0.01)
+  }
+
+  sound_toggle_btn.blur()
+})
 
 function init_audio() {
   if (!audio_ctx) {
@@ -196,6 +209,10 @@ function resolve_word() {
 }
 
 function handle_press(e, is_local = true) {
+  if (e && e.target === sound_toggle_btn) {
+    return
+  }
+
   if (e && (e.type === `mousedown` || e.type === `touchstart`)) {
     if (!document.hasFocus() || performance.now() - last_focus_time < 100) {
       return
@@ -236,7 +253,10 @@ function handle_press(e, is_local = true) {
   clearTimeout(letter_timeout)
   clearTimeout(word_timeout)
   clearTimeout(max_press_timeout)
-  gain_node.gain.setTargetAtTime(0.5, audio_ctx.currentTime, 0.01)
+
+  if (sound_enabled) {
+    gain_node.gain.setTargetAtTime(0.5, audio_ctx.currentTime, 0.01)
+  }
   particle_mesh.material.size = 0.5
 
   max_press_timeout = setTimeout(() => {
@@ -245,6 +265,10 @@ function handle_press(e, is_local = true) {
 }
 
 function handle_release(e, is_local = true) {
+  if (e && e.target === sound_toggle_btn) {
+    return
+  }
+
   if (e && (e.type === `keyup`)) {
     if (e.ctrlKey || e.metaKey || e.altKey) {
       return
@@ -289,6 +313,7 @@ function handle_release(e, is_local = true) {
 }
 
 window.addEventListener(`contextmenu`, (e) => {
+  if (e.target === sound_toggle_btn) return
   e.preventDefault()
   handle_press(e)
 })
@@ -299,11 +324,13 @@ window.addEventListener(`keydown`, handle_press)
 window.addEventListener(`keyup`, handle_release)
 
 window.addEventListener(`touchstart`, (e) => {
+  if (e.target === sound_toggle_btn) return
   e.preventDefault()
   handle_press(e)
 }, {passive: false})
 
 window.addEventListener(`touchend`, (e) => {
+  if (e.target === sound_toggle_btn) return
   e.preventDefault()
   handle_release(e)
 }, {passive: false})
