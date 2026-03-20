@@ -2,6 +2,7 @@ const express = require(`express`)
 const http = require(`http`)
 const WebSocket = require(`ws`)
 const path = require(`path`)
+const fs = require(`fs`)
 const app = express()
 const server = http.createServer(app)
 const wss = new WebSocket.Server({server})
@@ -9,6 +10,35 @@ const Shared = require(`./shared.js`)
 
 let zone_locks = {}
 let next_client_id = 1
+let nouns = new Set()
+
+try {
+  let nouns_data = fs.readFileSync(path.join(__dirname, `nouns.txt`), `utf8`)
+
+  nouns_data.split(`\n`).forEach(line => {
+    const word = line.trim()
+    if (word) nouns.add(word)
+  })
+}
+catch (err) {
+  console.error(`Error loading nouns.txt:`, err)
+}
+
+let zone_data = {}
+let data_file = path.join(__dirname, `data.json`)
+
+try {
+  if (fs.existsSync(data_file)) {
+    zone_data = JSON.parse(fs.readFileSync(data_file, `utf8`))
+  }
+}
+catch (err) {
+  console.error(`Error loading data.json:`, err)
+}
+
+function save_zone_data() {
+  fs.writeFileSync(data_file, JSON.stringify(zone_data, null, 2), `utf8`)
+}
 
 // Serve static files (like script.js and style.css) from the current directory
 app.use(express.static(__dirname))
@@ -55,6 +85,22 @@ function broadcast_zone_count(zone) {
       client.send(`USERS:${count}`)
     }
   })
+}
+
+function broadcast_zone_words(zone, client = null) {
+  let words = zone_data[zone] ? zone_data[zone].words : []
+  let msg = `WORDS:${JSON.stringify(words)}`
+
+  if (client) {
+    client.send(msg)
+  }
+  else {
+    wss.clients.forEach((c) => {
+      if (c.readyState === WebSocket.OPEN && c.zone === zone) {
+        c.send(msg)
+      }
+    })
+  }
 }
 
 wss.on(`connection`, (ws) => {
@@ -107,11 +153,27 @@ wss.on(`connection`, (ws) => {
         if (old_zone !== ws.zone) {
           broadcast_zone_count(old_zone)
           broadcast_zone_count(ws.zone)
+          broadcast_zone_words(ws.zone, ws)
         }
       }
       else if (cmd === `U` && !isNaN(arg) && arg >= 1 && arg <= 9) {
         ws.send(`LINK:/assets/zone/${ws.zone}/file/${arg}`)
       }
+    }
+
+    if ((current_word.length >= 3) && nouns.has(current_word.toLowerCase())) {
+      if (!zone_data[ws.zone]) {
+        zone_data[ws.zone] = {words: []}
+      }
+
+      zone_data[ws.zone].words.push(current_word)
+
+      if (zone_data[ws.zone].words.length > 10) {
+        zone_data[ws.zone].words.shift()
+      }
+
+      save_zone_data()
+      broadcast_zone_words(ws.zone)
     }
 
     current_word = ``
@@ -176,6 +238,7 @@ wss.on(`connection`, (ws) => {
   })
 
   broadcast_zone_count(ws.zone)
+  broadcast_zone_words(ws.zone, ws)
 })
 
 let port = process.env.PORT || 3773

@@ -72,6 +72,30 @@ ws.onmessage = (event) => {
     online_count = parseInt(event.data.split(`:`)[1])
     zone_info_el.innerText = `${current_zone} (${online_count})`
   }
+  else if (event.data.startsWith(`WORDS:`)) {
+    let words = JSON.parse(event.data.substring(6))
+    update_words_display(words)
+  }
+}
+
+let words_container = document.getElementById(`words-container`)
+if (!words_container) {
+  words_container = document.createElement(`div`)
+  words_container.id = `words-container`
+  words_container.style.position = `absolute`
+  words_container.style.left = `20px`
+  words_container.style.top = `50%`
+  words_container.style.transform = `translateY(-50%)`
+  words_container.style.color = `#ffffff`
+  words_container.style.fontFamily = `sans-serif`
+  words_container.style.fontSize = `24px`
+  words_container.style.pointerEvents = `none`
+  words_container.style.zIndex = `10`
+  document.body.appendChild(words_container)
+}
+
+function update_words_display(words) {
+  words_container.innerHTML = words.map(w => `<div>${w}</div>`).join(``)
 }
 
 let canvas = document.getElementById(`glcanvas`)
