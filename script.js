@@ -1,22 +1,14 @@
-let MORSE_CODE = {
-  [`.-`]: `A`, [`-...`]: `B`, [`-.-.`]: `C`, [`-..`]: `D`, [`.`]: `E`,
-  [`..-.`]: `F`, [`--.`]: `G`, [`....`]: `H`, [`..`]: `I`, [`.---`]: `J`,
-  [`-.-`]: `K`, [`.-..`]: `L`, [`--`]: `M`, [`-.`]: `N`, [`---`]: `O`,
-  [`.--.`]: `P`, [`--.-`]: `Q`, [`.-.`]: `R`, [`...`]: `S`, [`-`]: `T`,
-  [`..-`]: `U`, [`...-`]: `V`, [`.--`]: `W`, [`-..-`]: `X`, [`-.--`]: `Y`,
-  [`--..`]: `Z`, [`.----`]: `1`, [`..---`]: `2`, [`...--`]: `3`,
-  [`....-`]: `4`, [`.....`]: `5`, [`-....`]: `6`, [`--...`]: `7`,
-  [`---..`]: `8`, [`----.`]: `9`, [`-----`]: `0`
-}
-
+let MORSE_CODE = Shared.MORSE_CODE
 let audio_context = window.AudioContext || window.webkitAudioContext
 let audio_ctx
 let oscillator
 let gain_node
-let max_press_duration = 1500
+let current_zone = 1
+let current_settings = Shared.ZONE_SETTINGS[current_zone]
+let max_press_duration = current_settings.max_press
 let max_press_timeout = null
 let last_input_time = 0
-let input_throttle_ms = 40
+let input_throttle_ms = current_settings.throttle
 
 function init_audio() {
   if (!audio_ctx) {
@@ -47,7 +39,13 @@ ws.onmessage = (event) => {
     handle_release(null, false)
   }
   else if (event.data.startsWith(`ZONE:`)) {
-    console.log(`Navigated to zone ${event.data.split(`:`)[1]}`)
+    let new_zone = parseInt(event.data.split(`:`)[1])
+    console.log(`Navigated to zone ${new_zone}`)
+    current_zone = new_zone
+    current_settings = Shared.ZONE_SETTINGS[current_zone]
+    max_press_duration = current_settings.max_press
+    input_throttle_ms = current_settings.throttle
+    unit_duration = current_settings.unit_duration
   }
   else if (event.data.startsWith(`LINK:`)) {
     window.open(event.data.substring(5), `_blank`)
@@ -144,7 +142,7 @@ let is_pressed = false
 let press_start_time = 0
 let current_sequence = ``
 let current_word = ``
-let unit_duration = 250
+let unit_duration = current_settings.unit_duration
 let letter_timeout = null
 let word_timeout = null
 
@@ -178,9 +176,7 @@ function resolve_letter() {
 
   current_sequence = ``
   update_sequence_display()
-
-  // Extended word gap (Farnsworth timing) for easier reading
-  word_timeout = setTimeout(resolve_word, unit_duration * 8)
+  word_timeout = setTimeout(resolve_word, unit_duration * current_settings.word_mult)
 }
 
 function resolve_word() {
@@ -278,9 +274,11 @@ function handle_release(e, is_local = true) {
     unit_duration = (unit_duration * 0.7) + (estimated_unit * 0.3)
   }
 
-  unit_duration = Math.max(150, Math.min(500, unit_duration))
+  let min_u = current_settings.forgiving ? 150 : current_settings.unit_duration * 0.8
+  let max_u = current_settings.forgiving ? 500 : current_settings.unit_duration * 1.2
+  unit_duration = Math.max(min_u, Math.min(max_u, unit_duration))
   update_sequence_display()
-  letter_timeout = setTimeout(resolve_letter, unit_duration * 4)
+  letter_timeout = setTimeout(resolve_letter, unit_duration * current_settings.letter_mult)
 }
 
 window.addEventListener(`contextmenu`, (e) => {

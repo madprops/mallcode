@@ -5,17 +5,9 @@ const path = require(`path`)
 const app = express()
 const server = http.createServer(app)
 const wss = new WebSocket.Server({server})
-
-const MORSE_CODE = {
-  [`.-`]: `A`, [`-...`]: `B`, [`-.-.`]: `C`, [`-..`]: `D`, [`.`]: `E`,
-  [`..-.`]: `F`, [`--.`]: `G`, [`....`]: `H`, [`..`]: `I`, [`.---`]: `J`,
-  [`-.-`]: `K`, [`.-..`]: `L`, [`--`]: `M`, [`-.`]: `N`, [`---`]: `O`,
-  [`.--.`]: `P`, [`--.-`]: `Q`, [`.-.`]: `R`, [`...`]: `S`, [`-`]: `T`,
-  [`..-`]: `U`, [`...-`]: `V`, [`.--`]: `W`, [`-..-`]: `X`, [`-.--`]: `Y`,
-  [`--..`]: `Z`, [`.----`]: `1`, [`..---`]: `2`, [`...--`]: `3`,
-  [`....-`]: `4`, [`.....`]: `5`, [`-....`]: `6`, [`--...`]: `7`,
-  [`---..`]: `8`, [`----.`]: `9`, [`-----`]: `0`
-}
+const Shared = require(`./shared.js`)
+const MORSE_CODE = Shared.MORSE_CODE
+const ZONE_SETTINGS = Shared.ZONE_SETTINGS
 
 // Serve static files (like script.js and style.css) from the current directory
 app.use(express.static(__dirname))
@@ -38,10 +30,11 @@ wss.on(`connection`, (ws) => {
   let press_start_time = 0
   let current_sequence = ``
   let current_word = ``
-  let unit_duration = 250
+  ws.zone = 1 // default zone
+  let current_settings = ZONE_SETTINGS[ws.zone]
+  let unit_duration = current_settings.unit_duration
   let letter_timeout = null
   let word_timeout = null
-  ws.zone = 1 // default zone
 
   function resolve_letter() {
     if (!current_sequence) return
@@ -52,7 +45,7 @@ wss.on(`connection`, (ws) => {
     }
 
     current_sequence = ``
-    word_timeout = setTimeout(resolve_word, unit_duration * 8)
+    word_timeout = setTimeout(resolve_word, unit_duration * current_settings.word_mult)
   }
 
   function resolve_word() {
@@ -64,6 +57,8 @@ wss.on(`connection`, (ws) => {
 
       if (cmd === `G` && !isNaN(arg) && arg >= 1 && arg <= 9) {
         ws.zone = arg
+        current_settings = ZONE_SETTINGS[ws.zone]
+        unit_duration = current_settings.unit_duration
         ws.send(`ZONE:${arg}`)
       } else if (cmd === `U` && !isNaN(arg) && arg >= 1 && arg <= 9) {
         ws.send(`LINK:/assets/zone/${ws.zone}/file/${arg}`)
@@ -101,14 +96,16 @@ wss.on(`connection`, (ws) => {
           unit_duration = (unit_duration * 0.7) + (estimated_unit * 0.3)
         }
 
-        unit_duration = Math.max(150, Math.min(500, unit_duration))
-        letter_timeout = setTimeout(resolve_letter, unit_duration * 4)
+        let min_u = current_settings.forgiving ? 150 : current_settings.unit_duration * 0.8
+        let max_u = current_settings.forgiving ? 500 : current_settings.unit_duration * 1.2
+        unit_duration = Math.max(min_u, Math.min(max_u, unit_duration))
+        letter_timeout = setTimeout(resolve_letter, unit_duration * current_settings.letter_mult)
       }
     }
 
     // Broadcast the signal to all OTHER connected clients (no identifiers)
     wss.clients.forEach((client) => {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
+      if (client !== ws && client.readyState === WebSocket.OPEN && client.zone === ws.zone) {
         client.send(signal)
       }
     })
