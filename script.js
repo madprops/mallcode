@@ -24,7 +24,6 @@ function init_audio() {
     gain_node = audio_ctx.createGain()
     gain_node.gain.value = 0
     gain_node.connect(audio_ctx.destination)
-
     oscillator = audio_ctx.createOscillator()
     oscillator.type = `sine`
     oscillator.frequency.value = 600
@@ -53,13 +52,10 @@ let canvas = document.getElementById(`glcanvas`)
 let renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: true, alpha: true})
 renderer.setSize(window.innerWidth, window.innerHeight)
 renderer.setPixelRatio(window.devicePixelRatio)
-
 let scene = new THREE.Scene()
 scene.fog = new THREE.FogExp2(0x020208, 0.0015)
-
 let camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000)
 camera.position.z = 40
-
 let particles_geometry = new THREE.BufferGeometry()
 let particles_count = 3000
 let pos_array = new Float32Array(particles_count * 3)
@@ -77,9 +73,9 @@ let particles_material = new THREE.PointsMaterial({
   opacity: 0.6,
   blending: THREE.AdditiveBlending
 })
+
 let particle_mesh = new THREE.Points(particles_geometry, particles_material)
 scene.add(particle_mesh)
-
 let sprites = []
 let active_sequence_sprite = null
 
@@ -88,7 +84,6 @@ function create_text_texture(text, is_word = false, is_sequence = false) {
   text_canvas.width = 1024
   text_canvas.height = 256
   let ctx = text_canvas.getContext(`2d`)
-
   ctx.clearRect(0, 0, text_canvas.width, text_canvas.height)
 
   if (is_word) {
@@ -109,7 +104,6 @@ function create_text_texture(text, is_word = false, is_sequence = false) {
   ctx.shadowColor = ctx.fillStyle
   ctx.shadowBlur = is_sequence ? 10 : 30
   ctx.fillText(text, text_canvas.width / 2, text_canvas.height / 2)
-
   return new THREE.CanvasTexture(text_canvas)
 }
 
@@ -139,7 +133,6 @@ function spawn_sprite(text, type) {
   }
 
   scene.add(sprite)
-
   return sprite
 }
 
@@ -223,7 +216,6 @@ function handle_press(e, is_local = true) {
   clearTimeout(letter_timeout)
   clearTimeout(word_timeout)
   clearTimeout(max_press_timeout)
-
   gain_node.gain.setTargetAtTime(0.5, audio_ctx.currentTime, 0.01)
   particle_mesh.material.size = 0.5
 
@@ -240,7 +232,6 @@ function handle_release(e, is_local = true) {
 
   let now = performance.now()
   is_pressed = false
-
   clearTimeout(max_press_timeout)
 
   // We don't throttle the release to ensure the socket doesn't get stuck in a DOWN state,
@@ -268,7 +259,6 @@ function handle_release(e, is_local = true) {
 
   unit_duration = Math.max(50, Math.min(250, unit_duration))
   update_sequence_display()
-
   letter_timeout = setTimeout(resolve_letter, unit_duration * 3)
 }
 
@@ -297,12 +287,9 @@ let clock = new THREE.Clock()
 
 function animate() {
   requestAnimationFrame(animate)
-
   let delta = clock.getDelta()
-
   particle_mesh.rotation.y += 0.02 * delta
   particle_mesh.rotation.x += 0.01 * delta
-
   let target_z = is_pressed ? 35 : 40
   camera.position.z = THREE.MathUtils.lerp(camera.position.z, target_z, 0.15)
 
@@ -311,10 +298,8 @@ function animate() {
     s.position.add(s.userData.velocity)
     s.userData.age += delta
     s.userData.life -= s.userData.decay
-
     let fade_in = Math.min(1.0, s.userData.age * 3.0)
     s.material.opacity = Math.max(0, fade_in * s.userData.life)
-
     s.scale.x += s.userData.decay * 10
     s.scale.y += s.userData.decay * 5
 
