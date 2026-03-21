@@ -283,9 +283,10 @@ App.handle_press = (e, is_local = true) => {
   }
 
   if (e && e.type === `keydown`) {
-    if ((e.key === `Meta`) || (e.key === `OS`) || (e.key === `Control`) || (e.key === `Alt`) || (e.key === `Shift`)) {
+    if ([`Meta`, `OS`, `Control`, `Alt`, `Shift`, `F5`, `F11`, `F12`].includes(e.key)) {
       return
     }
+
     if (e.ctrlKey || e.metaKey || e.altKey) {
       return
     }
@@ -341,7 +342,7 @@ App.handle_release = (e, is_local = true) => {
   }
 
   if (e && (e.type === `keyup`)) {
-    if ((e.key === `Meta`) || (e.key === `OS`) || (e.key === `Control`) || (e.key === `Alt`) || (e.key === `Shift`)) {
+    if ([`Meta`, `OS`, `Control`, `Alt`, `Shift`, `F5`, `F12`].includes(e.key)) {
       return
     }
 
