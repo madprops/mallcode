@@ -208,9 +208,11 @@ App.process_word = (zone, current_word, ws) => {
 }
 
 App.setup_sockets = () => {
-  App.wss.on(`connection`, (ws) => {
+  App.wss.on(`connection`, (ws, req) => {
     ws.is_alive = true
     ws.id = App.next_client_id++
+    ws.ip = req.headers[`x-forwarded-for`] || req.socket.remoteAddress
+    ws.username = App.shared.random_word(3, true, ws.ip)
     ws.zone = App.default_zone()
     ws.unit_duration = null
 

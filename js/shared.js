@@ -79,6 +79,33 @@ Shared.create_seeded_random = (seed) => {
   }
 }
 
+Shared.random_word = (parts = 3, cap = true, seed = null) => {
+  let cons = `bcdfghjklmnpqrstvwxyz`
+  let vowels = `aeiou`
+  let rng = seed ? Shared.create_seeded_random(Shared.get_string_hash(seed.toString())) : Math.random
+  let cons_next = Math.floor(rng() * 2) === 0
+  let word = ``
+
+  for (let i = 0; i < parts * 2; i++) {
+    if (cons_next) {
+      let index = Math.floor(rng() * cons.length)
+      word += cons[index]
+    }
+    else {
+      let index = Math.floor(rng() * vowels.length)
+      word += vowels[index]
+    }
+
+    cons_next = !cons_next
+  }
+
+  if (cap) {
+    word = word.charAt(0).toUpperCase() + word.slice(1)
+  }
+
+  return word
+}
+
 if ((typeof module !== `undefined`) && module.exports) {
   module.exports = Shared
 }
