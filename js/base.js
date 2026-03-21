@@ -41,6 +41,8 @@ ws.onmessage = (event) => {
     unit_duration = App.zone_settings.unit_duration
     App.zone_info_el.innerText = `${App.zone} (${App.online_count})`
     App.play_warp_drive()
+    let theme = App.get_theme(App.zone)
+    App.particles_material.color.set(theme.particles)
   }
   else if (data.type === `MODAL`) {
     App.show_modal(data.text)
@@ -111,7 +113,8 @@ App.setup_canvas = () => {
   }
 
   App.particles_geometry.setAttribute(`position`, new THREE.BufferAttribute(pos_array, 3))
-  App.particles_material = new THREE.PointsMaterial({size: 0.15, color: 0x4488ff, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending})
+  let theme = App.get_theme(App.zone)
+  App.particles_material = new THREE.PointsMaterial({size: 0.15, color: new THREE.Color(theme.particles), transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending})
   App.particle_mesh = new THREE.Points(App.particles_geometry, App.particles_material)
   App.scene.add(App.particle_mesh)
   App.sprites = []
@@ -446,13 +449,15 @@ App.get_theme = (zone) => {
   let random = App.create_seeded_random(seed)
   let base_hue = random() * 360
   let hue1 = base_hue
-  let hue2 = (base_hue + 120 + (random() * 40 - 20)) % 360
-  let hue3 = (base_hue + 240 + (random() * 40 - 20)) % 360
+  let hue2 = (base_hue + 120 + random() * 40 - 20) % 360
+  let hue3 = (base_hue + 240 + random() * 40 - 20) % 360
+  let particle_hue = random() * 360
 
   return {
-    letter: `hsl(${hue1.toFixed(1)}, ${(70 + random() * 30).toFixed(1)}%, ${(60 + random() * 20).toFixed(1)}%)`,
-    word: `hsl(${hue2.toFixed(1)}, ${(70 + random() * 30).toFixed(1)}%, ${(60 + random() * 20).toFixed(1)}%)`,
-    sequence: `hsl(${hue3.toFixed(1)}, ${(70 + random() * 30).toFixed(1)}%, ${(60 + random() * 20).toFixed(1)}%)`,
+    letter: `hsl(${Math.round(hue1)}, ${Math.round(70 + random() * 30)}%, ${Math.round(60 + random() * 20)}%)`,
+    word: `hsl(${Math.round(hue2)}, ${Math.round(70 + random() * 30)}%, ${Math.round(60 + random() * 20)}%)`,
+    sequence: `hsl(${Math.round(hue3)}, ${Math.round(70 + random() * 30)}%, ${Math.round(60 + random() * 20)}%)`,
+    particles: `hsl(${Math.round(particle_hue)}, ${Math.round(80 + random() * 20)}%, ${Math.round(30 + random() * 20)}%)`
   }
 }
 
