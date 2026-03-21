@@ -1,16 +1,15 @@
-const App = {}
+let App = {}
 
 App.express = require(`express`)
 App.app = App.express()
-const http = require(`http`)
-const WebSocket = require(`ws`)
-const path = require(`path`)
-const fs = require(`fs`)
+let http = require(`http`)
+let WebSocket = require(`ws`)
+let path = require(`path`)
+let fs = require(`fs`)
 App.server = http.createServer(App.app)
 App.wss = new WebSocket.Server({server: App.server})
 App.shared = require(`./js/shared.js`)
 
-App.zone_locks = {}
 App.zone_states = {}
 App.next_client_id = 1
 App.nouns = new Set()
@@ -101,7 +100,6 @@ App.get_zone_state = (zone) => {
     let settings = App.shared.zone_settings[z_num] || App.shared.zone_settings[5]
 
     App.zone_states[zone] = {
-      unit_duration: settings.unit_duration,
       current_sequence: ``,
       current_word: ``,
       press_start_time: 0,
@@ -129,15 +127,16 @@ App.resolve_letter = (zone) => {
   }
 
   let msg = JSON.stringify({type: `LETTER`, char: letter})
-
   App.wss.clients.forEach((c) => {
+
     if ((c.readyState === WebSocket.OPEN) && (c.zone === zone)) {
       c.send(msg)
     }
   })
 
   z_state.current_sequence = ``
-  z_state.word_timeout = setTimeout(() => App.resolve_word(zone), z_state.unit_duration * z_state.settings.word_mult)
+  let unit = z_state.last_active_ws ? (z_state.last_active_ws.unit_duration || z_state.settings.unit_duration) : z_state.settings.unit_duration
+  z_state.word_timeout = setTimeout(() => App.resolve_word(zone), unit * z_state.settings.word_mult)
 }
 
 App.resolve_word = (zone) => {
@@ -210,6 +209,7 @@ App.setup_sockets = () => {
     ws.is_alive = true
     ws.id = App.next_client_id++
     ws.zone = App.default_zone()
+    ws.unit_duration = null
 
     ws.on(`pong`, () => {
       ws.is_alive = true
@@ -248,22 +248,30 @@ App.setup_sockets = () => {
       }
 
       let now = Date.now()
-      let lock = App.zone_locks[ws.zone]
-
-      if ((lock && lock.owner !== ws.id) && (lock.expires > now)) {
-        return
-      }
-
-      if (ws.last_msg_time && (now - ws.last_msg_time < 20)) {
-        return
-      }
-
-      ws.last_msg_time = now
-      App.zone_locks[ws.zone] = {owner: ws.id, expires: now + App.shared.lock_time}
       let z_state = App.get_zone_state(ws.zone)
-      z_state.last_active_ws = ws
+
+      if (!ws.unit_duration) {
+        ws.unit_duration = z_state.settings.unit_duration
+      }
 
       if (signal === `DOWN`) {
+        if (z_state.last_active_ws && (z_state.last_active_ws !== ws)) {
+          z_state.is_pressed = false
+          clearTimeout(z_state.letter_timeout)
+          clearTimeout(z_state.word_timeout)
+
+          if (z_state.current_sequence) {
+            App.resolve_letter(ws.zone)
+          }
+
+          if (z_state.current_word) {
+            clearTimeout(z_state.word_timeout)
+            App.resolve_word(ws.zone)
+          }
+        }
+
+        z_state.last_active_ws = ws
+
         if (z_state.is_pressed) {
           return
         }
@@ -281,6 +289,10 @@ App.setup_sockets = () => {
         })
       }
       else if (signal === `UP`) {
+        if (z_state.last_active_ws && (z_state.last_active_ws !== ws)) {
+          return
+        }
+
         if (!z_state.is_pressed) {
           return
         }
@@ -292,25 +304,25 @@ App.setup_sockets = () => {
           let max_seq_length = 15
 
           if (z_state.current_sequence.length < max_seq_length) {
-            if (duration < z_state.unit_duration * 1.5) {
+            if (duration < ws.unit_duration * 1.5) {
               z_state.current_sequence += `.`
               let estimated_unit = duration
-              z_state.unit_duration = z_state.unit_duration * 0.7 + estimated_unit * 0.3
+              ws.unit_duration = ws.unit_duration * 0.7 + estimated_unit * 0.3
             }
             else {
               z_state.current_sequence += `-`
               let estimated_unit = duration / 3
-              z_state.unit_duration = z_state.unit_duration * 0.7 + estimated_unit * 0.3
+              ws.unit_duration = ws.unit_duration * 0.7 + estimated_unit * 0.3
             }
           }
 
           let min_u = z_state.settings.forgiving ? 150 : z_state.settings.unit_duration * 0.8
           let max_u = z_state.settings.forgiving ? 500 : z_state.settings.unit_duration * 1.2
-          z_state.unit_duration = Math.max(min_u, Math.min(max_u, z_state.unit_duration))
+          ws.unit_duration = Math.max(min_u, Math.min(max_u, ws.unit_duration))
           let msg_up = JSON.stringify({type: `UP`})
 
           App.wss.clients.forEach((client) => {
-            if (client !== ws && client.readyState === WebSocket.OPEN && client.zone === ws.zone) {
+            if ((client !== ws) && (client.readyState) === WebSocket.OPEN && (client.zone === ws.zone)) {
               client.send(msg_up)
             }
           })
@@ -318,12 +330,12 @@ App.setup_sockets = () => {
           let msg_seq = JSON.stringify({type: `SEQUENCE`, sequence: z_state.current_sequence})
 
           App.wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN && client.zone === ws.zone) {
+            if ((client.readyState === WebSocket.OPEN) && (client.zone === ws.zone)) {
               client.send(msg_seq)
             }
           })
 
-          z_state.letter_timeout = setTimeout(() => App.resolve_letter(ws.zone), z_state.unit_duration * z_state.settings.letter_mult)
+          z_state.letter_timeout = setTimeout(() => App.resolve_letter(ws.zone), ws.unit_duration * z_state.settings.letter_mult)
         }
       }
     })
