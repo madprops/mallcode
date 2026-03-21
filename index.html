@@ -9,11 +9,23 @@
     </head>
 
     <body>
+        <script>
+            const App = {}
+        </script>
+
         <div id="zone-info">G1 (1 online)</div>
         <button id="sound-toggle">🔊</button>
         <canvas id="glcanvas"></canvas>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
         <script src="shared.js"></script>
-        <script src="script.js"></script>
+        <script src="js/base.js"></script>
+        <script src="js/sound.js"></script>
+        <script src="js/utils.js"></script>
+
+        <script>
+            window.onload = () => {
+                App.init()
+            }
+        </script>
     </body>
 </html>
