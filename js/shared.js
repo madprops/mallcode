@@ -1,17 +1,5 @@
 const Shared = {}
 
-Shared.default_zone = () => {
-  let date = new Date()
-  let day = String(date.getDate()).padStart(2, `0`)
-  let month = String(date.getMonth() + 1).padStart(2, `0`)
-  let year = date.getFullYear()
-  let date_str = `${day}/${month}/${year}`
-  let hash = Shared.get_string_hash(date_str)
-  let rng = Shared.create_seeded_random(hash)
-  let letter = String.fromCharCode(65 + Math.floor(rng() * 26)) // A-Z
-  return `${letter}5`
-}
-
 Shared.morse_code = {
   ".-":         `A`,
   "-...":       `B`,

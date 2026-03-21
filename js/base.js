@@ -1,64 +1,73 @@
-App.zone = Shared.default_zone()
-App.zone_settings = Shared.zone_settings[parseInt(App.zone.charAt(1))]
-App.max_press_duration = App.zone_settings.max_press
+App.started = false
+App.zone = `nothing`
 App.max_press_timeout = null
 App.last_input_time = 0
-App.input_throttle_ms = App.zone_settings.throttle
 App.online_count = 1
 App.last_focus_time = 0
 App.zone_info_el = document.getElementById(`zone-info`)
 App.sound_btn = document.getElementById(`sound-toggle`)
 App.remote_lock_time = -Shared.lock_time
 let protocol = window.location.protocol === `https:` ? `wss:` : `ws:`
-let ws = new WebSocket(`${protocol}//${window.location.host}`)
+App.ws = new WebSocket(`${protocol}//${window.location.host}`)
+App.is_pressed = false
+App.press_start_time = 0
+App.current_sequence = ``
+App.current_word = ``
+App.letter_timeout = null
+App.word_timeout = null
 
-ws.onmessage = (event) => {
-  let data
+App.setup_socket = () => {
+  App.ws.onmessage = (event) => {
+    let data
 
-  try {
-    data = JSON.parse(event.data)
-  }
-  catch (err) {
-    return
-  }
-
-  if (data.type === `DOWN`) {
-    App.remote_lock_time = performance.now()
-    App.handle_press(null, false)
-  }
-  else if (data.type === `UP`) {
-    App.remote_lock_time = performance.now()
-    App.handle_release(null, false)
-  }
-  else if (data.type === `ZONE`) {
-    let new_zone = data.zone
-    console.log(`Navigated to zone ${new_zone}`)
-    App.zone = new_zone
-    App.zone_settings = Shared.zone_settings[parseInt(App.zone.charAt(1))]
-    App.max_press_duration = App.zone_settings.max_press
-    App.input_throttle_ms = App.zone_settings.throttle
-    unit_duration = App.zone_settings.unit_duration
-    App.zone_info_el.innerText = `${App.zone} (${App.online_count})`
-    App.play_warp_drive()
-    let theme = App.get_theme(App.zone)
-    App.particles_material.color.set(theme.particles)
-
-    if (App.particles_material.map) {
-      App.particles_material.map.dispose()
+    try {
+      data = JSON.parse(event.data)
+    }
+    catch (err) {
+      return
     }
 
-    App.particles_material.map = App.create_particle_texture(theme)
-    App.particles_material.needsUpdate = true
-  }
-  else if (data.type === `MODAL`) {
-    App.show_modal(data.text)
-  }
-  else if (data.type === `USERS`) {
-    App.online_count = data.count
-    App.zone_info_el.innerText = `${App.zone} (${App.online_count})`
-  }
-  else if (data.type === `WORDS`) {
-    App.update_words_display(data.words)
+    if (data.type === `DOWN`) {
+      App.remote_lock_time = performance.now()
+      App.handle_press(null, false)
+    }
+    else if (data.type === `UP`) {
+      App.remote_lock_time = performance.now()
+      App.handle_release(null, false)
+    }
+    else if (data.type === `ZONE`) {
+      if (!App.started) {
+        App.start()
+      }
+
+      App.zone = data.zone
+      console.log(`Navigated to zone ${data.zone}`)
+      App.zone_settings = Shared.zone_settings[parseInt(App.zone.charAt(1))]
+      App.max_press_duration = App.zone_settings.max_press
+      App.input_throttle_ms = App.zone_settings.throttle
+      App.unit_duration = App.zone_settings.unit_duration
+      App.zone_info_el.innerText = `${App.zone} (${App.online_count})`
+      App.play_warp_drive()
+      let theme = App.get_theme(App.zone)
+      App.particles_material.color.set(theme.particles)
+
+      if (App.particles_material.map) {
+        App.particles_material.map.dispose()
+      }
+
+      App.particles_material.map = App.create_particle_texture(theme)
+      App.particles_material.needsUpdate = true
+    }
+    else if (data.type === `MODAL`) {
+      App.show_modal(data.text)
+    }
+    else if (data.type === `USERS`) {
+      App.online_count = data.count
+      App.zone_info_el.innerText = `${App.zone} (${App.online_count})`
+    }
+    else if (data.type === `WORDS`) {
+      App.update_words_display(data.words)
+    }
   }
 }
 
@@ -230,14 +239,6 @@ App.spawn_sprite = (text, type) => {
   return sprite
 }
 
-let is_pressed = false
-let press_start_time = 0
-let current_sequence = ``
-let current_word = ``
-let unit_duration = App.zone_settings.unit_duration
-let letter_timeout = null
-let word_timeout = null
-
 App.update_sequence_display = () => {
   if (App.active_sequence_sprite) {
     App.scene.remove(App.active_sequence_sprite)
@@ -246,38 +247,38 @@ App.update_sequence_display = () => {
     App.active_sequence_sprite = null
   }
 
-  if (current_sequence) {
-    App.active_sequence_sprite = App.spawn_sprite(current_sequence, `sequence`)
+  if (App.current_sequence) {
+    App.active_sequence_sprite = App.spawn_sprite(App.current_sequence, `sequence`)
   }
 }
 
 App.resolve_letter = () => {
-  if (!current_sequence) {
+  if (!App.current_sequence) {
     return
   }
 
-  let letter = Shared.morse_code[current_sequence]
+  let letter = Shared.morse_code[App.current_sequence]
 
   if (letter) {
-    current_word += letter
+    App.current_word += letter
     App.spawn_sprite(letter, `letter`)
   }
   else {
     App.spawn_sprite(`?`, `letter`)
   }
 
-  current_sequence = ``
+  App.current_sequence = ``
   App.update_sequence_display()
-  word_timeout = setTimeout(App.resolve_word, unit_duration * App.zone_settings.word_mult)
+  App.word_timeout = setTimeout(App.resolve_word, App.unit_duration * App.zone_settings.word_mult)
 }
 
 App.resolve_word = () => {
-  if (!current_word) {
+  if (!App.current_word) {
     return
   }
 
-  App.spawn_sprite(current_word, `word`)
-  current_word = ``
+  App.spawn_sprite(App.current_word, `word`)
+  App.current_word = ``
 }
 
 App.handle_press = (e, is_local = true) => {
@@ -314,7 +315,7 @@ App.handle_press = (e, is_local = true) => {
     return
   }
 
-  if (is_pressed) {
+  if (App.is_pressed) {
     return
   }
 
@@ -329,15 +330,15 @@ App.handle_press = (e, is_local = true) => {
   }
 
   App.last_input_time = now
-  is_pressed = true
-  press_start_time = now
+  App.is_pressed = true
+  App.press_start_time = now
 
-  if ((is_local !== false) && (ws.readyState === WebSocket.OPEN)) {
-    ws.send(JSON.stringify({type: `DOWN`}))
+  if ((is_local !== false) && (App.ws.readyState === WebSocket.OPEN)) {
+    App.ws.send(JSON.stringify({type: `DOWN`}))
   }
 
-  clearTimeout(letter_timeout)
-  clearTimeout(word_timeout)
+  clearTimeout(App.letter_timeout)
+  clearTimeout(App.word_timeout)
   clearTimeout(App.max_press_timeout)
 
   if (App.sound_enabled()) {
@@ -368,39 +369,39 @@ App.handle_release = (e, is_local = true) => {
     e.preventDefault()
   }
 
-  if (!is_pressed) {
+  if (!App.is_pressed) {
     return
   }
 
   let now = performance.now()
-  is_pressed = false
+  App.is_pressed = false
   clearTimeout(App.max_press_timeout)
   App.last_input_time = now
 
-  if ((is_local !== false) && (ws.readyState === WebSocket.OPEN)) {
-    ws.send(JSON.stringify({type: `UP`}))
+  if ((is_local !== false) && (App.ws.readyState === WebSocket.OPEN)) {
+    App.ws.send(JSON.stringify({type: `UP`}))
   }
 
-  let duration = now - press_start_time
+  let duration = now - App.press_start_time
   App.mute_beep()
   App.particle_mesh.material.size = 0.15
 
-  if (duration < (unit_duration * 1.5)) {
-    current_sequence += `.`
+  if (duration < (App.unit_duration * 1.5)) {
+    App.current_sequence += `.`
     let estimated_unit = duration
-    unit_duration = (unit_duration * 0.7) + (estimated_unit * 0.3)
+    App.unit_duration = (App.unit_duration * 0.7) + (estimated_unit * 0.3)
   }
   else {
-    current_sequence += `-`
+    App.current_sequence += `-`
     let estimated_unit = duration / 3
-    unit_duration = (unit_duration * 0.7) + (estimated_unit * 0.3)
+    App.unit_duration = (App.unit_duration * 0.7) + (estimated_unit * 0.3)
   }
 
   let min_u = App.zone_settings.forgiving ? 150 : App.zone_settings.unit_duration * 0.8
   let max_u = App.zone_settings.forgiving ? 500 : App.zone_settings.unit_duration * 1.2
-  unit_duration = Math.max(min_u, Math.min(max_u, unit_duration))
+  App.unit_duration = Math.max(min_u, Math.min(max_u, App.unit_duration))
   App.update_sequence_display()
-  letter_timeout = setTimeout(App.resolve_letter, unit_duration * App.zone_settings.letter_mult)
+  App.letter_timeout = setTimeout(App.resolve_letter, App.unit_duration * App.zone_settings.letter_mult)
 }
 
 App.setup_events = () => {
@@ -465,7 +466,7 @@ App.animate = () => {
   let delta = App.clock.getDelta()
   App.particle_mesh.rotation.y += 0.02 * delta
   App.particle_mesh.rotation.x += 0.01 * delta
-  let target_z = is_pressed ? 35 : 40
+  let target_z = App.is_pressed ? 35 : 40
   App.camera.position.z = THREE.MathUtils.lerp(App.camera.position.z, target_z, 0.15)
 
   for (let i = App.sprites.length - 1; i >= 0; i--) {
@@ -510,9 +511,14 @@ App.get_theme = (zone) => {
   }
 }
 
-App.init = () => {
+App.start = () => {
   App.setup_canvas()
   App.setup_events()
   App.setup_sound()
   App.animate()
+  App.started = true
+}
+
+App.init = () => {
+  App.setup_socket()
 }

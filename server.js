@@ -8,7 +8,7 @@ const path = require(`path`)
 const fs = require(`fs`)
 App.server = http.createServer(App.app)
 const wss = new WebSocket.Server({server: App.server})
-App.shared = require(`./shared.js`)
+App.shared = require(`./js/shared.js`)
 
 App.zone_locks = {}
 App.next_client_id = 1
@@ -94,7 +94,7 @@ App.broadcast_zone_words = (zone, client = null) => {
 App.setup_sockets = () => {
   wss.on(`connection`, (ws) => {
     ws.id = App.next_client_id++
-    ws.zone = App.shared.default_zone()
+    ws.zone = App.default_zone()
     let is_pressed = false
     let press_start_time = 0
     let current_sequence = ``
@@ -237,6 +237,7 @@ App.setup_sockets = () => {
 
     App.broadcast_zone_count(ws.zone)
     App.broadcast_zone_words(ws.zone, ws)
+    ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone}))
   })
 }
 
@@ -246,6 +247,18 @@ App.start_server = () => {
   App.server.listen(port, () => {
     console.log(`Morse multiplayer server running on http://localhost:${port}`)
   })
+}
+
+App.default_zone = () => {
+  let date = new Date()
+  let day = String(date.getDate()).padStart(2, `0`)
+  let month = String(date.getMonth() + 1).padStart(2, `0`)
+  let year = date.getFullYear()
+  let date_str = `${day}/${month}/${year}`
+  let hash = App.shared.get_string_hash(date_str)
+  let rng = App.shared.create_seeded_random(hash)
+  let letter = String.fromCharCode(65 + Math.floor(rng() * 26)) // A-Z
+  return `${letter}5`
 }
 
 App.get_nouns()
