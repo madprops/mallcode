@@ -167,7 +167,7 @@ App.process_word = (zone, current_word, ws) => {
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({
         type: `MODAL`,
-        text: `Use the dials in the top right to change zones.\n\nThe higher the number the higher the speed.\n\nFor example: E4, G1, X9.`
+        text: `Use the dials on the top right to change zones.\n\nThe higher the number the higher the speed.\n\nFor example: E4, G1, X9.`
       }))
     }
   }
