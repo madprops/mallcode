@@ -7,12 +7,13 @@ App.last_focus_time = 0
 App.zone_info_el = document.getElementById(`zone-info`)
 App.sound_btn = document.getElementById(`sound-toggle`)
 App.remote_lock_time = -Shared.lock_time
-let protocol = window.location.protocol === `https:` ? `wss:` : `ws:`
-App.ws = new WebSocket(`${protocol}//${window.location.host}`)
+App.protocol = window.location.protocol === `https:` ? `wss:` : `ws:`
+App.ws = new WebSocket(`${App.protocol}//${window.location.host}`)
 App.is_pressed = false
 App.press_start_time = 0
 App.current_sequence = ``
 App.current_word = ``
+App.last_typist_was_local = true
 App.letter_timeout = null
 App.word_timeout = null
 
@@ -332,6 +333,7 @@ App.handle_press = (e, is_local = true) => {
   App.last_input_time = now
   App.is_pressed = true
   App.press_start_time = now
+  App.last_typist_was_local = is_local
 
   if ((is_local !== false) && (App.ws.readyState === WebSocket.OPEN)) {
     App.ws.send(JSON.stringify({type: `DOWN`}))
