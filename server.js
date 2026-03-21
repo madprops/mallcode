@@ -161,8 +161,8 @@ App.resolve_word = (zone) => {
   App.process_word(zone, current_word, z_state.last_active_ws)
 }
 
-App.help_text = `Use the dials on the top right to change zones.\n\n
-The higher the number the higher the speed.\n\n
+App.help_text = `Use the dials on the top right to change zones.
+The higher the number the higher the speed.
 For example: E4, G1, X9.`
 
 App.process_word = (zone, current_word, ws) => {
