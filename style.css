@@ -75,7 +75,6 @@ body, html {
     font-family: sans-serif;
     font-size: 18px;
     font-weight: bold;
-    pointer-events: none;
     z-index: 10;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
@@ -98,12 +97,10 @@ body, html {
   letter-spacing: 2px;
   cursor: pointer;
   outline: none;
-
   background-image: linear-gradient(45deg, transparent 50%, #fff 50%), linear-gradient(135deg, #fff 50%, transparent 50%);
   background-position: calc(100% - 16px) calc(50% + 2px), calc(100% - 11px) calc(50% + 2px);
   background-size: 5px 5px, 5px 5px;
   background-repeat: no-repeat;
-
   box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.05);
   transition: all 0.2s ease-in-out;
 }
@@ -111,7 +108,6 @@ body, html {
 .dial:hover {
   border-color: #fff;
   background-color: rgba(25, 25, 30, 0.9);
-  /* Adds a tactical HUD glow when interacting */
   box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.2), 0 0 8px rgba(255, 255, 255, 0.3);
   text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
 }
@@ -121,6 +117,7 @@ body, html {
   color: #fff;
   font-family: monospace;
   padding: 10px;
+  font-size: 16px;
 }
 
 .corner {
@@ -129,6 +126,7 @@ body, html {
     gap: 20px;
     align-items: center;
     justify-content: center;
+    user-select: none;
 }
 
 #top-left {
@@ -143,4 +141,8 @@ body, html {
     top: var(--hud_top);
     right: 20px;
     z-index: 10;
+}
+
+#words-container {
+    user-select: none;
 }
