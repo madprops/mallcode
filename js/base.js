@@ -592,10 +592,12 @@ App.setup_dials = () => {
   }
 
   letter_dial.addEventListener(`change`, () => {
+    letter_dial.blur()
     App.zone_change_debouncer.call()
   })
 
   speed_dial.addEventListener(`change`, () => {
+    speed_dial.blur()
     App.zone_change_debouncer.call()
   })
 }
