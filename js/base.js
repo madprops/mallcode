@@ -4,9 +4,9 @@ App.max_press_timeout = null
 App.last_input_time = 0
 App.online_count = 1
 App.last_focus_time = 0
-App.zone_info_el = document.getElementById(`zone-info`)
-App.username_info_el = document.getElementById(`username-info`)
-App.sound_btn = document.getElementById(`sound-toggle`)
+App.zone_info_el = DOM.el(`#zone-info`)
+App.username_info_el = DOM.el(`#username-info`)
+App.sound_btn = DOM.el(`#sound-toggle`)
 App.protocol = window.location.protocol === `https:` ? `wss:` : `ws:`
 App.is_pressed = false
 App.press_start_time = 0
@@ -22,8 +22,8 @@ App.create_debouncers = () => {
   }, App.restore_username_delay)
 
   App.zone_change_debouncer = Shared.create_debouncer(() => {
-    let letter = document.getElementById(`zone-letter`).value
-    let speed = document.getElementById(`zone-speed`).value
+    let letter = DOM.el(`#zone-letter`).value
+    let speed = DOM.el(`#zone-speed`).value
     let new_zone = `${letter}${speed}`
 
     if ((new_zone !== App.zone) && App.ws && (App.ws.readyState === WebSocket.OPEN)) {
@@ -97,15 +97,13 @@ App.setup_socket = () => {
       App.unit_duration = App.zone_settings.unit_duration
       App.zone_info_el.innerText = `Users: ${App.online_count}`
       App.play_warp_drive()
-      let letter_dial = document.getElementById(`zone-letter`)
-      let speed_dial = document.getElementById(`zone-speed`)
 
-      if (letter_dial) {
-        letter_dial.value = App.zone.charAt(0)
+      if (App.letter_dial_el) {
+        App.letter_dial_el.value = App.zone.charAt(0)
       }
 
-      if (speed_dial) {
-        speed_dial.value = App.zone.charAt(1)
+      if (App.speed_dial_el) {
+        App.speed_dial_el.value = App.zone.charAt(1)
       }
 
       let theme = App.get_theme(App.zone)
@@ -153,7 +151,7 @@ App.show_modal = (text) => {
   modal_content.innerText = text
   modal_overlay.appendChild(modal_content)
 
-  modal_overlay.addEventListener(`click`, (e) => {
+  DOM.ev(modal_overlay, `click`, (e) => {
     if ((e.target === modal_overlay) && document.body.contains(modal_overlay)) {
       document.body.removeChild(modal_overlay)
     }
@@ -162,7 +160,7 @@ App.show_modal = (text) => {
   document.body.appendChild(modal_overlay)
 }
 
-let words_container = document.getElementById(`words-container`)
+let words_container = DOM.el(`#words-container`)
 
 if (!words_container) {
   words_container = document.createElement(`div`)
@@ -223,7 +221,7 @@ App.create_particle_texture = (theme) => {
 }
 
 App.setup_canvas = () => {
-  App.canvas = document.getElementById(`glcanvas`)
+  App.canvas = DOM.el(`#glcanvas`)
   App.renderer = new THREE.WebGLRenderer({canvas: App.canvas, antialias: true, alpha: true})
   App.renderer.setSize(window.innerWidth, window.innerHeight)
   App.renderer.setPixelRatio(window.devicePixelRatio)
@@ -248,6 +246,10 @@ App.setup_canvas = () => {
   App.scene.add(App.particle_mesh)
   App.sprites = []
   App.active_sequence_sprite = null
+
+  DOM.ev(App.canvas, `click`, () => {
+    App.defocus_dial()
+  })
 }
 
 App.create_text_texture = (text, is_word = false, is_sequence = false) => {
@@ -335,9 +337,9 @@ App.handle_press = (e, is_local = true) => {
     return
   }
 
-  if (document.getElementById(`modal-overlay`)) {
+  if (DOM.el(`#modal-overlay`)) {
     if (e && (e.type === `keydown`) && (e.key === `Escape`)) {
-      let m = document.getElementById(`modal-overlay`)
+      let m = DOM.el(`#modal-overlay`)
 
       if (m && document.body.contains(m)) {
         document.body.removeChild(m)
@@ -416,7 +418,7 @@ App.handle_release = (e, is_local = true) => {
     return
   }
 
-  if (document.getElementById(`modal-overlay`)) {
+  if (DOM.el(`#modal-overlay`)) {
     return
   }
 
@@ -446,7 +448,7 @@ App.handle_release = (e, is_local = true) => {
 }
 
 App.setup_events = () => {
-  window.addEventListener(`contextmenu`, (e) => {
+  DOM.ev(window, `contextmenu`, (e) => {
     if (e.target === App.sound_btn) {
       return
     }
@@ -455,7 +457,7 @@ App.setup_events = () => {
       return
     }
 
-    if (document.getElementById(`modal-overlay`)) {
+    if (DOM.el(`#modal-overlay`)) {
       return
     }
 
@@ -463,12 +465,12 @@ App.setup_events = () => {
     App.handle_press(e)
   })
 
-  window.addEventListener(`mousedown`, App.handle_press)
-  window.addEventListener(`mouseup`, App.handle_release)
-  window.addEventListener(`keydown`, App.handle_press)
-  window.addEventListener(`keyup`, App.handle_release)
+  DOM.ev(window, `mousedown`, App.handle_press)
+  DOM.ev(window, `mouseup`, App.handle_release)
+  DOM.ev(window, `keydown`, App.handle_press)
+  DOM.ev(window, `keyup`, App.handle_release)
 
-  window.addEventListener(`touchstart`, (e) => {
+  DOM.ev(window, `touchstart`, (e) => {
     if (e.target === App.sound_btn) {
       return
     }
@@ -477,7 +479,7 @@ App.setup_events = () => {
       return
     }
 
-    if (document.getElementById(`modal-overlay`)) {
+    if (DOM.el(`#modal-overlay`)) {
       return
     }
 
@@ -485,7 +487,7 @@ App.setup_events = () => {
     App.handle_press(e)
   }, {passive: false})
 
-  window.addEventListener(`touchend`, (e) => {
+  DOM.ev(window, `touchend`, (e) => {
     if (e.target === App.sound_btn) {
       return
     }
@@ -494,7 +496,7 @@ App.setup_events = () => {
       return
     }
 
-    if (document.getElementById(`modal-overlay`)) {
+    if (DOM.el(`#modal-overlay`)) {
       return
     }
 
@@ -502,17 +504,17 @@ App.setup_events = () => {
     App.handle_release(e)
   }, {passive: false})
 
-  window.addEventListener(`resize`, () => {
+  DOM.ev(window, `resize`, () => {
     App.camera.aspect = window.innerWidth / window.innerHeight
     App.camera.updateProjectionMatrix()
     App.renderer.setSize(window.innerWidth, window.innerHeight)
   })
 
-  window.addEventListener(`focus`, () => {
+  DOM.ev(window, `focus`, () => {
     App.last_focus_time = performance.now()
   })
 
-  window.addEventListener(`blur`, () => {
+  DOM.ev(window, `blur`, () => {
     App.handle_release(null, true)
   })
 }
@@ -568,38 +570,38 @@ App.get_theme = (zone) => {
 }
 
 App.setup_dials = () => {
-  let letter_dial = document.querySelector(`#zone-dial-letter`)
-  letter_dial.id = `zone-letter`
-  letter_dial.className = `dial`
+  App.letter_dial_el = DOM.el(`#zone-dial-letter`)
+  App.speed_dial_el = DOM.el(`#zone-dial-speed`)
 
   for (let i = 0; i < 26; i++) {
     let char = String.fromCharCode(65 + i)
     let opt = document.createElement(`option`)
     opt.value = char
     opt.text = char
-    letter_dial.appendChild(opt)
+    App.letter_dial_el.appendChild(opt)
   }
-
-  let speed_dial = document.querySelector(`#zone-dial-speed`)
-  speed_dial.id = `zone-speed`
-  speed_dial.className = `dial`
 
   for (let i = 1; i <= 9; i++) {
     let opt = document.createElement(`option`)
     opt.value = i
     opt.text = i
-    speed_dial.appendChild(opt)
+    App.speed_dial_el.appendChild(opt)
   }
 
-  letter_dial.addEventListener(`change`, () => {
-    letter_dial.blur()
+  DOM.ev(App.letter_dial_el, `change`, () => {
+    App.defocus_dial()
     App.zone_change_debouncer.call()
   })
 
-  speed_dial.addEventListener(`change`, () => {
-    speed_dial.blur()
+  DOM.ev(App.speed_dial_el, `change`, () => {
+    App.defocus_dial()
     App.zone_change_debouncer.call()
   })
+}
+
+App.defocus_dial = () => {
+  App.letter_dial_el.blur()
+  App.speed_dial_el.blur()
 }
 
 App.start = () => {
