@@ -13,7 +13,7 @@ App.shared = require(`./js/shared.js`)
 App.zone_states = {}
 App.next_client_id = 1
 App.nouns = new Set()
-App.default_speed = 4
+App.default_speed = 3
 
 App.get_nouns = () => {
   try {
