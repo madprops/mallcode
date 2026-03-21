@@ -1,3 +1,16 @@
+App.audio_context = window.AudioContext || window.webkitAudioContext
+App.volume_level = 0.5
+
+App.init_audio = () => {
+  if (!App.audio_ctx) {
+    App.audio_ctx = new App.audio_context()
+  }
+
+  if (App.audio_ctx.state === `suspended`) {
+    App.audio_ctx.resume()
+  }
+}
+
 App.play_warp_drive = () => {
   App.init_audio()
 
@@ -39,4 +52,71 @@ App.play_warp_drive = () => {
 
   osc_main.stop(start_time + duration)
   osc_sub.stop(start_time + duration)
+}
+
+App.sound_enabled = () => {
+  return App.volume_level > 0
+}
+
+App.setup_sound = () => {
+  App.sound_btn.addEventListener(`click`, () => {
+    if (App.volume_level === 0.5) {
+      App.volume_level = 0.25
+    }
+    else if (App.volume_level === 0.25) {
+      App.volume_level = 0
+    }
+    else {
+      App.volume_level = 0.5
+    }
+
+    if (App.volume_level === 0.5) {
+      App.sound_btn.textContent = `🔊`
+    }
+    else if (App.volume_level === 0.25) {
+      App.sound_btn.textContent = `🔉`
+    }
+    else {
+      App.sound_btn.textContent = `🔇`
+    }
+
+    if (!App.sound_enabled() && App.gain_node) {
+      App.gain_node.gain.setTargetAtTime(0, App.audio_ctx.currentTime, 0.01)
+    }
+
+    App.sound_btn.blur()
+  })
+}
+
+App.mute_beep = () => {
+  App.gain_node.gain.setTargetAtTime(0, App.audio_ctx.currentTime, 0.01)
+}
+
+App.play_beep = () => {
+  App.init_audio()
+
+  if (App.volume_level === 0) {
+    return
+  }
+
+  let hash = App.get_string_hash(App.zone)
+  let rng = App.create_seeded_random(hash)
+  let duration = 0.1 + rng() * 0.3
+  let start_time = App.audio_ctx.currentTime
+  let osc = App.audio_ctx.createOscillator()
+  App.gain_node = App.audio_ctx.createGain()
+  let types = [`sine`, `square`, `sawtooth`, `triangle`]
+  let type_index = Math.floor(rng() * 4)
+  osc.type = types[type_index]
+  let start_freq = 300 + rng() * 700
+  let end_freq = start_freq + rng() * 400 - 150
+  osc.frequency.setValueAtTime(start_freq, start_time)
+  osc.frequency.exponentialRampToValueAtTime(end_freq, start_time + duration)
+  App.gain_node.gain.setValueAtTime(0, start_time)
+  App.gain_node.gain.linearRampToValueAtTime(App.volume_level, start_time + 0.02)
+  App.gain_node.gain.exponentialRampToValueAtTime(0.01, start_time + duration)
+  osc.connect(App.gain_node)
+  App.gain_node.connect(App.audio_ctx.destination)
+  osc.start(start_time)
+  osc.stop(start_time + duration)
 }

@@ -1,4 +1,3 @@
-App.audio_context = window.AudioContext || window.webkitAudioContext
 App.zone = Shared.default_zone
 App.zone_settings = Shared.zone_settings[1]
 App.max_press_duration = App.zone_settings.max_press
@@ -10,59 +9,6 @@ App.last_focus_time = 0
 App.zone_info_el = document.getElementById(`zone-info`)
 App.sound_btn = document.getElementById(`sound-toggle`)
 App.remote_lock_time = -Shared.lock_time
-App.volume_level = 0.5
-
-App.sound_enabled = () => {
-  return App.volume_level > 0
-}
-
-App.setup_sound = () => {
-  App.sound_btn.addEventListener(`click`, () => {
-    if (App.volume_level === 0.5) {
-      App.volume_level = 0.25
-    }
-    else if (App.volume_level === 0.25) {
-      App.volume_level = 0
-    }
-    else {
-      App.volume_level = 0.5
-    }
-
-    if (App.volume_level === 0.5) {
-      App.sound_btn.textContent = `🔊`
-    }
-    else if (App.volume_level === 0.25) {
-      App.sound_btn.textContent = `🔉`
-    }
-    else {
-      App.sound_btn.textContent = `🔇`
-    }
-
-    if (!App.sound_enabled() && App.gain_node) {
-      App.gain_node.gain.setTargetAtTime(0, App.audio_ctx.currentTime, 0.01)
-    }
-
-    App.sound_btn.blur()
-  })
-}
-
-App.init_audio = () => {
-  if (!App.audio_ctx) {
-    App.audio_ctx = new App.audio_context()
-    App.gain_node = App.audio_ctx.createGain()
-    App.gain_node.gain.value = 0
-    App.gain_node.connect(App.audio_ctx.destination)
-    App.oscillator = App.audio_ctx.createOscillator()
-    App.oscillator.type = `sine`
-    App.oscillator.frequency.value = 600
-    App.oscillator.connect(App.gain_node)
-    App.oscillator.start()
-  }
-
-  if (App.audio_ctx.state === `suspended`) {
-    App.audio_ctx.resume()
-  }
-}
 
 let protocol = window.location.protocol === `https:` ? `wss:` : `ws:`
 let ws = new WebSocket(`${protocol}//${window.location.host}`)
@@ -341,13 +287,12 @@ App.handle_press = (e, is_local = true) => {
     ws.send(JSON.stringify({type: `DOWN`}))
   }
 
-  App.init_audio()
   clearTimeout(letter_timeout)
   clearTimeout(word_timeout)
   clearTimeout(App.max_press_timeout)
 
   if (App.sound_enabled()) {
-    App.gain_node.gain.setTargetAtTime(App.volume_level, App.audio_ctx.currentTime, 0.01)
+    App.play_beep()
   }
 
   App.particle_mesh.material.size = 0.5
@@ -388,7 +333,7 @@ App.handle_release = (e, is_local = true) => {
   }
 
   let duration = now - press_start_time
-  App.gain_node.gain.setTargetAtTime(0, App.audio_ctx.currentTime, 0.01)
+  App.mute_beep()
   App.particle_mesh.material.size = 0.15
 
   if (duration < (unit_duration * 1.5)) {
