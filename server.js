@@ -13,6 +13,7 @@ App.shared = require(`./js/shared.js`)
 App.zone_states = {}
 App.next_client_id = 1
 App.nouns = new Set()
+App.default_speed = 4
 
 App.get_nouns = () => {
   try {
@@ -94,7 +95,7 @@ App.get_zone_state = (zone) => {
     let z_num = parseInt(zone.charAt(1))
 
     if (isNaN(z_num)) {
-      z_num = 5
+      z_num = App.default_speed
     }
 
     let settings = App.shared.zone_settings[z_num] || App.shared.zone_settings[5]
@@ -121,12 +122,13 @@ App.resolve_letter = (zone) => {
     return
   }
 
-  let letter = App.shared.morse_code[z_state.current_sequence] || `?`
+  let letter = App.shared.morse_code[z_state.current_sequence] || `@`
 
-  if (letter !== `?`) {
+  if (letter !== `@`) {
     z_state.current_word += letter
   }
 
+  console.log(letter)
   let msg = JSON.stringify({type: `LETTER`, char: letter})
   App.wss.clients.forEach((c) => {
 
@@ -386,7 +388,7 @@ App.default_zone = () => {
   let hash = App.shared.get_string_hash(date_str)
   let rng = App.shared.create_seeded_random(hash)
   let letter = String.fromCharCode(65 + Math.floor(rng() * 26))
-  return `${letter}5`
+  return `${letter}${App.default_speed}`
 }
 
 App.get_nouns()
