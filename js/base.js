@@ -42,6 +42,13 @@ ws.onmessage = (event) => {
     App.play_warp_drive()
     let theme = App.get_theme(App.zone)
     App.particles_material.color.set(theme.particles)
+
+    if (App.particles_material.map) {
+      App.particles_material.map.dispose()
+    }
+
+    App.particles_material.map = App.create_particle_texture(theme)
+    App.particles_material.needsUpdate = true
   }
   else if (data.type === `MODAL`) {
     App.show_modal(data.text)
@@ -93,27 +100,7 @@ App.update_words_display = (words) => {
   words_container.innerHTML = words.map(w => `<div>${w}</div>`).join(``)
 }
 
-App.setup_canvas = () => {
-  App.canvas = document.getElementById(`glcanvas`)
-  App.renderer = new THREE.WebGLRenderer({canvas: App.canvas, antialias: true, alpha: true})
-  App.renderer.setSize(window.innerWidth, window.innerHeight)
-  App.renderer.setPixelRatio(window.devicePixelRatio)
-  App.scene = new THREE.Scene()
-  App.scene.fog = new THREE.FogExp2(0x020208, 0.0015)
-  App.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000)
-  App.camera.position.z = 40
-  App.clock = new THREE.Clock()
-  App.particles_geometry = new THREE.BufferGeometry()
-  let particles_count = 3000
-  let pos_array = new Float32Array(particles_count * 3)
-
-  for (let i = 0; i < (particles_count * 3); i++) {
-    pos_array[i] = ((Math.random() - 0.5) * 150)
-  }
-
-  App.particles_geometry.setAttribute(`position`, new THREE.BufferAttribute(pos_array, 3))
-  let theme = App.get_theme(App.zone)
-
+App.create_particle_texture = (theme) => {
   let particle_canvas = document.createElement(`canvas`)
   particle_canvas.width = 64
   particle_canvas.height = 64
@@ -149,8 +136,30 @@ App.setup_canvas = () => {
     ctx.fill()
   }
 
-  let texture = new THREE.CanvasTexture(particle_canvas)
+  return new THREE.CanvasTexture(particle_canvas)
+}
 
+App.setup_canvas = () => {
+  App.canvas = document.getElementById(`glcanvas`)
+  App.renderer = new THREE.WebGLRenderer({canvas: App.canvas, antialias: true, alpha: true})
+  App.renderer.setSize(window.innerWidth, window.innerHeight)
+  App.renderer.setPixelRatio(window.devicePixelRatio)
+  App.scene = new THREE.Scene()
+  App.scene.fog = new THREE.FogExp2(0x020208, 0.0015)
+  App.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000)
+  App.camera.position.z = 40
+  App.clock = new THREE.Clock()
+  App.particles_geometry = new THREE.BufferGeometry()
+  let particles_count = 3000
+  let pos_array = new Float32Array(particles_count * 3)
+
+  for (let i = 0; i < (particles_count * 3); i++) {
+    pos_array[i] = ((Math.random() - 0.5) * 150)
+  }
+
+  App.particles_geometry.setAttribute(`position`, new THREE.BufferAttribute(pos_array, 3))
+  let theme = App.get_theme(App.zone)
+  let texture = App.create_particle_texture(theme)
   App.particles_material = new THREE.PointsMaterial({size: 0.15, color: new THREE.Color(theme.particles), map: texture, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false})
   App.particle_mesh = new THREE.Points(App.particles_geometry, App.particles_material)
   App.scene.add(App.particle_mesh)
