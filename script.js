@@ -65,8 +65,8 @@ ws.onmessage = (event) => {
     unit_duration = current_settings.unit_duration
     zone_info_el.innerText = `${current_zone} (${online_count})`
   }
-  else if (event.data.startsWith(`LINK:`)) {
-    window.open(event.data.substring(5), `_blank`)
+  else if (event.data.startsWith(`MODAL:`)) {
+    show_modal(event.data.substring(6))
   }
   else if (event.data.startsWith(`USERS:`)) {
     online_count = parseInt(event.data.split(`:`)[1])
@@ -76,6 +76,24 @@ ws.onmessage = (event) => {
     let words = JSON.parse(event.data.substring(6))
     update_words_display(words)
   }
+}
+
+function show_modal(text) {
+  let modal_overlay = document.createElement(`div`)
+  modal_overlay.id = `modal-overlay`
+
+  let modal_content = document.createElement(`div`)
+  modal_content.id = `modal-content`
+  modal_content.innerText = text
+  modal_overlay.appendChild(modal_content)
+
+  modal_overlay.addEventListener(`click`, (e) => {
+    if (e.target === modal_overlay && document.body.contains(modal_overlay)) {
+      document.body.removeChild(modal_overlay)
+    }
+  })
+
+  document.body.appendChild(modal_overlay)
 }
 
 let words_container = document.getElementById(`words-container`)
@@ -239,6 +257,14 @@ function handle_press(e, is_local = true) {
     return
   }
 
+  if (document.getElementById(`modal-overlay`)) {
+    if (e && e.type === `keydown` && e.key === `Escape`) {
+      let m = document.getElementById(`modal-overlay`)
+      if (m && document.body.contains(m)) document.body.removeChild(m)
+    }
+    return
+  }
+
   if (e && (e.type === `mousedown` || e.type === `touchstart`)) {
     if (!document.hasFocus() || performance.now() - last_focus_time < 100) {
       return
@@ -303,6 +329,10 @@ function handle_release(e, is_local = true) {
     return
   }
 
+  if (document.getElementById(`modal-overlay`)) {
+    return
+  }
+
   if (e && (e.type === `keyup`)) {
     if (e.key === `Meta` || e.key === `OS` || e.key === `Control` || e.key === `Alt` || e.key === `Shift`) {
       return
@@ -348,6 +378,7 @@ function handle_release(e, is_local = true) {
 
 window.addEventListener(`contextmenu`, (e) => {
   if (e.target === sound_toggle_btn) return
+  if (document.getElementById(`modal-overlay`)) return
   e.preventDefault()
   handle_press(e)
 })
@@ -359,12 +390,14 @@ window.addEventListener(`keyup`, handle_release)
 
 window.addEventListener(`touchstart`, (e) => {
   if (e.target === sound_toggle_btn) return
+  if (document.getElementById(`modal-overlay`)) return
   e.preventDefault()
   handle_press(e)
 }, {passive: false})
 
 window.addEventListener(`touchend`, (e) => {
   if (e.target === sound_toggle_btn) return
+  if (document.getElementById(`modal-overlay`)) return
   e.preventDefault()
   handle_release(e)
 }, {passive: false})

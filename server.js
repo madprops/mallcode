@@ -48,19 +48,6 @@ app.get(`/`, (req, res) => {
   res.sendFile(path.join(__dirname, `index.html`))
 })
 
-app.get(`/help`, (req, res) => {
-  res.send(`<html><body style="font-family: sans-serif; margin-top: 10%; display: flex; flex-direction: column; align-items: center;">
-    <h1>Information</h1>
-
-    <div style="max-width: 600px; text-align: left; line-height: 1.6;">
-      <h2>Zone Navigation</h2>
-      <p>You can move between different zones. Zones can be any letter A-Z followed by a speed number from 1 to 9.</p>
-      <p>To navigate to a zone, input a letter followed by a speed number from 1 to 9 (e.g., <strong>E4</strong>, <strong>G1</strong>, <strong>X9</strong>).</p>
-    </div>
-
-  </body></html>`)
-})
-
 function broadcast_zone_count(zone) {
   let count = 0
 
@@ -126,8 +113,10 @@ wss.on(`connection`, (ws) => {
     }
 
     if (current_word === `HELP`) {
-      ws.send(`LINK:/help`)
+      ws.send(`MODAL:Zones can be any letter A-Z followed by a number from 1-9.\n\n
+        For example: E4, G1, X9.\n\nThe higher the number the higher the speed.`)
     }
+
     else if (current_word.length === 2) {
       let cmd = current_word[0]
       let arg = parseInt(current_word[1])
@@ -170,7 +159,7 @@ wss.on(`connection`, (ws) => {
   ws.on(`message`, (message) => {
     let signal = message.toString()
 
-    if (signal === `DOWN` || signal === `UP`) {
+    if ((signal === `DOWN`) || (signal === `UP`)) {
       let lock = zone_locks[ws.zone]
       let now = Date.now()
 
