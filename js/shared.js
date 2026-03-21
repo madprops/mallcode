@@ -53,7 +53,7 @@ Shared.zone_settings = {
   6: {unit_duration: 150, letter_mult: 3.5, word_mult: 7, max_press: 800, throttle: 25, forgiving: false},
   7: {unit_duration: 120, letter_mult: 3.0, word_mult: 7, max_press: 700, throttle: 20, forgiving: false},
   8: {unit_duration: 100, letter_mult: 3.0, word_mult: 7, max_press: 600, throttle: 15, forgiving: false},
-  9: {unit_duration: 80,  letter_mult: 3.0, word_mult: 7, max_press: 500, throttle: 10, forgiving: false},
+  9: {unit_duration: 80, letter_mult: 3.0, word_mult: 7, max_press: 500, throttle: 10, forgiving: false},
   // Pro/Realistic
 }
 

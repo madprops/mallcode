@@ -1,15 +1,19 @@
 {
-  "name": "morse-multiplayer",
+  "name": "mallcode",
   "version": "1.0.0",
   "description": "A multiplayer morse code experience using WebSockets",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+		"lint":	"eslint --cache -c eslint.config.mjs",
+		"fix": "eslint --fix -c eslint.config.mjs"
   },
   "dependencies": {
     "express": "^4.18.2",
     "ws": "^8.16.0"
   },
-  "author": "",
-  "license": "ISC"
+  "devDependencies": {
+    "eslint": "~9.11.1",
+    "globals": "~15.9.0"
+  }
 }

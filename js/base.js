@@ -154,7 +154,7 @@ App.show_modal = (text) => {
   modal_overlay.appendChild(modal_content)
 
   modal_overlay.addEventListener(`click`, (e) => {
-    if (e.target === modal_overlay && document.body.contains(modal_overlay)) {
+    if ((e.target === modal_overlay) && document.body.contains(modal_overlay)) {
       document.body.removeChild(modal_overlay)
     }
   })
@@ -327,7 +327,7 @@ App.update_sequence_display = () => {
 }
 
 App.handle_press = (e, is_local = true) => {
-  if (e && e.target === App.sound_btn) {
+  if (e && (e.target === App.sound_btn)) {
     return
   }
 
@@ -336,7 +336,7 @@ App.handle_press = (e, is_local = true) => {
   }
 
   if (document.getElementById(`modal-overlay`)) {
-    if (e && e.type === `keydown` && e.key === `Escape`) {
+    if (e && (e.type === `keydown`) && (e.key === `Escape`)) {
       let m = document.getElementById(`modal-overlay`)
 
       if (m && document.body.contains(m)) {
@@ -347,13 +347,13 @@ App.handle_press = (e, is_local = true) => {
     return
   }
 
-  if (e && (e.type === `mousedown` || e.type === `touchstart`)) {
-    if (!document.hasFocus() || performance.now() - App.last_focus_time < 100) {
+  if (e && ((e.type === `mousedown`) || (e.type === `touchstart`))) {
+    if (!document.hasFocus() || ((performance.now() - App.last_focus_time) < 100)) {
       return
     }
   }
 
-  if (e && e.type === `keydown`) {
+  if (e && (e.type === `keydown`)) {
     if ([`Meta`, `OS`, `Control`, `Alt`, `Shift`, `F5`, `F11`, `F12`].includes(e.key)) {
       return
     }
@@ -383,7 +383,7 @@ App.handle_press = (e, is_local = true) => {
     App.last_typist_was_local = true
   }
 
-  if (is_local && now - App.last_input_time < App.input_throttle_ms) {
+  if (is_local && ((now - App.last_input_time) < App.input_throttle_ms)) {
     return
   }
 
@@ -392,7 +392,7 @@ App.handle_press = (e, is_local = true) => {
   App.press_start_time = now
   App.last_typist_was_local = is_local
 
-  if (is_local !== false && App.ws && App.ws.readyState === WebSocket.OPEN) {
+  if ((is_local !== false) && App.ws && (App.ws.readyState === WebSocket.OPEN)) {
     App.ws.send(JSON.stringify({type: `DOWN`}))
   }
 
@@ -408,11 +408,11 @@ App.handle_press = (e, is_local = true) => {
 }
 
 App.handle_release = (e, is_local = true) => {
-  if (e && e.target === App.sound_btn) {
+  if (e && (e.target === App.sound_btn)) {
     return
   }
 
-  if (e && (e.target.id === `zone-letter` || e.target.id === `zone-speed`)) {
+  if (e && ((e.target.id === `zone-letter`) || (e.target.id === `zone-speed`))) {
     return
   }
 
@@ -420,7 +420,7 @@ App.handle_release = (e, is_local = true) => {
     return
   }
 
-  if (e && e.type === `keyup`) {
+  if (e && (e.type === `keyup`)) {
     if ([`Meta`, `OS`, `Control`, `Alt`, `Shift`, `F5`, `F12`].includes(e.key)) {
       return
     }
@@ -437,7 +437,7 @@ App.handle_release = (e, is_local = true) => {
   clearTimeout(App.max_press_timeout)
   App.last_input_time = now
 
-  if (is_local !== false && App.ws && App.ws.readyState === WebSocket.OPEN) {
+  if ((is_local !== false) && App.ws && (App.ws.readyState === WebSocket.OPEN)) {
     App.ws.send(JSON.stringify({type: `UP`}))
   }
 
@@ -451,7 +451,7 @@ App.setup_events = () => {
       return
     }
 
-    if (e.target.id === `zone-letter` || e.target.id === `zone-speed`) {
+    if ((e.target.id === `zone-letter`) || (e.target.id === `zone-speed`)) {
       return
     }
 
@@ -563,7 +563,7 @@ App.get_theme = (zone) => {
     word: `hsl(${Math.round(hue2)}, ${Math.round(70 + random() * 30)}%, ${Math.round(60 + random() * 20)}%)`,
     sequence: `hsl(${Math.round(hue3)}, ${Math.round(70 + random() * 30)}%, ${Math.round(60 + random() * 20)}%)`,
     particles: `hsl(${Math.round(particle_hue)}, ${Math.round(80 + random() * 20)}%, ${Math.round(30 + random() * 20)}%)`,
-    shape: shape
+    shape,
   }
 }
 

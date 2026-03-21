@@ -62,13 +62,13 @@ App.broadcast_zone_count = (zone) => {
   let count = 0
 
   App.wss.clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN && client.zone === zone) {
+    if ((client.readyState === WebSocket.OPEN) && (client.zone === zone)) {
       count++
     }
   })
 
   App.wss.clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN && client.zone === zone) {
+    if ((client.readyState === WebSocket.OPEN) && (client.zone === zone)) {
       client.send(JSON.stringify({type: `USERS`, count}))
     }
   })
@@ -83,7 +83,7 @@ App.broadcast_zone_words = (zone, client = null) => {
   }
   else {
     App.wss.clients.forEach((c) => {
-      if (c.readyState === WebSocket.OPEN && c.zone === zone) {
+      if ((c.readyState === WebSocket.OPEN) && (c.zone === zone)) {
         c.send(msg)
       }
     })
@@ -106,9 +106,9 @@ App.get_zone_state = (zone) => {
       press_start_time: 0,
       letter_timeout: null,
       word_timeout: null,
-      settings: settings,
       last_active_ws: null,
-      lock_expires: 0
+      lock_expires: 0,
+      settings,
     }
   }
 
@@ -137,7 +137,7 @@ App.resolve_letter = (zone) => {
   })
 
   z_state.current_sequence = ``
-  let unit = z_state.last_active_ws ? (z_state.last_active_ws.unit_duration || z_state.settings.unit_duration) : z_state.settings.unit_duration
+  let unit = z_state.last_active_ws ? z_state.last_active_ws.unit_duration || z_state.settings.unit_duration : z_state.settings.unit_duration
   z_state.word_timeout = setTimeout(() => App.resolve_word(zone), unit * z_state.settings.word_mult)
 }
 
@@ -161,12 +161,16 @@ App.resolve_word = (zone) => {
   App.process_word(zone, current_word, z_state.last_active_ws)
 }
 
+App.help_text = `Use the dials on the top right to change zones.\n\n
+The higher the number the higher the speed.\n\n
+For example: E4, G1, X9.`
+
 App.process_word = (zone, current_word, ws) => {
   if (current_word === `HELP`) {
-    if (ws && ws.readyState === WebSocket.OPEN) {
+    if (ws && (ws.readyState === WebSocket.OPEN)) {
       ws.send(JSON.stringify({
         type: `MODAL`,
-        text: `Use the dials on the top right to change zones.\n\nThe higher the number the higher the speed.\n\nFor example: E4, G1, X9.`
+        text: App.help_text,
       }))
     }
   }
@@ -245,19 +249,18 @@ App.setup_sockets = () => {
         if (now < z_state.lock_expires) {
           return
         }
-        else {
-          z_state.is_pressed = false
-          clearTimeout(z_state.letter_timeout)
+
+        z_state.is_pressed = false
+        clearTimeout(z_state.letter_timeout)
+        clearTimeout(z_state.word_timeout)
+
+        if (z_state.current_sequence) {
+          App.resolve_letter(ws.zone)
+        }
+
+        if (z_state.current_word) {
           clearTimeout(z_state.word_timeout)
-
-          if (z_state.current_sequence) {
-            App.resolve_letter(ws.zone)
-          }
-
-          if (z_state.current_word) {
-            clearTimeout(z_state.word_timeout)
-            App.resolve_word(ws.zone)
-          }
+          App.resolve_word(ws.zone)
         }
       }
 
@@ -276,7 +279,7 @@ App.setup_sockets = () => {
         let msg_down = JSON.stringify({type: `DOWN`, username: ws.username})
 
         App.wss.clients.forEach((client) => {
-          if (client !== ws && client.readyState === WebSocket.OPEN && client.zone === ws.zone) {
+          if ((client !== ws) && (client.readyState === WebSocket.OPEN) && (client.zone === ws.zone)) {
             client.send(msg_down)
           }
         })
@@ -315,7 +318,7 @@ App.setup_sockets = () => {
           let msg_up = JSON.stringify({type: `UP`, username: ws.username})
 
           App.wss.clients.forEach((client) => {
-            if (client !== ws && client.readyState === WebSocket.OPEN && client.zone === ws.zone) {
+            if ((client !== ws) && (client.readyState === WebSocket.OPEN) && (client.zone === ws.zone)) {
               client.send(msg_up)
             }
           })
@@ -323,7 +326,7 @@ App.setup_sockets = () => {
           let msg_seq = JSON.stringify({type: `SEQUENCE`, sequence: z_state.current_sequence, username: ws.username})
 
           App.wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN && client.zone === ws.zone) {
+            if ((client.readyState === WebSocket.OPEN) && (client.zone === ws.zone)) {
               client.send(msg_seq)
             }
           })
