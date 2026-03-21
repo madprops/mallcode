@@ -6,12 +6,12 @@ App.online_count = 1
 App.last_focus_time = 0
 App.zone_info_el = document.getElementById(`zone-info`)
 App.sound_btn = document.getElementById(`sound-toggle`)
-App.remote_lock_time = -Shared.lock_time
 App.protocol = window.location.protocol === `https:` ? `wss:` : `ws:`
 App.is_pressed = false
 App.press_start_time = 0
 App.current_sequence = ``
 App.current_word = ``
+App.remote_lock_time = -Shared.lock_time
 App.last_typist_was_local = true
 
 App.setup_socket = () => {
@@ -35,10 +35,12 @@ App.setup_socket = () => {
 
     if (data.type === `DOWN`) {
       App.remote_lock_time = performance.now()
+      App.last_typist_was_local = false
       App.handle_press(null, false)
     }
     else if (data.type === `UP`) {
       App.remote_lock_time = performance.now()
+      App.last_typist_was_local = false
       App.handle_release(null, false)
     }
     else if (data.type === `SEQUENCE`) {
@@ -325,8 +327,12 @@ App.handle_press = (e, is_local = true) => {
 
   let now = performance.now()
 
-  if (is_local && now - App.remote_lock_time < Shared.lock_time) {
+  if (is_local && !App.last_typist_was_local && (now - App.remote_lock_time < Shared.lock_time)) {
     return
+  }
+
+  if (is_local) {
+    App.last_typist_was_local = true
   }
 
   if (is_local && now - App.last_input_time < App.input_throttle_ms) {

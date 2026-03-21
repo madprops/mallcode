@@ -106,7 +106,8 @@ App.get_zone_state = (zone) => {
       letter_timeout: null,
       word_timeout: null,
       settings: settings,
-      last_active_ws: null
+      last_active_ws: null,
+      lock_expires: 0
     }
   }
 
@@ -254,8 +255,11 @@ App.setup_sockets = () => {
         ws.unit_duration = z_state.settings.unit_duration
       }
 
-      if (signal === `DOWN`) {
-        if (z_state.last_active_ws && (z_state.last_active_ws !== ws)) {
+      if (z_state.last_active_ws && (z_state.last_active_ws !== ws)) {
+        if (now < z_state.lock_expires) {
+          return
+        }
+        else {
           z_state.is_pressed = false
           clearTimeout(z_state.letter_timeout)
           clearTimeout(z_state.word_timeout)
@@ -269,9 +273,12 @@ App.setup_sockets = () => {
             App.resolve_word(ws.zone)
           }
         }
+      }
 
-        z_state.last_active_ws = ws
+      z_state.last_active_ws = ws
+      z_state.lock_expires = now + 3000
 
+      if (signal === `DOWN`) {
         if (z_state.is_pressed) {
           return
         }
@@ -319,10 +326,11 @@ App.setup_sockets = () => {
           let min_u = z_state.settings.forgiving ? 150 : z_state.settings.unit_duration * 0.8
           let max_u = z_state.settings.forgiving ? 500 : z_state.settings.unit_duration * 1.2
           ws.unit_duration = Math.max(min_u, Math.min(max_u, ws.unit_duration))
+
           let msg_up = JSON.stringify({type: `UP`})
 
           App.wss.clients.forEach((client) => {
-            if ((client !== ws) && (client.readyState) === WebSocket.OPEN && (client.zone === ws.zone)) {
+            if (client !== ws && client.readyState === WebSocket.OPEN && client.zone === ws.zone) {
               client.send(msg_up)
             }
           })
@@ -330,7 +338,7 @@ App.setup_sockets = () => {
           let msg_seq = JSON.stringify({type: `SEQUENCE`, sequence: z_state.current_sequence})
 
           App.wss.clients.forEach((client) => {
-            if ((client.readyState === WebSocket.OPEN) && (client.zone === ws.zone)) {
+            if (client.readyState === WebSocket.OPEN && client.zone === ws.zone) {
               client.send(msg_seq)
             }
           })
