@@ -9,8 +9,7 @@ Shared.default_zone = () => {
   let hash = Shared.get_string_hash(date_str)
   let rng = Shared.create_seeded_random(hash)
   let letter = String.fromCharCode(65 + Math.floor(rng() * 26)) // A-Z
-  let number = 1 + Math.floor(rng() * 9)                        // 1-9
-  return `${letter}${number}`
+  return `${letter}5`
 }
 
 Shared.morse_code = {
