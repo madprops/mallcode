@@ -246,6 +246,9 @@ function handle_press(e, is_local = true) {
   }
 
   if (e && e.type === `keydown`) {
+    if ((e.key === `Meta`) || (e.key === `OS`) || (e.key === `Control`) || (e.key === `Alt`) || (e.key === `Shift`)) {
+      return
+    }
     if (e.ctrlKey || e.metaKey || e.altKey) {
       return
     }
@@ -301,7 +304,7 @@ function handle_release(e, is_local = true) {
   }
 
   if (e && (e.type === `keyup`)) {
-    if (e.ctrlKey || e.metaKey || e.altKey) {
+    if (e.key === `Meta` || e.key === `OS` || e.key === `Control` || e.key === `Alt` || e.key === `Shift`) {
       return
     }
 
@@ -408,6 +411,10 @@ let last_focus_time = 0
 
 window.addEventListener(`focus`, () => {
   last_focus_time = performance.now()
+})
+
+window.addEventListener(`blur`, () => {
+  handle_release(null, true)
 })
 
 animate()
