@@ -167,26 +167,8 @@ App.process_word = (zone, current_word, ws) => {
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({
         type: `MODAL`,
-        text: `Zones can be any letter A-Z followed by a number from 1-9.\n\nThe higher the number the higher the speed.\n\nFor example: E4, G1, X9.`
+        text: `Use the dials in the top right to change zones.\n\nThe higher the number the higher the speed.\n\nFor example: E4, G1, X9.`
       }))
-    }
-  }
-  else if (current_word.length === 2) {
-    let cmd = current_word[0]
-    let arg = parseInt(current_word[1])
-
-    if ((cmd >= `A`) && (cmd <= `Z`) && !isNaN(arg) && (arg >= 1) && (arg <= 9)) {
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        let old_zone = ws.zone
-        ws.zone = cmd + arg
-        ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone}))
-
-        if (old_zone !== ws.zone) {
-          App.broadcast_zone_count(old_zone)
-          App.broadcast_zone_count(ws.zone)
-          App.broadcast_zone_words(ws.zone, ws)
-        }
-      }
     }
   }
 

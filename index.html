@@ -13,9 +13,20 @@
             const App = {}
         </script>
 
-        <div id="zone-info"></div>
-        <div id="username-info"></div>
-        <button id="sound-toggle">🔊</button>
+        <div id="top-left" class="corner">
+            <button id="sound-toggle">🔊</button>
+            <div id="username-info"></div>
+        </div>
+
+        <div id="top-right" class="corner">
+            <div id="zone-info"></div>
+
+            <div id="zone-dials">
+                <select id="zone-dial-letter"></select>
+                <select id="zone-dial-speed"></select>
+            </div>
+        </div>
+
         <canvas id="glcanvas"></canvas>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
         <script src="js/shared.js"></script>

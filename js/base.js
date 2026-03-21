@@ -20,6 +20,16 @@ App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
     App.username_info_el.innerText = ``
   }, App.restore_username_delay)
+
+  App.zone_change_debouncer = Shared.create_debouncer(() => {
+    let letter = document.getElementById(`zone-letter`).value
+    let speed = document.getElementById(`zone-speed`).value
+    let new_zone = `${letter}${speed}`
+
+    if ((new_zone !== App.zone) && App.ws && (App.ws.readyState === WebSocket.OPEN)) {
+      App.ws.send(JSON.stringify({type: `RESTORE_ZONE`, zone: new_zone}))
+    }
+  }, 250)
 }
 
 App.setup_socket = () => {
@@ -74,13 +84,23 @@ App.setup_socket = () => {
       }
 
       App.zone = data.zone
-      console.log(`Moved to zone ${data.zone}`)
       App.zone_settings = Shared.zone_settings[parseInt(App.zone.charAt(1))]
       App.max_press_duration = App.zone_settings.max_press
       App.input_throttle_ms = App.zone_settings.throttle
       App.unit_duration = App.zone_settings.unit_duration
-      App.zone_info_el.innerText = `${App.zone} (${App.online_count})`
+      App.zone_info_el.innerText = `Online: ${App.online_count}`
       App.play_warp_drive()
+      let letter_dial = document.getElementById(`zone-letter`)
+      let speed_dial = document.getElementById(`zone-speed`)
+
+      if (letter_dial) {
+        letter_dial.value = App.zone.charAt(0)
+      }
+
+      if (speed_dial) {
+        speed_dial.value = App.zone.charAt(1)
+      }
+
       let theme = App.get_theme(App.zone)
       App.particles_material.color.set(theme.particles)
 
@@ -96,7 +116,7 @@ App.setup_socket = () => {
     }
     else if (data.type === `USERS`) {
       App.online_count = data.count
-      App.zone_info_el.innerText = `${App.zone} (${App.online_count})`
+      App.zone_info_el.innerText = `Users: ${App.online_count}`
     }
     else if (data.type === `WORDS`) {
       App.update_words_display(data.words)
@@ -300,6 +320,10 @@ App.handle_press = (e, is_local = true) => {
     return
   }
 
+  if (e && ((e.target.id === `zone-letter`) || (e.target.id === `zone-speed`))) {
+    return
+  }
+
   if (document.getElementById(`modal-overlay`)) {
     if (e && e.type === `keydown` && e.key === `Escape`) {
       let m = document.getElementById(`modal-overlay`)
@@ -377,6 +401,10 @@ App.handle_release = (e, is_local = true) => {
     return
   }
 
+  if (e && (e.target.id === `zone-letter` || e.target.id === `zone-speed`)) {
+    return
+  }
+
   if (document.getElementById(`modal-overlay`)) {
     return
   }
@@ -412,6 +440,10 @@ App.setup_events = () => {
       return
     }
 
+    if (e.target.id === `zone-letter` || e.target.id === `zone-speed`) {
+      return
+    }
+
     if (document.getElementById(`modal-overlay`)) {
       return
     }
@@ -430,6 +462,10 @@ App.setup_events = () => {
       return
     }
 
+    if ((e.target.id === `zone-letter`) || (e.target.id === `zone-speed`)) {
+      return
+    }
+
     if (document.getElementById(`modal-overlay`)) {
       return
     }
@@ -440,6 +476,10 @@ App.setup_events = () => {
 
   window.addEventListener(`touchend`, (e) => {
     if (e.target === App.sound_btn) {
+      return
+    }
+
+    if ((e.target.id === `zone-letter`) || (e.target.id === `zone-speed`)) {
       return
     }
 
@@ -516,6 +556,39 @@ App.get_theme = (zone) => {
   }
 }
 
+App.setup_dials = () => {
+  let letter_dial = document.querySelector(`#zone-dial-letter`)
+  letter_dial.id = `zone-letter`
+  letter_dial.className = `dial`
+
+  for (let i = 0; i < 26; i++) {
+    let char = String.fromCharCode(65 + i)
+    let opt = document.createElement(`option`)
+    opt.value = char
+    opt.text = char
+    letter_dial.appendChild(opt)
+  }
+
+  let speed_dial = document.querySelector(`#zone-dial-speed`)
+  speed_dial.id = `zone-speed`
+  speed_dial.className = `dial`
+
+  for (let i = 1; i <= 9; i++) {
+    let opt = document.createElement(`option`)
+    opt.value = i
+    opt.text = i
+    speed_dial.appendChild(opt)
+  }
+
+  letter_dial.addEventListener(`change`, () => {
+    App.zone_change_debouncer.call()
+  })
+
+  speed_dial.addEventListener(`change`, () => {
+    App.zone_change_debouncer.call()
+  })
+}
+
 App.start = () => {
   App.setup_canvas()
   App.setup_events()
@@ -526,5 +599,6 @@ App.start = () => {
 }
 
 App.init = () => {
+  App.setup_dials()
   App.setup_socket()
 }
