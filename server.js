@@ -48,24 +48,14 @@ app.get(`/`, (req, res) => {
   res.sendFile(path.join(__dirname, `index.html`))
 })
 
-// Dynamic route to serve dummy files for any zone/asset combination
-app.get(`/assets/zone/:z/file/:u`, (req, res) => {
-  res.send(`<html><body style="font-family: sans-serif; text-align: center; margin-top: 20%;">
-    <h1>Zone ${req.params.z}</h1>
-    <h2>Asset u${req.params.u}</h2>
-  </body></html>`)
-})
-
 app.get(`/help`, (req, res) => {
   res.send(`<html><body style="font-family: sans-serif; margin-top: 10%; display: flex; flex-direction: column; align-items: center;">
     <h1>Information</h1>
 
     <div style="max-width: 600px; text-align: left; line-height: 1.6;">
       <h2>Zone Navigation</h2>
-      <p>You can move between different zones. The available zones are <strong>G</strong>, <strong>M</strong>, <strong>X</strong>, <strong>E</strong>, and <strong>A</strong>.</p>
-      <p>To navigate to a zone, input the letter followed by a speed number from 1 to 9 (e.g., <strong>E4</strong>, <strong>G1</strong>, <strong>X9</strong>).</p>
-      <h2>Opening Files</h2>
-      <p>Within any zone, you can open asset files by inputting <strong>U</strong> followed by a file number from 1 to 9 (e.g., <strong>U1</strong>, <strong>U5</strong>).</p>
+      <p>You can move between different zones. Zones can be any letter A-Z followed by a speed number from 1 to 9.</p>
+      <p>To navigate to a zone, input a letter followed by a speed number from 1 to 9 (e.g., <strong>E4</strong>, <strong>G1</strong>, <strong>X9</strong>).</p>
     </div>
 
   </body></html>`)
@@ -141,9 +131,8 @@ wss.on(`connection`, (ws) => {
     else if (current_word.length === 2) {
       let cmd = current_word[0]
       let arg = parseInt(current_word[1])
-      let allowed_zones = [`G`, `M`, `X`, `E`, `A`]
 
-      if (allowed_zones.includes(cmd) && !isNaN(arg) && arg >= 1 && arg <= 9) {
+      if (cmd >= `A` && cmd <= `Z` && !isNaN(arg) && arg >= 1 && arg <= 9) {
         let old_zone = ws.zone
         ws.zone = cmd + arg
         current_settings = Shared.zone_settings[arg]
@@ -155,9 +144,6 @@ wss.on(`connection`, (ws) => {
           broadcast_zone_count(ws.zone)
           broadcast_zone_words(ws.zone, ws)
         }
-      }
-      else if (cmd === `U` && !isNaN(arg) && arg >= 1 && arg <= 9) {
-        ws.send(`LINK:/assets/zone/${ws.zone}/file/${arg}`)
       }
     }
 
