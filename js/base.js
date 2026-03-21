@@ -1,5 +1,5 @@
 App.started = false
-App.zone = `nothing`
+App.zone = ``
 App.max_press_timeout = null
 App.last_input_time = 0
 App.online_count = 1
