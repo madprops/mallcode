@@ -14,6 +14,13 @@ App.current_sequence = ``
 App.current_word = ``
 App.remote_lock_time = -Shared.lock_time
 App.last_typist_was_local = true
+App.restore_username_delay = Shared.lock_time
+
+App.create_debouncers = () => {
+  App.username_debouncer = Shared.create_debouncer(() => {
+    App.username_info_el.innerText = ``
+  }, App.restore_username_delay)
+}
 
 App.setup_socket = () => {
   App.ws = new WebSocket(`${App.protocol}//${window.location.host}`)
@@ -34,7 +41,10 @@ App.setup_socket = () => {
       return
     }
 
-    App.username_info_el.innerText = data.username || ``
+    if (data.username) {
+      App.username_info_el.innerText = data.username
+      App.username_debouncer.call()
+    }
 
     if (data.type === `DOWN`) {
       App.remote_lock_time = performance.now()
@@ -510,6 +520,7 @@ App.start = () => {
   App.setup_canvas()
   App.setup_events()
   App.setup_sound()
+  App.create_debouncers()
   App.animate()
   App.started = true
 }
