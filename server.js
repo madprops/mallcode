@@ -118,7 +118,6 @@ wss.on(`connection`, (ws) => {
         text: `Zones can be any letter A-Z followed by a number from 1-9.\n\nThe higher the number the higher the speed.\n\nFor example: E4, G1, X9.\n\n`
       }))
     }
-
     else if (current_word.length === 2) {
       let cmd = current_word[0]
       let arg = parseInt(current_word[1])
@@ -160,6 +159,7 @@ wss.on(`connection`, (ws) => {
   // When a user transmits a morse code signal
   ws.on(`message`, (message) => {
     let data
+
     try {
       data = JSON.parse(message.toString())
     }
