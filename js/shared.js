@@ -79,7 +79,7 @@ Shared.create_seeded_random = (seed) => {
   }
 }
 
-Shared.random_word = (parts = 3, cap = true, seed = null) => {
+Shared.random_word = (parts = 3, seed = null) => {
   let cons = `bcdfghjklmnpqrstvwxyz`
   let vowels = `aeiou`
   let rng = seed ? Shared.create_seeded_random(Shared.get_string_hash(seed.toString())) : Math.random
@@ -87,7 +87,7 @@ Shared.random_word = (parts = 3, cap = true, seed = null) => {
   let word = ``
 
   for (let i = 0; i < parts * 2; i++) {
-    if (cons_next) {
+    if (!cons_next) {
       let index = Math.floor(rng() * cons.length)
       word += cons[index]
     }
@@ -97,10 +97,6 @@ Shared.random_word = (parts = 3, cap = true, seed = null) => {
     }
 
     cons_next = !cons_next
-  }
-
-  if (cap) {
-    word = word.charAt(0).toUpperCase() + word.slice(1)
   }
 
   return word

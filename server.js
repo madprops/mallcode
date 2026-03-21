@@ -128,8 +128,8 @@ App.resolve_letter = (zone) => {
     z_state.current_word += letter
   }
 
-  console.log(letter)
-  let msg = JSON.stringify({type: `LETTER`, char: letter})
+  let msg = JSON.stringify({type: `LETTER`, char: letter, username: z_state.last_active_ws ? z_state.last_active_ws.username : ``})
+
   App.wss.clients.forEach((c) => {
 
     if ((c.readyState === WebSocket.OPEN) && (c.zone === zone)) {
@@ -151,7 +151,7 @@ App.resolve_word = (zone) => {
 
   let current_word = z_state.current_word
   z_state.current_word = ``
-  let msg = JSON.stringify({type: `WORD`, word: current_word})
+  let msg = JSON.stringify({type: `WORD`, word: current_word, username: z_state.last_active_ws ? z_state.last_active_ws.username : ``})
 
   App.wss.clients.forEach((c) => {
     if ((c.readyState === WebSocket.OPEN) && (c.zone === zone)) {
@@ -212,7 +212,7 @@ App.setup_sockets = () => {
     ws.is_alive = true
     ws.id = App.next_client_id++
     ws.ip = req.headers[`x-forwarded-for`] || req.socket.remoteAddress
-    ws.username = App.shared.random_word(3, true, ws.ip)
+    ws.username = App.shared.random_word(3, ws.ip)
     ws.zone = App.default_zone()
     ws.unit_duration = null
 
@@ -291,7 +291,7 @@ App.setup_sockets = () => {
         z_state.press_start_time = now
         clearTimeout(z_state.letter_timeout)
         clearTimeout(z_state.word_timeout)
-        let msg_down = JSON.stringify({type: `DOWN`})
+        let msg_down = JSON.stringify({type: `DOWN`, username: ws.username})
 
         App.wss.clients.forEach((client) => {
           if (client !== ws && client.readyState === WebSocket.OPEN && client.zone === ws.zone) {
@@ -330,8 +330,7 @@ App.setup_sockets = () => {
           let min_u = z_state.settings.forgiving ? 150 : z_state.settings.unit_duration * 0.8
           let max_u = z_state.settings.forgiving ? 500 : z_state.settings.unit_duration * 1.2
           ws.unit_duration = Math.max(min_u, Math.min(max_u, ws.unit_duration))
-
-          let msg_up = JSON.stringify({type: `UP`})
+          let msg_up = JSON.stringify({type: `UP`, username: ws.username})
 
           App.wss.clients.forEach((client) => {
             if (client !== ws && client.readyState === WebSocket.OPEN && client.zone === ws.zone) {
@@ -339,7 +338,7 @@ App.setup_sockets = () => {
             }
           })
 
-          let msg_seq = JSON.stringify({type: `SEQUENCE`, sequence: z_state.current_sequence})
+          let msg_seq = JSON.stringify({type: `SEQUENCE`, sequence: z_state.current_sequence, username: ws.username})
 
           App.wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN && client.zone === ws.zone) {

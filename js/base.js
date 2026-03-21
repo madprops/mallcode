@@ -5,6 +5,7 @@ App.last_input_time = 0
 App.online_count = 1
 App.last_focus_time = 0
 App.zone_info_el = document.getElementById(`zone-info`)
+App.username_info_el = document.getElementById(`username-info`)
 App.sound_btn = document.getElementById(`sound-toggle`)
 App.protocol = window.location.protocol === `https:` ? `wss:` : `ws:`
 App.is_pressed = false
@@ -32,6 +33,8 @@ App.setup_socket = () => {
     catch (err) {
       return
     }
+
+    App.username_info_el.innerText = data.username || ``
 
     if (data.type === `DOWN`) {
       App.remote_lock_time = performance.now()
