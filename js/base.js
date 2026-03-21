@@ -83,6 +83,13 @@ App.setup_socket = () => {
         App.start()
       }
 
+      if (App.is_pressed) {
+        App.handle_release(null, false)
+      }
+
+      App.current_sequence = ``
+      App.update_sequence_display()
+
       App.zone = data.zone
       App.zone_settings = Shared.zone_settings[parseInt(App.zone.charAt(1))]
       App.max_press_duration = App.zone_settings.max_press
@@ -124,6 +131,10 @@ App.setup_socket = () => {
   }
 
   App.ws.onclose = () => {
+    if (App.is_pressed) {
+      App.handle_release(null, true)
+    }
+
     setTimeout(() => {
       App.setup_socket()
     }, 2000)
@@ -364,7 +375,7 @@ App.handle_press = (e, is_local = true) => {
 
   let now = performance.now()
 
-  if (is_local && !App.last_typist_was_local && (now - App.remote_lock_time < Shared.lock_time)) {
+  if (is_local && !App.last_typist_was_local && ((now - App.remote_lock_time) < Shared.lock_time)) {
     return
   }
 

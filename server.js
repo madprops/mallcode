@@ -131,7 +131,6 @@ App.resolve_letter = (zone) => {
   let msg = JSON.stringify({type: `LETTER`, char: letter, username: z_state.last_active_ws ? z_state.last_active_ws.username : ``})
 
   App.wss.clients.forEach((c) => {
-
     if ((c.readyState === WebSocket.OPEN) && (c.zone === zone)) {
       c.send(msg)
     }
@@ -217,6 +216,7 @@ App.setup_sockets = () => {
       if (signal === `RESTORE_ZONE`) {
         if (data.zone) {
           let old_zone = ws.zone
+          App.force_release(ws, old_zone)
           ws.zone = data.zone
           ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone}))
 
@@ -334,6 +334,7 @@ App.setup_sockets = () => {
     })
 
     ws.on(`close`, () => {
+      App.force_release(ws, ws.zone)
       App.broadcast_zone_count(ws.zone)
     })
 
@@ -372,6 +373,38 @@ App.default_zone = () => {
   let rng = App.shared.create_seeded_random(hash)
   let letter = String.fromCharCode(65 + Math.floor(rng() * 26))
   return `${letter}${App.default_speed}`
+}
+
+App.force_release = (ws, zone) => {
+  let z_state = App.zone_states[zone]
+
+  if (z_state && (z_state.last_active_ws === ws)) {
+    if (z_state.is_pressed) {
+      z_state.is_pressed = false
+      let msg_up = JSON.stringify({type: `UP`, username: ws.username})
+
+      App.wss.clients.forEach((client) => {
+        if ((client !== ws) && (client.readyState === WebSocket.OPEN) && (client.zone === zone)) {
+          client.send(msg_up)
+        }
+      })
+    }
+
+    z_state.current_sequence = ``
+    z_state.current_word = ``
+    z_state.press_start_time = 0
+    clearTimeout(z_state.letter_timeout)
+    clearTimeout(z_state.word_timeout)
+    z_state.last_active_ws = null
+    z_state.lock_expires = 0
+    let msg_seq = JSON.stringify({type: `SEQUENCE`, sequence: ``, username: ws.username})
+
+    App.wss.clients.forEach((client) => {
+      if ((client.readyState === WebSocket.OPEN) && (client.zone === zone)) {
+        client.send(msg_seq)
+      }
+    })
+  }
 }
 
 App.get_nouns()
