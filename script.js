@@ -10,15 +10,36 @@ let last_input_time = 0
 let input_throttle_ms = current_settings.throttle
 let online_count = 1
 let zone_info_el = document.getElementById(`zone-info`)
-let sound_enabled = true
 let sound_toggle_btn = document.getElementById(`sound-toggle`)
 let remote_lock_time = -Shared.lock_time
+let volume_level = 0.5
+
+function sound_enabled() {
+  return volume_level > 0
+}
 
 sound_toggle_btn.addEventListener(`click`, () => {
-  sound_enabled = !sound_enabled
-  sound_toggle_btn.style.textDecoration = sound_enabled ? `none` : `line-through`
+  if (volume_level === 0.5) {
+    volume_level = 0.25
+  }
+  else if (volume_level === 0.25) {
+    volume_level = 0
+  }
+  else {
+    volume_level = 0.5
+  }
 
-  if (!sound_enabled && gain_node) {
+  if (volume_level === 0.5) {
+    sound_toggle_btn.textContent = `🔊`
+  }
+  else if (volume_level === 0.25) {
+    sound_toggle_btn.textContent = `🔉`
+  }
+  else {
+    sound_toggle_btn.textContent = `🔇`
+  }
+
+  if (!sound_enabled() && gain_node) {
     gain_node.gain.setTargetAtTime(0, audio_ctx.currentTime, 0.01)
   }
 
@@ -89,7 +110,6 @@ ws.onmessage = (event) => {
 function show_modal(text) {
   let modal_overlay = document.createElement(`div`)
   modal_overlay.id = `modal-overlay`
-
   let modal_content = document.createElement(`div`)
   modal_content.id = `modal-content`
   modal_content.innerText = text
@@ -160,7 +180,7 @@ function create_text_texture(text, is_word = false, is_sequence = false) {
   }
   else if (is_sequence) {
     ctx.font = `bold 100px sans-serif`
-    ctx.fillStyle = `#ff5555`
+    ctx.fillStyle = `#6be6c5`
   }
   else {
     ctx.font = `bold 180px sans-serif`
@@ -321,8 +341,8 @@ function handle_press(e, is_local = true) {
   clearTimeout(word_timeout)
   clearTimeout(max_press_timeout)
 
-  if (sound_enabled) {
-    gain_node.gain.setTargetAtTime(0.5, audio_ctx.currentTime, 0.01)
+  if (sound_enabled()) {
+    gain_node.gain.setTargetAtTime(volume_level, audio_ctx.currentTime, 0.01)
   }
 
   particle_mesh.material.size = 0.5
@@ -333,7 +353,7 @@ function handle_press(e, is_local = true) {
 }
 
 function handle_release(e, is_local = true) {
-  if (e && e.target === sound_toggle_btn) {
+  if (e && (e.target === sound_toggle_btn)) {
     return
   }
 
@@ -342,7 +362,7 @@ function handle_release(e, is_local = true) {
   }
 
   if (e && (e.type === `keyup`)) {
-    if (e.key === `Meta` || e.key === `OS` || e.key === `Control` || e.key === `Alt` || e.key === `Shift`) {
+    if ((e.key === `Meta`) || (e.key === `OS`) || (e.key === `Control`) || (e.key === `Alt`) || (e.key === `Shift`)) {
       return
     }
 
@@ -385,8 +405,14 @@ function handle_release(e, is_local = true) {
 }
 
 window.addEventListener(`contextmenu`, (e) => {
-  if (e.target === sound_toggle_btn) return
-  if (document.getElementById(`modal-overlay`)) return
+  if (e.target === sound_toggle_btn) {
+    return
+  }
+
+  if (document.getElementById(`modal-overlay`)) {
+    return
+  }
+
   e.preventDefault()
   handle_press(e)
 })
@@ -397,14 +423,20 @@ window.addEventListener(`keydown`, handle_press)
 window.addEventListener(`keyup`, handle_release)
 
 window.addEventListener(`touchstart`, (e) => {
-  if (e.target === sound_toggle_btn) return
+  if (e.target === sound_toggle_btn) {
+    return
+  }
+
   if (document.getElementById(`modal-overlay`)) return
   e.preventDefault()
   handle_press(e)
 }, {passive: false})
 
 window.addEventListener(`touchend`, (e) => {
-  if (e.target === sound_toggle_btn) return
+  if (e.target === sound_toggle_btn) {
+    return
+  }
+
   if (document.getElementById(`modal-overlay`)) return
   e.preventDefault()
   handle_release(e)
