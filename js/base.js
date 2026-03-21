@@ -94,6 +94,18 @@ App.update_words_display = (words) => {
   words_container.innerHTML = words.map(w => `<div>${w}</div>`).join(``)
 }
 
+App.create_circle_texture = () => {
+  let canvas = document.createElement(`canvas`)
+  canvas.width = 64
+  canvas.height = 64
+  let ctx = canvas.getContext(`2d`)
+  ctx.beginPath()
+  ctx.arc(32, 32, 32, 0, Math.PI * 2)
+  ctx.fillStyle = `#ffffff`
+  ctx.fill()
+  return new THREE.CanvasTexture(canvas)
+}
+
 App.setup_canvas = () => {
   App.canvas = document.getElementById(`glcanvas`)
   App.renderer = new THREE.WebGLRenderer({canvas: App.canvas, antialias: true, alpha: true})
@@ -115,6 +127,7 @@ App.setup_canvas = () => {
   App.particles_geometry.setAttribute(`position`, new THREE.BufferAttribute(pos_array, 3))
   let theme = App.get_theme(App.zone)
   App.particles_material = new THREE.PointsMaterial({size: 0.15, color: new THREE.Color(theme.particles), transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending})
+  App.particles_material = new THREE.PointsMaterial({size: 0.15, color: new THREE.Color(theme.particles), transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, map: App.create_circle_texture(), depthWrite: false})
   App.particle_mesh = new THREE.Points(App.particles_geometry, App.particles_material)
   App.scene.add(App.particle_mesh)
   App.sprites = []
