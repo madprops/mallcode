@@ -95,7 +95,7 @@ App.setup_socket = () => {
       App.max_press_duration = App.zone_settings.max_press
       App.input_throttle_ms = App.zone_settings.throttle
       App.unit_duration = App.zone_settings.unit_duration
-      App.zone_info_el.innerText = `Online: ${App.online_count}`
+      App.zone_info_el.innerText = `Users: ${App.online_count}`
       App.play_warp_drive()
       let letter_dial = document.getElementById(`zone-letter`)
       let speed_dial = document.getElementById(`zone-speed`)
