@@ -7,7 +7,7 @@ const WebSocket = require(`ws`)
 const path = require(`path`)
 const fs = require(`fs`)
 App.server = http.createServer(App.app)
-const wss = new WebSocket.Server({server: App.server})
+App.wss = new WebSocket.Server({server: App.server})
 App.shared = require(`./js/shared.js`)
 
 App.zone_locks = {}
@@ -51,10 +51,8 @@ App.save_zone_data = () => {
 }
 
 App.setup_server = () => {
-  // Serve static files (like script.js and style.css) from the current directory
   App.app.use(App.express.static(__dirname))
 
-  // Serve the HTML file directly
   App.app.get(`/`, (req, res) => {
     res.sendFile(path.join(__dirname, `index.html`))
   })
@@ -63,13 +61,13 @@ App.setup_server = () => {
 App.broadcast_zone_count = (zone) => {
   let count = 0
 
-  wss.clients.forEach((client) => {
+  App.wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN && client.zone === zone) {
       count++
     }
   })
 
-  wss.clients.forEach((client) => {
+  App.wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN && client.zone === zone) {
       client.send(JSON.stringify({type: `USERS`, count}))
     }
@@ -84,7 +82,7 @@ App.broadcast_zone_words = (zone, client = null) => {
     client.send(msg)
   }
   else {
-    wss.clients.forEach((c) => {
+    App.wss.clients.forEach((c) => {
       if (c.readyState === WebSocket.OPEN && c.zone === zone) {
         c.send(msg)
       }
@@ -105,36 +103,53 @@ App.get_zone_state = (zone) => {
       press_start_time: 0,
       letter_timeout: null,
       word_timeout: null,
-      settings: settings
+      settings: settings,
+      last_active_ws: null
     }
   }
 
   return App.zone_states[zone]
 }
 
-App.resolve_letter = (zone, ws) => {
+App.resolve_letter = (zone) => {
   let z_state = App.zone_states[zone]
 
   if (!z_state || !z_state.current_sequence) {
     return
   }
 
-  let letter = App.shared.morse_code[z_state.current_sequence]
+  let letter = App.shared.morse_code[z_state.current_sequence] || `?`
 
-  if (letter) {
+  if (letter !== `?`) {
     z_state.current_word += letter
   }
 
+  let msg = JSON.stringify({type: `LETTER`, char: letter})
+
+  App.wss.clients.forEach((c) => {
+    if ((c.readyState === WebSocket.OPEN) && (c.zone === zone)) {
+      c.send(msg)
+    }
+  })
+
   z_state.current_sequence = ``
-  z_state.word_timeout = setTimeout(() => App.resolve_word(zone, ws), z_state.unit_duration * z_state.settings.word_mult)
+  z_state.word_timeout = setTimeout(() => App.resolve_word(zone), z_state.unit_duration * z_state.settings.word_mult)
 }
 
-App.resolve_word = (zone, ws) => {
+App.resolve_word = (zone) => {
   let z_state = App.zone_states[zone]
   if (!z_state || !z_state.current_word) return
   let current_word = z_state.current_word
   z_state.current_word = ``
-  App.process_word(zone, current_word, ws)
+  let msg = JSON.stringify({type: `WORD`, word: current_word})
+
+  App.wss.clients.forEach((c) => {
+    if ((c.readyState === WebSocket.OPEN) && (c.zone === zone)) {
+      c.send(msg)
+    }
+  })
+
+  App.process_word(zone, current_word, z_state.last_active_ws)
 }
 
 App.process_word = (zone, current_word, ws) => {
@@ -183,11 +198,10 @@ App.process_word = (zone, current_word, ws) => {
 }
 
 App.setup_sockets = () => {
-  wss.on(`connection`, (ws) => {
+  App.wss.on(`connection`, (ws) => {
     ws.id = App.next_client_id++
     ws.zone = App.default_zone()
 
-    // When a user transmits a morse code signal
     ws.on(`message`, (message) => {
       let data
 
@@ -200,53 +214,71 @@ App.setup_sockets = () => {
 
       let signal = data.type
 
-      if ((signal === `DOWN`) || (signal === `UP`)) {
-        let lock = App.zone_locks[ws.zone]
-        let now = Date.now()
-
-        if (lock && (lock.owner !== ws.id) && (lock.expires > now)) {
-          return
-        }
-
-        App.zone_locks[ws.zone] = {owner: ws.id, expires: now + App.shared.lock_time}
-
-        let z_state = App.get_zone_state(ws.zone)
-
-        if (signal === `DOWN`) {
-          z_state.press_start_time = now
-          clearTimeout(z_state.letter_timeout)
-          clearTimeout(z_state.word_timeout)
-        }
-        else if (signal === `UP`) {
-          if (z_state.press_start_time) {
-            let duration = now - z_state.press_start_time
-
-            if (duration < (z_state.unit_duration * 1.5)) {
-              z_state.current_sequence += `.`
-              let estimated_unit = duration
-              z_state.unit_duration = (z_state.unit_duration * 0.7) + (estimated_unit * 0.3)
-            }
-            else {
-              z_state.current_sequence += `-`
-              let estimated_unit = duration / 3
-              z_state.unit_duration = (z_state.unit_duration * 0.7) + (estimated_unit * 0.3)
-            }
-
-            let min_u = z_state.settings.forgiving ? 150 : z_state.settings.unit_duration * 0.8
-            let max_u = z_state.settings.forgiving ? 500 : z_state.settings.unit_duration * 1.2
-            z_state.unit_duration = Math.max(min_u, Math.min(max_u, z_state.unit_duration))
-
-            z_state.letter_timeout = setTimeout(() => App.resolve_letter(ws.zone, ws), z_state.unit_duration * z_state.settings.letter_mult)
-          }
-        }
+      if ((signal !== `DOWN`) && (signal !== `UP`)) {
+        return
       }
 
-      // Broadcast the signal to all OTHER connected clients (no identifiers)
-      wss.clients.forEach((client) => {
-        if ((client !== ws) && (client.readyState === WebSocket.OPEN) && (client.zone === ws.zone)) {
-          client.send(JSON.stringify({type: signal}))
+      let lock = App.zone_locks[ws.zone]
+      let now = Date.now()
+
+      if (lock && (lock.owner !== ws.id) && (lock.expires > now)) {
+        return
+      }
+
+      App.zone_locks[ws.zone] = {owner: ws.id, expires: now + App.shared.lock_time}
+      let z_state = App.get_zone_state(ws.zone)
+      z_state.last_active_ws = ws
+
+      if (signal === `DOWN`) {
+        z_state.press_start_time = now
+        clearTimeout(z_state.letter_timeout)
+        clearTimeout(z_state.word_timeout)
+
+        let msg_down = JSON.stringify({type: `DOWN`})
+
+        App.wss.clients.forEach((client) => {
+          if ((client !== ws) && (client.readyState === WebSocket.OPEN) && (client.zone === ws.zone)) {
+            client.send(msg_down)
+          }
+        })
+      }
+      else if (signal === `UP`) {
+        if (z_state.press_start_time) {
+          let duration = now - z_state.press_start_time
+
+          if (duration < (z_state.unit_duration * 1.5)) {
+            z_state.current_sequence += `.`
+            let estimated_unit = duration
+            z_state.unit_duration = (z_state.unit_duration * 0.7) + (estimated_unit * 0.3)
+          }
+          else {
+            z_state.current_sequence += `-`
+            let estimated_unit = duration / 3
+            z_state.unit_duration = (z_state.unit_duration * 0.7) + (estimated_unit * 0.3)
+          }
+
+          let min_u = z_state.settings.forgiving ? 150 : z_state.settings.unit_duration * 0.8
+          let max_u = z_state.settings.forgiving ? 500 : z_state.settings.unit_duration * 1.2
+          z_state.unit_duration = Math.max(min_u, Math.min(max_u, z_state.unit_duration))
+          let msg_up = JSON.stringify({type: `UP`})
+
+          App.wss.clients.forEach((client) => {
+            if ((client !== ws) && (client.readyState === WebSocket.OPEN) && (client.zone === ws.zone)) {
+              client.send(msg_up)
+            }
+          })
+
+          let msg_seq = JSON.stringify({type: `SEQUENCE`, sequence: z_state.current_sequence})
+
+          App.wss.clients.forEach((client) => {
+            if ((client.readyState === WebSocket.OPEN) && (client.zone === ws.zone)) {
+              client.send(msg_seq)
+            }
+          })
+
+          z_state.letter_timeout = setTimeout(() => App.resolve_letter(ws.zone), z_state.unit_duration * z_state.settings.letter_mult)
         }
-      })
+      }
     })
 
     ws.on(`close`, () => {
@@ -275,7 +307,7 @@ App.default_zone = () => {
   let date_str = `${day}/${month}/${year}`
   let hash = App.shared.get_string_hash(date_str)
   let rng = App.shared.create_seeded_random(hash)
-  let letter = String.fromCharCode(65 + Math.floor(rng() * 26)) // A-Z
+  let letter = String.fromCharCode(65 + Math.floor(rng() * 26))
   return `${letter}5`
 }
 

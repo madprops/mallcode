@@ -14,8 +14,6 @@ App.press_start_time = 0
 App.current_sequence = ``
 App.current_word = ``
 App.last_typist_was_local = true
-App.letter_timeout = null
-App.word_timeout = null
 
 App.setup_socket = () => {
   App.ws.onmessage = (event) => {
@@ -36,13 +34,25 @@ App.setup_socket = () => {
       App.remote_lock_time = performance.now()
       App.handle_release(null, false)
     }
+    else if (data.type === `SEQUENCE`) {
+      App.current_sequence = data.sequence
+      App.update_sequence_display()
+    }
+    else if (data.type === `LETTER`) {
+      App.spawn_sprite(data.char, `letter`)
+      App.current_sequence = ``
+      App.update_sequence_display()
+    }
+    else if (data.type === `WORD`) {
+      App.spawn_sprite(data.word, `word`)
+    }
     else if (data.type === `ZONE`) {
       if (!App.started) {
         App.start()
       }
 
       App.zone = data.zone
-      console.log(`Navigated to zone ${data.zone}`)
+      console.log(`Mapsd to zone ${data.zone}`)
       App.zone_settings = Shared.zone_settings[parseInt(App.zone.charAt(1))]
       App.max_press_duration = App.zone_settings.max_press
       App.input_throttle_ms = App.zone_settings.throttle
@@ -253,35 +263,6 @@ App.update_sequence_display = () => {
   }
 }
 
-App.resolve_letter = () => {
-  if (!App.current_sequence) {
-    return
-  }
-
-  let letter = Shared.morse_code[App.current_sequence]
-
-  if (letter) {
-    App.current_word += letter
-    App.spawn_sprite(letter, `letter`)
-  }
-  else {
-    App.spawn_sprite(`?`, `letter`)
-  }
-
-  App.current_sequence = ``
-  App.update_sequence_display()
-  App.word_timeout = setTimeout(App.resolve_word, App.unit_duration * App.zone_settings.word_mult)
-}
-
-App.resolve_word = () => {
-  if (!App.current_word) {
-    return
-  }
-
-  App.spawn_sprite(App.current_word, `word`)
-  App.current_word = ``
-}
-
 App.handle_press = (e, is_local = true) => {
   if (e && e.target === App.sound_btn) {
     return
@@ -339,10 +320,6 @@ App.handle_press = (e, is_local = true) => {
     App.ws.send(JSON.stringify({type: `DOWN`}))
   }
 
-  clearTimeout(App.letter_timeout)
-  clearTimeout(App.word_timeout)
-  clearTimeout(App.max_press_timeout)
-
   if (App.sound_enabled()) {
     App.play_beep()
   }
@@ -384,26 +361,8 @@ App.handle_release = (e, is_local = true) => {
     App.ws.send(JSON.stringify({type: `UP`}))
   }
 
-  let duration = now - App.press_start_time
   App.mute_beep()
   App.particle_mesh.material.size = 0.15
-
-  if (duration < (App.unit_duration * 1.5)) {
-    App.current_sequence += `.`
-    let estimated_unit = duration
-    App.unit_duration = (App.unit_duration * 0.7) + (estimated_unit * 0.3)
-  }
-  else {
-    App.current_sequence += `-`
-    let estimated_unit = duration / 3
-    App.unit_duration = (App.unit_duration * 0.7) + (estimated_unit * 0.3)
-  }
-
-  let min_u = App.zone_settings.forgiving ? 150 : App.zone_settings.unit_duration * 0.8
-  let max_u = App.zone_settings.forgiving ? 500 : App.zone_settings.unit_duration * 1.2
-  App.unit_duration = Math.max(min_u, Math.min(max_u, App.unit_duration))
-  App.update_sequence_display()
-  App.letter_timeout = setTimeout(App.resolve_letter, App.unit_duration * App.zone_settings.letter_mult)
 }
 
 App.setup_events = () => {
