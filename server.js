@@ -218,22 +218,33 @@ App.setup_sockets = () => {
         return
       }
 
-      let lock = App.zone_locks[ws.zone]
       let now = Date.now()
+      let lock = App.zone_locks[ws.zone]
 
-      if (lock && (lock.owner !== ws.id) && (lock.expires > now)) {
+      if (lock && lock.owner !== ws.id && lock.expires > now) {
         return
       }
 
+      // Prevent inhuman spam that could cause memory overflow
+      if (ws.last_msg_time && now - ws.last_msg_time < 20) {
+        return
+      }
+
+      ws.last_msg_time = now
       App.zone_locks[ws.zone] = {owner: ws.id, expires: now + App.shared.lock_time}
       let z_state = App.get_zone_state(ws.zone)
       z_state.last_active_ws = ws
 
       if (signal === `DOWN`) {
+        // Prevent infinite locking by ignoring redundant DOWN signals
+        if (z_state.is_pressed) {
+          return
+        }
+
+        z_state.is_pressed = true
         z_state.press_start_time = now
         clearTimeout(z_state.letter_timeout)
         clearTimeout(z_state.word_timeout)
-
         let msg_down = JSON.stringify({type: `DOWN`})
 
         App.wss.clients.forEach((client) => {
@@ -243,18 +254,29 @@ App.setup_sockets = () => {
         })
       }
       else if (signal === `UP`) {
+        // Prevent orphaned UP signals from using old timestamps
+        if (!z_state.is_pressed) {
+          return
+        }
+
+        z_state.is_pressed = false
+
         if (z_state.press_start_time) {
           let duration = now - z_state.press_start_time
+          let max_seq_length = 15
 
-          if (duration < (z_state.unit_duration * 1.5)) {
-            z_state.current_sequence += `.`
-            let estimated_unit = duration
-            z_state.unit_duration = (z_state.unit_duration * 0.7) + (estimated_unit * 0.3)
-          }
-          else {
-            z_state.current_sequence += `-`
-            let estimated_unit = duration / 3
-            z_state.unit_duration = (z_state.unit_duration * 0.7) + (estimated_unit * 0.3)
+          // Cap the sequence length to prevent memory DoS
+          if (z_state.current_sequence.length < max_seq_length) {
+            if (duration < (z_state.unit_duration * 1.5)) {
+              z_state.current_sequence += `.`
+              let estimated_unit = duration
+              z_state.unit_duration = z_state.unit_duration * 0.7 + estimated_unit * 0.3
+            }
+            else {
+              z_state.current_sequence += `-`
+              let estimated_unit = duration / 3
+              z_state.unit_duration = z_state.unit_duration * 0.7 + estimated_unit * 0.3
+            }
           }
 
           let min_u = z_state.settings.forgiving ? 150 : z_state.settings.unit_duration * 0.8
@@ -263,7 +285,7 @@ App.setup_sockets = () => {
           let msg_up = JSON.stringify({type: `UP`})
 
           App.wss.clients.forEach((client) => {
-            if ((client !== ws) && (client.readyState === WebSocket.OPEN) && (client.zone === ws.zone)) {
+            if (client !== ws && client.readyState === WebSocket.OPEN && client.zone === ws.zone) {
               client.send(msg_up)
             }
           })
@@ -271,7 +293,7 @@ App.setup_sockets = () => {
           let msg_seq = JSON.stringify({type: `SEQUENCE`, sequence: z_state.current_sequence})
 
           App.wss.clients.forEach((client) => {
-            if ((client.readyState === WebSocket.OPEN) && (client.zone === ws.zone)) {
+            if (client.readyState === WebSocket.OPEN && client.zone === ws.zone) {
               client.send(msg_seq)
             }
           })

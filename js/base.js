@@ -52,7 +52,7 @@ App.setup_socket = () => {
       }
 
       App.zone = data.zone
-      console.log(`Mapsd to zone ${data.zone}`)
+      console.log(`Moved to zone ${data.zone}`)
       App.zone_settings = Shared.zone_settings[parseInt(App.zone.charAt(1))]
       App.max_press_duration = App.zone_settings.max_press
       App.input_throttle_ms = App.zone_settings.throttle
