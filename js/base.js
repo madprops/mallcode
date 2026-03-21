@@ -9,7 +9,6 @@ App.last_focus_time = 0
 App.zone_info_el = document.getElementById(`zone-info`)
 App.sound_btn = document.getElementById(`sound-toggle`)
 App.remote_lock_time = -Shared.lock_time
-
 let protocol = window.location.protocol === `https:` ? `wss:` : `ws:`
 let ws = new WebSocket(`${protocol}//${window.location.host}`)
 
@@ -114,7 +113,45 @@ App.setup_canvas = () => {
 
   App.particles_geometry.setAttribute(`position`, new THREE.BufferAttribute(pos_array, 3))
   let theme = App.get_theme(App.zone)
-  App.particles_material = new THREE.PointsMaterial({size: 0.15, color: new THREE.Color(theme.particles), transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending})
+
+  let particle_canvas = document.createElement(`canvas`)
+  particle_canvas.width = 64
+  particle_canvas.height = 64
+  let ctx = particle_canvas.getContext(`2d`)
+  ctx.fillStyle = `#ffffff`
+
+  if (theme.shape === `circle`) {
+    ctx.beginPath()
+    ctx.arc(32, 32, 32, 0, Math.PI * 2)
+    ctx.fill()
+  }
+  else if (theme.shape === `square`) {
+    ctx.fillRect(0, 0, 64, 64)
+  }
+  else if (theme.shape === `triangle`) {
+    ctx.beginPath()
+    ctx.moveTo(32, 0)
+    ctx.lineTo(64, 64)
+    ctx.lineTo(0, 64)
+    ctx.closePath()
+    ctx.fill()
+  }
+  else if (theme.shape === `star`) {
+    ctx.beginPath()
+
+    for (let i = 0; i < 10; i++) {
+      let r = i % 2 === 0 ? 32 : 16
+      let angle = (i * Math.PI) / 5 - (Math.PI / 2)
+      ctx.lineTo(32 + Math.cos(angle) * r, 32 + Math.sin(angle) * r)
+    }
+
+    ctx.closePath()
+    ctx.fill()
+  }
+
+  let texture = new THREE.CanvasTexture(particle_canvas)
+
+  App.particles_material = new THREE.PointsMaterial({size: 0.15, color: new THREE.Color(theme.particles), map: texture, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false})
   App.particle_mesh = new THREE.Points(App.particles_geometry, App.particles_material)
   App.scene.add(App.particle_mesh)
   App.sprites = []
@@ -452,12 +489,15 @@ App.get_theme = (zone) => {
   let hue2 = (base_hue + 120 + random() * 40 - 20) % 360
   let hue3 = (base_hue + 240 + random() * 40 - 20) % 360
   let particle_hue = random() * 360
+  let shapes = [`circle`, `square`, `triangle`, `star`]
+  let shape = shapes[Math.floor(random() * shapes.length)]
 
   return {
     letter: `hsl(${Math.round(hue1)}, ${Math.round(70 + random() * 30)}%, ${Math.round(60 + random() * 20)}%)`,
     word: `hsl(${Math.round(hue2)}, ${Math.round(70 + random() * 30)}%, ${Math.round(60 + random() * 20)}%)`,
     sequence: `hsl(${Math.round(hue3)}, ${Math.round(70 + random() * 30)}%, ${Math.round(60 + random() * 20)}%)`,
-    particles: `hsl(${Math.round(particle_hue)}, ${Math.round(80 + random() * 20)}%, ${Math.round(30 + random() * 20)}%)`
+    particles: `hsl(${Math.round(particle_hue)}, ${Math.round(80 + random() * 20)}%, ${Math.round(30 + random() * 20)}%)`,
+    shape: shape
   }
 }
 
