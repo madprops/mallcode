@@ -94,12 +94,12 @@ App.broadcast_zone_words = (zone, client = null) => {
 App.setup_sockets = () => {
   wss.on(`connection`, (ws) => {
     ws.id = App.next_client_id++
-    ws.zone = App.shared.default_zone
+    ws.zone = App.shared.default_zone()
     let is_pressed = false
     let press_start_time = 0
     let current_sequence = ``
     let current_word = ``
-    let current_settings = App.shared.zone_settings[1]
+    let current_settings = App.shared.zone_settings[parseInt(ws.zone.charAt(1))]
     let unit_duration = current_settings.unit_duration
     let letter_timeout = null
     let word_timeout = null

@@ -99,8 +99,8 @@ App.play_beep = () => {
     return
   }
 
-  let hash = App.get_string_hash(App.zone)
-  let rng = App.create_seeded_random(hash)
+  let hash = Shared.get_string_hash(App.zone)
+  let rng = Shared.create_seeded_random(hash)
   let duration = 0.1 + rng() * 0.3
   let start_time = App.audio_ctx.currentTime
   let osc = App.audio_ctx.createOscillator()

@@ -1,5 +1,5 @@
-App.zone = Shared.default_zone
-App.zone_settings = Shared.zone_settings[1]
+App.zone = Shared.default_zone()
+App.zone_settings = Shared.zone_settings[parseInt(App.zone.charAt(1))]
 App.max_press_duration = App.zone_settings.max_press
 App.max_press_timeout = null
 App.last_input_time = 0
@@ -94,18 +94,6 @@ App.update_words_display = (words) => {
   words_container.innerHTML = words.map(w => `<div>${w}</div>`).join(``)
 }
 
-App.create_circle_texture = () => {
-  let canvas = document.createElement(`canvas`)
-  canvas.width = 64
-  canvas.height = 64
-  let ctx = canvas.getContext(`2d`)
-  ctx.beginPath()
-  ctx.arc(32, 32, 32, 0, Math.PI * 2)
-  ctx.fillStyle = `#ffffff`
-  ctx.fill()
-  return new THREE.CanvasTexture(canvas)
-}
-
 App.setup_canvas = () => {
   App.canvas = document.getElementById(`glcanvas`)
   App.renderer = new THREE.WebGLRenderer({canvas: App.canvas, antialias: true, alpha: true})
@@ -127,7 +115,6 @@ App.setup_canvas = () => {
   App.particles_geometry.setAttribute(`position`, new THREE.BufferAttribute(pos_array, 3))
   let theme = App.get_theme(App.zone)
   App.particles_material = new THREE.PointsMaterial({size: 0.15, color: new THREE.Color(theme.particles), transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending})
-  App.particles_material = new THREE.PointsMaterial({size: 0.15, color: new THREE.Color(theme.particles), transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, map: App.create_circle_texture(), depthWrite: false})
   App.particle_mesh = new THREE.Points(App.particles_geometry, App.particles_material)
   App.scene.add(App.particle_mesh)
   App.sprites = []
@@ -458,8 +445,8 @@ App.animate = () => {
 }
 
 App.get_theme = (zone) => {
-  let seed = App.get_string_hash(zone)
-  let random = App.create_seeded_random(seed)
+  let seed = Shared.get_string_hash(zone)
+  let random = Shared.create_seeded_random(seed)
   let base_hue = random() * 360
   let hue1 = base_hue
   let hue2 = (base_hue + 120 + random() * 40 - 20) % 360
