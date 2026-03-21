@@ -33,11 +33,11 @@ App.get_nouns = () => {
 
 App.get_zone_data = () => {
   App.zone_data = {}
-  let data_file = path.join(__dirname, `data.json`)
+  App.data_file = path.join(__dirname, `data.json`)
 
   try {
-    if (fs.existsSync(data_file)) {
-      App.zone_data = JSON.parse(fs.readFileSync(data_file, `utf8`))
+    if (fs.existsSync(App.data_file)) {
+      App.zone_data = JSON.parse(fs.readFileSync(App.data_file, `utf8`))
     }
   }
   catch (err) {
@@ -46,7 +46,7 @@ App.get_zone_data = () => {
 }
 
 App.save_zone_data = () => {
-  fs.writeFileSync(data_file, JSON.stringify(App.zone_data, null, 2), `utf8`)
+  fs.writeFileSync(App.data_file, JSON.stringify(App.zone_data, null, 2), `utf8`)
 }
 
 App.setup_server = () => {
