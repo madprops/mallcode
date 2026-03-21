@@ -93,7 +93,11 @@ App.broadcast_zone_words = (zone, client = null) => {
 App.get_zone_state = (zone) => {
   if (!App.zone_states[zone]) {
     let z_num = parseInt(zone.charAt(1))
-    if (isNaN(z_num)) z_num = 5
+
+    if (isNaN(z_num)) {
+      z_num = 5
+    }
+
     let settings = App.shared.zone_settings[z_num] || App.shared.zone_settings[5]
 
     App.zone_states[zone] = {
@@ -138,7 +142,11 @@ App.resolve_letter = (zone) => {
 
 App.resolve_word = (zone) => {
   let z_state = App.zone_states[zone]
-  if (!z_state || !z_state.current_word) return
+
+  if (!z_state || !z_state.current_word) {
+    return
+  }
+
   let current_word = z_state.current_word
   z_state.current_word = ``
   let msg = JSON.stringify({type: `WORD`, word: current_word})
@@ -199,8 +207,13 @@ App.process_word = (zone, current_word, ws) => {
 
 App.setup_sockets = () => {
   App.wss.on(`connection`, (ws) => {
+    ws.is_alive = true
     ws.id = App.next_client_id++
     ws.zone = App.default_zone()
+
+    ws.on(`pong`, () => {
+      ws.is_alive = true
+    })
 
     ws.on(`message`, (message) => {
       let data
@@ -214,6 +227,22 @@ App.setup_sockets = () => {
 
       let signal = data.type
 
+      if (signal === `RESTORE_ZONE`) {
+        if (data.zone) {
+          let old_zone = ws.zone
+          ws.zone = data.zone
+          ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone}))
+
+          if (old_zone !== ws.zone) {
+            App.broadcast_zone_count(old_zone)
+            App.broadcast_zone_count(ws.zone)
+            App.broadcast_zone_words(ws.zone, ws)
+          }
+        }
+
+        return
+      }
+
       if ((signal !== `DOWN`) && (signal !== `UP`)) {
         return
       }
@@ -221,12 +250,11 @@ App.setup_sockets = () => {
       let now = Date.now()
       let lock = App.zone_locks[ws.zone]
 
-      if (lock && lock.owner !== ws.id && lock.expires > now) {
+      if ((lock && lock.owner !== ws.id) && (lock.expires > now)) {
         return
       }
 
-      // Prevent inhuman spam that could cause memory overflow
-      if (ws.last_msg_time && now - ws.last_msg_time < 20) {
+      if (ws.last_msg_time && (now - ws.last_msg_time < 20)) {
         return
       }
 
@@ -236,7 +264,6 @@ App.setup_sockets = () => {
       z_state.last_active_ws = ws
 
       if (signal === `DOWN`) {
-        // Prevent infinite locking by ignoring redundant DOWN signals
         if (z_state.is_pressed) {
           return
         }
@@ -248,13 +275,12 @@ App.setup_sockets = () => {
         let msg_down = JSON.stringify({type: `DOWN`})
 
         App.wss.clients.forEach((client) => {
-          if ((client !== ws) && (client.readyState === WebSocket.OPEN) && (client.zone === ws.zone)) {
+          if (client !== ws && client.readyState === WebSocket.OPEN && client.zone === ws.zone) {
             client.send(msg_down)
           }
         })
       }
       else if (signal === `UP`) {
-        // Prevent orphaned UP signals from using old timestamps
         if (!z_state.is_pressed) {
           return
         }
@@ -265,9 +291,8 @@ App.setup_sockets = () => {
           let duration = now - z_state.press_start_time
           let max_seq_length = 15
 
-          // Cap the sequence length to prevent memory DoS
           if (z_state.current_sequence.length < max_seq_length) {
-            if (duration < (z_state.unit_duration * 1.5)) {
+            if (duration < z_state.unit_duration * 1.5) {
               z_state.current_sequence += `.`
               let estimated_unit = duration
               z_state.unit_duration = z_state.unit_duration * 0.7 + estimated_unit * 0.3
@@ -319,6 +344,17 @@ App.start_server = () => {
   App.server.listen(port, () => {
     console.log(`Mall Code server running on http://localhost:${port}`)
   })
+
+  setInterval(() => {
+    App.wss.clients.forEach((ws) => {
+      if (!ws.is_alive) {
+        return ws.terminate()
+      }
+
+      ws.is_alive = false
+      ws.ping()
+    })
+  }, 30000)
 }
 
 App.default_zone = () => {

@@ -8,7 +8,6 @@ App.zone_info_el = document.getElementById(`zone-info`)
 App.sound_btn = document.getElementById(`sound-toggle`)
 App.remote_lock_time = -Shared.lock_time
 App.protocol = window.location.protocol === `https:` ? `wss:` : `ws:`
-App.ws = new WebSocket(`${App.protocol}//${window.location.host}`)
 App.is_pressed = false
 App.press_start_time = 0
 App.current_sequence = ``
@@ -16,6 +15,14 @@ App.current_word = ``
 App.last_typist_was_local = true
 
 App.setup_socket = () => {
+  App.ws = new WebSocket(`${App.protocol}//${window.location.host}`)
+
+  App.ws.onopen = () => {
+    if (App.zone) {
+      App.ws.send(JSON.stringify({type: `RESTORE_ZONE`, zone: App.zone}))
+    }
+  }
+
   App.ws.onmessage = (event) => {
     let data
 
@@ -79,6 +86,16 @@ App.setup_socket = () => {
     else if (data.type === `WORDS`) {
       App.update_words_display(data.words)
     }
+  }
+
+  App.ws.onclose = () => {
+    setTimeout(() => {
+      App.setup_socket()
+    }, 2000)
+  }
+
+  App.ws.onerror = () => {
+    App.ws.close()
   }
 }
 
@@ -148,7 +165,7 @@ App.create_particle_texture = (theme) => {
 
     for (let i = 0; i < 10; i++) {
       let r = i % 2 === 0 ? 32 : 16
-      let angle = (i * Math.PI) / 5 - (Math.PI / 2)
+      let angle = i * Math.PI / 5 - Math.PI / 2
       ctx.lineTo(32 + Math.cos(angle) * r, 32 + Math.sin(angle) * r)
     }
 
@@ -173,8 +190,8 @@ App.setup_canvas = () => {
   let particles_count = 3000
   let pos_array = new Float32Array(particles_count * 3)
 
-  for (let i = 0; i < (particles_count * 3); i++) {
-    pos_array[i] = ((Math.random() - 0.5) * 150)
+  for (let i = 0; i < particles_count * 3; i++) {
+    pos_array[i] = (Math.random() - 0.5) * 150
   }
 
   App.particles_geometry.setAttribute(`position`, new THREE.BufferAttribute(pos_array, 3))
@@ -233,8 +250,8 @@ App.spawn_sprite = (text, type) => {
       sprite.scale.set(12, 3, 1)
     }
 
-    sprite.position.set(((Math.random() - 0.5) * 20), ((Math.random() - 0.5) * 10), type === `word` ? 20 : 0)
-    sprite.userData = {velocity: new THREE.Vector3(((Math.random() - 0.5) * 0.05), (Math.random() * 0.05) + 0.02, 0.05), life: 1.0, decay_rate: type === `word` ? 0.25 : 0.5, age: 0, growth: type === `word` ? 2 : 10}
+    sprite.position.set((Math.random() - 0.5) * 20, (Math.random() - 0.5) * 10, type === `word` ? 20 : 0)
+    sprite.userData = {velocity: new THREE.Vector3((Math.random() - 0.5) * 0.05, Math.random() * 0.05 + 0.02, 0.05), life: 1.0, decay_rate: type === `word` ? 0.25 : 0.5, age: 0, growth: type === `word` ? 2 : 10}
     App.sprites.push(sprite)
   }
 
@@ -271,8 +288,12 @@ App.handle_press = (e, is_local = true) => {
   if (document.getElementById(`modal-overlay`)) {
     if (e && e.type === `keydown` && e.key === `Escape`) {
       let m = document.getElementById(`modal-overlay`)
-      if (m && document.body.contains(m)) document.body.removeChild(m)
+
+      if (m && document.body.contains(m)) {
+        document.body.removeChild(m)
+      }
     }
+
     return
   }
 
@@ -304,11 +325,11 @@ App.handle_press = (e, is_local = true) => {
 
   let now = performance.now()
 
-  if (is_local && ((now - App.remote_lock_time) < Shared.lock_time)) {
+  if (is_local && now - App.remote_lock_time < Shared.lock_time) {
     return
   }
 
-  if (is_local && ((now - App.last_input_time) < App.input_throttle_ms)) {
+  if (is_local && now - App.last_input_time < App.input_throttle_ms) {
     return
   }
 
@@ -317,7 +338,7 @@ App.handle_press = (e, is_local = true) => {
   App.press_start_time = now
   App.last_typist_was_local = is_local
 
-  if ((is_local !== false) && (App.ws.readyState === WebSocket.OPEN)) {
+  if (is_local !== false && App.ws && App.ws.readyState === WebSocket.OPEN) {
     App.ws.send(JSON.stringify({type: `DOWN`}))
   }
 
@@ -333,7 +354,7 @@ App.handle_press = (e, is_local = true) => {
 }
 
 App.handle_release = (e, is_local = true) => {
-  if (e && (e.target === App.sound_btn)) {
+  if (e && e.target === App.sound_btn) {
     return
   }
 
@@ -341,7 +362,7 @@ App.handle_release = (e, is_local = true) => {
     return
   }
 
-  if (e && (e.type === `keyup`)) {
+  if (e && e.type === `keyup`) {
     if ([`Meta`, `OS`, `Control`, `Alt`, `Shift`, `F5`, `F12`].includes(e.key)) {
       return
     }
@@ -358,7 +379,7 @@ App.handle_release = (e, is_local = true) => {
   clearTimeout(App.max_press_timeout)
   App.last_input_time = now
 
-  if ((is_local !== false) && (App.ws.readyState === WebSocket.OPEN)) {
+  if (is_local !== false && App.ws && App.ws.readyState === WebSocket.OPEN) {
     App.ws.send(JSON.stringify({type: `UP`}))
   }
 
@@ -403,7 +424,10 @@ App.setup_events = () => {
       return
     }
 
-    if (document.getElementById(`modal-overlay`)) return
+    if (document.getElementById(`modal-overlay`)) {
+      return
+    }
+
     e.preventDefault()
     App.handle_release(e)
   }, {passive: false})
