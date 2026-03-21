@@ -1,1 +1,1 @@
-![](favicon.png)
+![](image.png)
