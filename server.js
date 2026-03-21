@@ -59,14 +59,14 @@ function broadcast_zone_count(zone) {
 
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN && client.zone === zone) {
-      client.send(`USERS:${count}`)
+      client.send(JSON.stringify({type: `USERS`, count}))
     }
   })
 }
 
 function broadcast_zone_words(zone, client = null) {
   let words = zone_data[zone] ? zone_data[zone].words : []
-  let msg = `WORDS:${JSON.stringify(words)}`
+  let msg = JSON.stringify({type: `WORDS`, words})
 
   if (client) {
     client.send(msg)
@@ -113,8 +113,10 @@ wss.on(`connection`, (ws) => {
     }
 
     if (current_word === `HELP`) {
-      ws.send(`MODAL:Zones can be any letter A-Z followed by a number from 1-9.\n\n
-        For example: E4, G1, X9.\n\nThe higher the number the higher the speed.`)
+      ws.send(JSON.stringify({
+        type: `MODAL`,
+        text: `Zones can be any letter A-Z followed by a number from 1-9.\n\nThe higher the number the higher the speed.\n\nFor example: E4, G1, X9.\n\n`
+      }))
     }
 
     else if (current_word.length === 2) {
@@ -126,7 +128,7 @@ wss.on(`connection`, (ws) => {
         ws.zone = cmd + arg
         current_settings = Shared.zone_settings[arg]
         unit_duration = current_settings.unit_duration
-        ws.send(`ZONE:${ws.zone}`)
+        ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone}))
 
         if (old_zone !== ws.zone) {
           broadcast_zone_count(old_zone)
@@ -157,7 +159,15 @@ wss.on(`connection`, (ws) => {
 
   // When a user transmits a morse code signal
   ws.on(`message`, (message) => {
-    let signal = message.toString()
+    let data
+    try {
+      data = JSON.parse(message.toString())
+    }
+    catch (err) {
+      return
+    }
+
+    let signal = data.type
 
     if ((signal === `DOWN`) || (signal === `UP`)) {
       let lock = zone_locks[ws.zone]
@@ -204,7 +214,7 @@ wss.on(`connection`, (ws) => {
     // Broadcast the signal to all OTHER connected clients (no identifiers)
     wss.clients.forEach((client) => {
       if ((client !== ws) && (client.readyState === WebSocket.OPEN) && (client.zone === ws.zone)) {
-        client.send(signal)
+        client.send(JSON.stringify({type: signal}))
       }
     })
   })

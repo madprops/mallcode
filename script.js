@@ -47,16 +47,25 @@ let protocol = window.location.protocol === `https:` ? `wss:` : `ws:`
 let ws = new WebSocket(`${protocol}//${window.location.host}`)
 
 ws.onmessage = (event) => {
-  if (event.data === `DOWN`) {
+  let data
+
+  try {
+    data = JSON.parse(event.data)
+  }
+  catch (err) {
+    return
+  }
+
+  if (data.type === `DOWN`) {
     remote_lock_time = performance.now()
     handle_press(null, false)
   }
-  else if (event.data === `UP`) {
+  else if (data.type === `UP`) {
     remote_lock_time = performance.now()
     handle_release(null, false)
   }
-  else if (event.data.startsWith(`ZONE:`)) {
-    let new_zone = event.data.split(`:`)[1]
+  else if (data.type === `ZONE`) {
+    let new_zone = data.zone
     console.log(`Navigated to zone ${new_zone}`)
     current_zone = new_zone
     current_settings = Shared.zone_settings[parseInt(current_zone.charAt(1))]
@@ -65,16 +74,15 @@ ws.onmessage = (event) => {
     unit_duration = current_settings.unit_duration
     zone_info_el.innerText = `${current_zone} (${online_count})`
   }
-  else if (event.data.startsWith(`MODAL:`)) {
-    show_modal(event.data.substring(6))
+  else if (data.type === `MODAL`) {
+    show_modal(data.text)
   }
-  else if (event.data.startsWith(`USERS:`)) {
-    online_count = parseInt(event.data.split(`:`)[1])
+  else if (data.type === `USERS`) {
+    online_count = data.count
     zone_info_el.innerText = `${current_zone} (${online_count})`
   }
-  else if (event.data.startsWith(`WORDS:`)) {
-    let words = JSON.parse(event.data.substring(6))
-    update_words_display(words)
+  else if (data.type === `WORDS`) {
+    update_words_display(data.words)
   }
 }
 
@@ -305,7 +313,7 @@ function handle_press(e, is_local = true) {
   press_start_time = now
 
   if ((is_local !== false) && (ws.readyState === WebSocket.OPEN)) {
-    ws.send(`DOWN`)
+    ws.send(JSON.stringify({type: `DOWN`}))
   }
 
   init_audio()
@@ -351,7 +359,7 @@ function handle_release(e, is_local = true) {
   last_input_time = now
 
   if ((is_local !== false) && (ws.readyState === WebSocket.OPEN)) {
-    ws.send(`UP`)
+    ws.send(JSON.stringify({type: `UP`}))
   }
 
   let duration = now - press_start_time
