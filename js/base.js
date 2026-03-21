@@ -22,8 +22,8 @@ App.create_debouncers = () => {
   }, App.restore_username_delay)
 
   App.zone_change_debouncer = Shared.create_debouncer(() => {
-    let letter = DOM.el(`#zone-letter`).value
-    let speed = DOM.el(`#zone-speed`).value
+    let letter = App.letter_dial_el.value
+    let speed = App.speed_dial_el.value
     let new_zone = `${letter}${speed}`
 
     if ((new_zone !== App.zone) && App.ws && (App.ws.readyState === WebSocket.OPEN)) {
@@ -333,7 +333,7 @@ App.handle_press = (e, is_local = true) => {
     return
   }
 
-  if (e && ((e.target.id === `zone-letter`) || (e.target.id === `zone-speed`))) {
+  if (e && ((e.target.id === `zone-dial-letter`) || (e.target.id === `zone-dial-speed`))) {
     return
   }
 
@@ -414,7 +414,7 @@ App.handle_release = (e, is_local = true) => {
     return
   }
 
-  if (e && ((e.target.id === `zone-letter`) || (e.target.id === `zone-speed`))) {
+  if (e && ((e.target.id === `zone-dial-letter`) || (e.target.id === `zone-dial-speed`))) {
     return
   }
 
@@ -453,7 +453,7 @@ App.setup_events = () => {
       return
     }
 
-    if ((e.target.id === `zone-letter`) || (e.target.id === `zone-speed`)) {
+    if ((e.target.id === `zone-dial-letter`) || (e.target.id === `zone-dial-speed`)) {
       return
     }
 
@@ -475,7 +475,7 @@ App.setup_events = () => {
       return
     }
 
-    if ((e.target.id === `zone-letter`) || (e.target.id === `zone-speed`)) {
+    if ((e.target.id === `zone-dial-letter`) || (e.target.id === `zone-dial-speed`)) {
       return
     }
 
@@ -492,7 +492,7 @@ App.setup_events = () => {
       return
     }
 
-    if ((e.target.id === `zone-letter`) || (e.target.id === `zone-speed`)) {
+    if ((e.target.id === `zone-dial-letter`) || (e.target.id === `zone-dial-speed`)) {
       return
     }
 
