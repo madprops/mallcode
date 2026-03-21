@@ -173,18 +173,19 @@ function create_text_texture(text, is_word = false, is_sequence = false) {
   text_canvas.height = 256
   let ctx = text_canvas.getContext(`2d`)
   ctx.clearRect(0, 0, text_canvas.width, text_canvas.height)
+  theme = get_theme(current_zone)
 
   if (is_word) {
     ctx.font = `bold 80px sans-serif`
-    ctx.fillStyle = `#ffaa00`
+    ctx.fillStyle = theme.word
   }
   else if (is_sequence) {
     ctx.font = `bold 100px sans-serif`
-    ctx.fillStyle = `#6be6c5`
+    ctx.fillStyle = theme.sequence
   }
   else {
     ctx.font = `bold 180px sans-serif`
-    ctx.fillStyle = `#ffffff`
+    ctx.fillStyle = theme.letter
   }
 
   ctx.textAlign = `center`
@@ -489,5 +490,40 @@ window.addEventListener(`focus`, () => {
 window.addEventListener(`blur`, () => {
   handle_release(null, true)
 })
+
+function get_string_hash(str) {
+  let hash = 0x811c9dc5
+
+  for (let i = 0; i < str.length; i++) {
+    hash ^= str.charCodeAt(i)
+    hash = Math.imul(hash, 0x01000193)
+  }
+
+  return hash >>> 0
+}
+
+function create_seeded_random(seed) {
+  return function() {
+    seed = (seed + 0x6D2B79F5) | 0
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed)
+    t ^= t + Math.imul(t ^ (t >>> 7), 61 | t)
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+function get_theme(zone) {
+  let seed = get_string_hash(zone)
+  let random = create_seeded_random(seed)
+  let base_hue = random() * 360
+  let hue1 = base_hue
+  let hue2 = (base_hue + 120 + (random() * 40 - 20)) % 360
+  let hue3 = (base_hue + 240 + (random() * 40 - 20)) % 360
+
+  return {
+    letter: `hsl(${hue1.toFixed(1)}, ${(70 + random() * 30).toFixed(1)}%, ${(60 + random() * 20).toFixed(1)}%)`,
+    word: `hsl(${hue2.toFixed(1)}, ${(70 + random() * 30).toFixed(1)}%, ${(60 + random() * 20).toFixed(1)}%)`,
+    sequence: `hsl(${hue3.toFixed(1)}, ${(70 + random() * 30).toFixed(1)}%, ${(60 + random() * 20).toFixed(1)}%)`,
+  }
+}
 
 animate()
