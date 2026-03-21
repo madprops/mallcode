@@ -167,7 +167,7 @@ App.process_word = (zone, current_word, ws) => {
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({
         type: `MODAL`,
-        text: `Zones can be any letter A-Z followed by a number from 1-9.\n\nThe higher the number the higher the speed.\n\nFor example: E4, G1, X9.\n\n`
+        text: `Zones can be any letter A-Z followed by a number from 1-9.\n\nThe higher the number the higher the speed.\n\nFor example: E4, G1, X9.`
       }))
     }
   }
