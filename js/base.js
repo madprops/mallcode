@@ -144,9 +144,9 @@ App.setup_socket = () => {
 }
 
 App.show_modal = (text) => {
-  let modal_overlay = document.createElement(`div`)
+  let modal_overlay = DOM.create(`div`)
   modal_overlay.id = `modal-overlay`
-  let modal_content = document.createElement(`div`)
+  let modal_content = DOM.create(`div`)
   modal_content.id = `modal-content`
   modal_content.innerText = text
   modal_overlay.appendChild(modal_content)
@@ -163,7 +163,7 @@ App.show_modal = (text) => {
 let words_container = DOM.el(`#words-container`)
 
 if (!words_container) {
-  words_container = document.createElement(`div`)
+  words_container = DOM.create(`div`)
   words_container.id = `words-container`
   words_container.style.position = `absolute`
   words_container.style.left = `20px`
@@ -182,7 +182,7 @@ App.update_words_display = (words) => {
 }
 
 App.create_particle_texture = (theme) => {
-  let particle_canvas = document.createElement(`canvas`)
+  let particle_canvas = DOM.create(`canvas`)
   particle_canvas.width = 64
   particle_canvas.height = 64
   let ctx = particle_canvas.getContext(`2d`)
@@ -253,7 +253,7 @@ App.setup_canvas = () => {
 }
 
 App.create_text_texture = (text, is_word = false, is_sequence = false) => {
-  let text_canvas = document.createElement(`canvas`)
+  let text_canvas = DOM.create(`canvas`)
   text_canvas.width = 1024
   text_canvas.height = 256
   let ctx = text_canvas.getContext(`2d`)
@@ -575,14 +575,14 @@ App.setup_dials = () => {
 
   for (let i = 0; i < 26; i++) {
     let char = String.fromCharCode(65 + i)
-    let opt = document.createElement(`option`)
+    let opt = DOM.create(`option`)
     opt.value = char
     opt.text = char
     App.letter_dial_el.appendChild(opt)
   }
 
   for (let i = 1; i <= 9; i++) {
-    let opt = document.createElement(`option`)
+    let opt = DOM.create(`option`)
     opt.value = i
     opt.text = i
     App.speed_dial_el.appendChild(opt)
