@@ -24,7 +24,7 @@ App.modal_open = false
 App.moving = false
 App.current_user = ``
 App.username = ``
-App.version = "0.0.0"
+App.version = `0.0.0`
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
