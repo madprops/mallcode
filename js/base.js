@@ -18,6 +18,7 @@ App.remote_lock_time = -Shared.lock_time
 App.last_typist_was_local = true
 App.restore_username_delay = Shared.lock_time
 App.zone_dial_delay = 100
+App.reconnect_delay = 5 * 1000
 App.modal_open = false
 App.moving = false
 App.current_user = ``
@@ -137,7 +138,7 @@ App.setup_socket = () => {
 
     setTimeout(() => {
       App.setup_socket()
-    }, 2000)
+    }, App.reconnect_delay)
   }
 
   App.ws.onerror = () => {
@@ -393,7 +394,7 @@ App.handle_press = (e, is_local = true) => {
     App.ws.send(JSON.stringify({type: `DOWN`}))
   }
 
-  if (App.sound_enabled()) {
+  if (App.sound_enabled() && App.current_user) {
     App.play_beep(App.current_user)
   }
 
