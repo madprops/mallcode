@@ -17,6 +17,16 @@ App.default_speed = 3
 App.block_seconds = 60
 App.spam_limit = 10
 
+App.get_version = () => {
+  try {
+    App.package = JSON.parse(fs.readFileSync(path.join(__dirname, `package.json`), `utf8`))
+    App.version = App.package.version || `0.0.0`
+  }
+  catch (err) {
+    App.version = `0.0.0`
+  }
+}
+
 App.get_nouns = () => {
   try {
     let nouns_data = fs.readFileSync(path.join(__dirname, `nouns.txt`), `utf8`)
@@ -165,9 +175,7 @@ App.resolve_word = (zone) => {
   App.process_word(zone, current_word, z_state.last_active_ws)
 }
 
-App.help_text = `Use the dials on the top right to change zones.
-The higher the number the higher the speed.
-For example: E4, G1, X9.`
+App.help_text = `https://www.youtube.com/watch?v=spdfnqS3bDg`
 
 App.process_word = (zone, current_word, ws) => {
   if (current_word === `HELP`) {
@@ -224,7 +232,7 @@ App.setup_sockets = () => {
           let old_zone = ws.zone
           App.force_release(ws, old_zone)
           ws.zone = data.zone
-          ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone}))
+          ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, version: App.version}))
 
           if (old_zone !== ws.zone) {
             App.broadcast_zone_count(old_zone)
@@ -366,7 +374,7 @@ App.setup_sockets = () => {
 
     App.broadcast_zone_count(ws.zone)
     App.broadcast_zone_words(ws.zone, ws)
-    ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username}))
+    ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username, version: App.version}))
   })
 }
 
@@ -441,6 +449,7 @@ App.send_message = (ws, text) => {
   }))
 }
 
+App.get_version()
 App.get_nouns()
 App.get_zone_data()
 App.setup_sockets()

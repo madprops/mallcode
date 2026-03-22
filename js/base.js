@@ -24,6 +24,7 @@ App.modal_open = false
 App.moving = false
 App.current_user = ``
 App.username = ``
+App.version = "0.0.0"
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
@@ -89,6 +90,10 @@ App.setup_socket = () => {
       App.spawn_sprite(data.word, `word`)
     }
     else if (data.type === `ZONE`) {
+      if (data.version) {
+        App.version = data.version
+      }
+
       if (!App.started) {
         App.start()
       }
@@ -584,7 +589,7 @@ App.hide_cover = () => {
 App.show_menu = () => {
   let text = `Mall Code v${App.version}
 This is a Morse Code MMO.
-234 Zones comprised of a letter and a speed number.
+234 Zones. A letter and a speed number.
 For example: A2, K4, V9, F3, T8.
 Lower zones are slower, more forgiving.
 Higher zones are closer to real speed.
