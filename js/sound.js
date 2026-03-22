@@ -63,7 +63,21 @@ App.sound_enabled = () => {
   return App.volume_level > 0
 }
 
+App.refresh_sound_icon = () => {
+  if (App.volume_level === 0.5) {
+    App.sound_btn.textContent = `🔊`
+  }
+  else if (App.volume_level === 0.25) {
+    App.sound_btn.textContent = `🔉`
+  }
+  else {
+    App.sound_btn.textContent = `🔇`
+  }
+}
+
 App.setup_sound = () => {
+  App.refresh_sound_icon()
+
   App.sound_btn.addEventListener(`click`, () => {
     if (App.volume_level === 0.5) {
       App.volume_level = 0.25
@@ -75,15 +89,12 @@ App.setup_sound = () => {
       App.volume_level = 0.5
     }
 
-    if (App.volume_level === 0.5) {
-      App.sound_btn.textContent = `🔊`
+    if (App.storage) {
+      App.storage.volume_level = App.volume_level
+      App.save_storage()
     }
-    else if (App.volume_level === 0.25) {
-      App.sound_btn.textContent = `🔉`
-    }
-    else {
-      App.sound_btn.textContent = `🔇`
-    }
+
+    App.refresh_sound_icon()
 
     if (!App.sound_enabled()) {
       App.mute_beep()

@@ -634,6 +634,11 @@ App.load_storage = async () => {
 
       get_req.onsuccess = () => {
         App.storage = get_req.result || {}
+
+        if (App.storage.volume_level !== undefined) {
+          App.volume_level = App.storage.volume_level
+        }
+
         resolve()
       }
 
@@ -669,7 +674,8 @@ App.start = () => {
   App.started = true
 }
 
-App.init = () => {
+App.init = async () => {
+  await App.load_storage()
   App.create_debouncers()
   App.setup_dials()
   App.setup_socket()
