@@ -14,6 +14,8 @@ App.zone_states = {}
 App.next_client_id = 1
 App.nouns = new Set()
 App.default_speed = 3
+App.block_seconds = 60
+App.spam_limit = 10
 
 App.get_nouns = () => {
   try {
@@ -108,7 +110,8 @@ App.get_zone_state = (zone) => {
       word_timeout: null,
       last_active_ws: null,
       lock_expires: 0,
-      settings,
+      control_start_time: 0,
+      settings
     }
   }
 
@@ -137,6 +140,7 @@ App.resolve_letter = (zone) => {
   })
 
   z_state.current_sequence = ``
+  z_state.control_start_time = Date.now()
   let unit = z_state.last_active_ws ? z_state.last_active_ws.unit_duration || z_state.settings.unit_duration : z_state.settings.unit_duration
   z_state.word_timeout = setTimeout(() => App.resolve_word(zone), unit * z_state.settings.word_mult)
 }
@@ -168,10 +172,7 @@ For example: E4, G1, X9.`
 App.process_word = (zone, current_word, ws) => {
   if (current_word === `HELP`) {
     if (ws && (ws.readyState === WebSocket.OPEN)) {
-      ws.send(JSON.stringify({
-        type: `MODAL`,
-        text: App.help_text,
-      }))
+      App.send_message(ws, App.help_text)
     }
   }
 
@@ -200,6 +201,7 @@ App.setup_sockets = () => {
     ws.username = App.shared.random_word(3, ws.ip)
     ws.zone = App.default_zone()
     ws.unit_duration = null
+    ws.penalty_expires = 0
 
     ws.on(`pong`, () => {
       ws.is_alive = true
@@ -239,6 +241,11 @@ App.setup_sockets = () => {
       }
 
       let now = Date.now()
+
+      if (ws.penalty_expires && (now < ws.penalty_expires)) {
+        return
+      }
+
       let z_state = App.get_zone_state(ws.zone)
 
       if (!ws.unit_duration) {
@@ -263,8 +270,24 @@ App.setup_sockets = () => {
           App.resolve_word(ws.zone)
         }
       }
+      else if (z_state.last_active_ws === ws) {
+        if (!z_state.current_sequence && !z_state.is_pressed && signal === `DOWN`) {
+          z_state.control_start_time = now
+        }
 
-      z_state.last_active_ws = ws
+        if ((now - z_state.control_start_time) > (App.spam_limit * 1000)) {
+          ws.penalty_expires = now + App.block_seconds * 1000
+          App.force_release(ws, ws.zone)
+          App.send_message(ws, `You have been blocked for ${App.block_seconds} seconds.`)
+          return
+        }
+      }
+
+      if (z_state.last_active_ws !== ws) {
+        z_state.last_active_ws = ws
+        z_state.control_start_time = now
+      }
+
       z_state.lock_expires = now + 3000
 
       if (signal === `DOWN`) {
@@ -400,6 +423,7 @@ App.force_release = (ws, zone) => {
     clearTimeout(z_state.word_timeout)
     z_state.last_active_ws = null
     z_state.lock_expires = 0
+    z_state.control_start_time = 0
     let msg_seq = JSON.stringify({type: `SEQUENCE`, sequence: ``, username: ws.username})
 
     App.wss.clients.forEach((client) => {
@@ -408,6 +432,13 @@ App.force_release = (ws, zone) => {
       }
     })
   }
+}
+
+App.send_message = (ws, text) => {
+  ws.send(JSON.stringify({
+    type: `MODAL`,
+    text,
+  }))
 }
 
 App.get_nouns()

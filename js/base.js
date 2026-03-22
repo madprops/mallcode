@@ -19,6 +19,7 @@ App.last_typist_was_local = true
 App.restore_username_delay = Shared.lock_time
 App.zone_dial_delay = 100
 App.reconnect_delay = 5 * 1000
+App.beep_delay = 10
 App.modal_open = false
 App.moving = false
 App.current_user = ``
@@ -32,6 +33,12 @@ App.create_debouncers = () => {
   App.zone_dial_debouncer = Shared.create_debouncer(() => {
     App.zone_dial_action()
   }, App.zone_dial_delay)
+
+  App.beep_debouncer = Shared.create_debouncer(() => {
+    if (App.current_user) {
+      App.play_beep(App.current_user)
+    }
+  }, App.beep_delay)
 }
 
 App.setup_socket = () => {
@@ -397,7 +404,7 @@ App.handle_press = (e, is_local = true) => {
   }
 
   if (App.sound_enabled() && App.current_user) {
-    App.play_beep(App.current_user)
+    App.beep_debouncer.call()
   }
 
   App.particle_mesh.material.size = 0.5
