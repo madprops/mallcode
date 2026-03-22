@@ -9,7 +9,6 @@ body, html {
     height: 100%;
     overflow: hidden;
     background-color: #020208;
-    user-select: none;
 }
 
 #glcanvas {
@@ -145,4 +144,12 @@ body, html {
 
 #words-container {
     user-select: none;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.hidden_2 {
+    display: none !important;
 }

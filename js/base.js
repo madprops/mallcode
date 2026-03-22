@@ -7,6 +7,8 @@ App.last_focus_time = 0
 App.zone_info_el = DOM.el(`#zone-info`)
 App.username_info_el = DOM.el(`#username-info`)
 App.sound_btn = DOM.el(`#sound-toggle`)
+App.overlay_el = DOM.el(`#modal-overlay`)
+App.modal_el = DOM.el(`#modal-content`)
 App.protocol = window.location.protocol === `https:` ? `wss:` : `ws:`
 App.is_pressed = false
 App.press_start_time = 0
@@ -15,6 +17,7 @@ App.current_word = ``
 App.remote_lock_time = -Shared.lock_time
 App.last_typist_was_local = true
 App.restore_username_delay = Shared.lock_time
+App.modal_open = false
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
@@ -143,21 +146,18 @@ App.setup_socket = () => {
   }
 }
 
-App.show_modal = (text) => {
-  let modal_overlay = DOM.create(`div`)
-  modal_overlay.id = `modal-overlay`
-  let modal_content = DOM.create(`div`)
-  modal_content.id = `modal-content`
-  modal_content.innerText = text
-  modal_overlay.appendChild(modal_content)
+App.show_modal = (text = ``) => {
+  if (text) {
+    App.modal_el.textContent = text
+  }
 
-  DOM.ev(modal_overlay, `click`, (e) => {
-    if ((e.target === modal_overlay) && document.body.contains(modal_overlay)) {
-      document.body.removeChild(modal_overlay)
-    }
-  })
+  DOM.show(App.overlay_el)
+  App.modal_open = true
+}
 
-  document.body.appendChild(modal_overlay)
+App.hide_modal = () => {
+  DOM.hide(App.overlay_el)
+  App.modal_open = false
 }
 
 let words_container = DOM.el(`#words-container`)
@@ -246,10 +246,6 @@ App.setup_canvas = () => {
   App.scene.add(App.particle_mesh)
   App.sprites = []
   App.active_sequence_sprite = null
-
-  DOM.ev(App.canvas, `click`, () => {
-    App.defocus_dial()
-  })
 }
 
 App.create_text_texture = (text, is_word = false, is_sequence = false) => {
@@ -337,13 +333,9 @@ App.handle_press = (e, is_local = true) => {
     return
   }
 
-  if (DOM.el(`#modal-overlay`)) {
-    if (e && (e.type === `keydown`) && (e.key === `Escape`)) {
-      let m = DOM.el(`#modal-overlay`)
-
-      if (m && document.body.contains(m)) {
-        document.body.removeChild(m)
-      }
+  if (App.modal_open) {
+    if (e.target.id === `modal-overlay`) {
+      App.hide_modal()
     }
 
     return
@@ -418,7 +410,7 @@ App.handle_release = (e, is_local = true) => {
     return
   }
 
-  if (DOM.el(`#modal-overlay`)) {
+  if (App.modal_open) {
     return
   }
 
@@ -457,7 +449,7 @@ App.setup_events = () => {
       return
     }
 
-    if (DOM.el(`#modal-overlay`)) {
+    if (App.modal_open) {
       return
     }
 
@@ -479,7 +471,7 @@ App.setup_events = () => {
       return
     }
 
-    if (DOM.el(`#modal-overlay`)) {
+    if (App.modal_open) {
       return
     }
 
@@ -496,7 +488,7 @@ App.setup_events = () => {
       return
     }
 
-    if (DOM.el(`#modal-overlay`)) {
+    if (App.modal_open) {
       return
     }
 
