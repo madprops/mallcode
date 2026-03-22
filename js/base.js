@@ -19,10 +19,11 @@ App.last_typist_was_local = true
 App.restore_username_delay = Shared.lock_time
 App.modal_open = false
 App.moving = false
+App.current_user = ``
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
-    App.username_info_el.innerText = ``
+    App.username_info_el.textContent = ``
   }, App.restore_username_delay)
 
   App.zone_dial_debouncer = Shared.create_debouncer(() => {
@@ -50,7 +51,8 @@ App.setup_socket = () => {
     }
 
     if (data.username) {
-      App.username_info_el.innerText = data.username
+      App.current_user = data.username
+      App.username_info_el.textContent = data.username
       App.username_debouncer.call()
     }
 
@@ -94,7 +96,7 @@ App.setup_socket = () => {
       App.max_press_duration = App.zone_settings.max_press
       App.input_throttle_ms = App.zone_settings.throttle
       App.unit_duration = App.zone_settings.unit_duration
-      App.zone_info_el.innerText = `Users: ${App.online_count}`
+      App.zone_info_el.textContent = `Users: ${App.online_count}`
       App.play_warp_drive()
 
       if (App.letter_dial_el) {
@@ -120,7 +122,7 @@ App.setup_socket = () => {
     }
     else if (data.type === `USERS`) {
       App.online_count = data.count
-      App.zone_info_el.innerText = `Users: ${App.online_count}`
+      App.zone_info_el.textContent = `Users: ${App.online_count}`
     }
     else if (data.type === `WORDS`) {
       App.update_words_display(data.words)
@@ -391,7 +393,7 @@ App.handle_press = (e, is_local = true) => {
   }
 
   if (App.sound_enabled()) {
-    App.play_beep()
+    App.play_beep(App.current_user)
   }
 
   App.particle_mesh.material.size = 0.5

@@ -92,31 +92,64 @@ App.mute_beep = () => {
   App.gain_node.gain.setTargetAtTime(0, App.audio_ctx.currentTime, 0.01)
 }
 
-App.play_beep = () => {
+App.play_beep = (seed = `normal`) => {
   App.init_audio()
 
   if (App.volume_level === 0) {
     return
   }
 
-  let hash = Shared.get_string_hash(App.zone)
+  let hash = Shared.get_string_hash(seed)
   let rng = Shared.create_seeded_random(hash)
-  let duration = 0.1 + rng() * 0.3
   let start_time = App.audio_ctx.currentTime
   let osc = App.audio_ctx.createOscillator()
   App.gain_node = App.audio_ctx.createGain()
-  let types = [`sine`, `square`, `sawtooth`, `triangle`]
-  let type_index = Math.floor(rng() * 4)
-  osc.type = types[type_index]
-  let start_freq = 300 + rng() * 700
-  let end_freq = start_freq + rng() * 400 - 150
-  osc.frequency.setValueAtTime(start_freq, start_time)
-  osc.frequency.exponentialRampToValueAtTime(end_freq, start_time + duration)
+  let filter = App.audio_ctx.createBiquadFilter()
+  filter.type = `lowpass`
+  let instrument_type = Math.floor(rng() * 4)
+  let duration
+  let attack
+  let start_freq = 200 + rng() * 600
+
+  if (instrument_type === 0) {
+    osc.type = `sine`
+    duration = 0.2 + rng() * 0.15
+    attack = 0.01
+    filter.frequency.value = start_freq * 2
+    osc.frequency.setValueAtTime(start_freq, start_time)
+  }
+  else if (instrument_type === 1) {
+    osc.type = `triangle`
+    duration = 0.1 + rng() * 0.1
+    attack = 0.005
+    filter.frequency.value = start_freq * 1.5
+    osc.frequency.setValueAtTime(start_freq, start_time)
+  }
+  else if (instrument_type === 2) {
+    osc.type = `sine`
+    duration = 0.25 + rng() * 0.1
+    attack = 0.03
+    filter.frequency.value = start_freq
+    osc.frequency.setValueAtTime(start_freq, start_time)
+    osc.frequency.linearRampToValueAtTime(start_freq * 1.02, start_time + duration / 2)
+    osc.frequency.linearRampToValueAtTime(start_freq, start_time + duration)
+  }
+  else {
+    osc.type = `triangle`
+    duration = 0.15 + rng() * 0.1
+    attack = 0.01
+    filter.frequency.value = start_freq * 3
+    filter.frequency.exponentialRampToValueAtTime(start_freq, start_time + 0.1)
+    osc.frequency.setValueAtTime(start_freq, start_time)
+  }
+
+  let release = 0.04
   App.gain_node.gain.setValueAtTime(0, start_time)
-  App.gain_node.gain.linearRampToValueAtTime(App.volume_level, start_time + 0.02)
-  App.gain_node.gain.exponentialRampToValueAtTime(0.01, start_time + duration)
-  osc.connect(App.gain_node)
+  App.gain_node.gain.linearRampToValueAtTime(App.volume_level, start_time + attack)
+  App.gain_node.gain.setTargetAtTime(0, start_time + duration, release / 3)
+  osc.connect(filter)
+  filter.connect(App.gain_node)
   App.gain_node.connect(App.audio_ctx.destination)
   osc.start(start_time)
-  osc.stop(start_time + duration)
+  osc.stop(start_time + duration + release * 3)
 }
