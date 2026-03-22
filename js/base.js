@@ -161,7 +161,8 @@ App.setup_socket = () => {
 }
 
 App.clean_html = (text) => {
-  return text.replace(/\</, `&lt;`, `g`)
+  text = text.replace(/</g, `&lt;`)
+  return text.replace(/>/g, `&gt;`)
 }
 
 App.urlize = (text) => {
