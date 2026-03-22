@@ -153,3 +153,31 @@ body, html {
 .hidden_2 {
     display: none !important;
 }
+
+#cover {
+    display: flex;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: black;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+#image {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+}
+
+@keyframes fadeOut {
+    from {opacity: 1;}
+    to {opacity: 0;}
+}
+
+.fade {
+    animation: fadeOut 3000ms ease-out forwards;
+}

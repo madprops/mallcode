@@ -630,6 +630,17 @@ App.zone_dial_action = () => {
   }
 }
 
+App.hide_cover = () => {
+  setTimeout(() => {
+    let cover = DOM.el(`#cover`)
+    cover.classList.add(`fade`)
+
+    setTimeout(() => {
+      cover.remove()
+    }, 3100)
+  }, 1000)
+}
+
 App.start = () => {
   App.setup_canvas()
   App.setup_events()
@@ -642,4 +653,5 @@ App.init = () => {
   App.create_debouncers()
   App.setup_dials()
   App.setup_socket()
+  App.hide_cover()
 }
