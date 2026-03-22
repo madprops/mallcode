@@ -473,8 +473,10 @@ App.setup_events = () => {
     App.show_menu()
   })
 
-  DOM.ev(`#modal-overlay`, `click`, () => {
-    App.hide_modal()
+  DOM.ev(`#modal-overlay`, `click`, (e) => {
+    if (e.target.id === `modal-overlay`) {
+      App.hide_modal()
+    }
   })
 }
 
