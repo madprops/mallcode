@@ -558,13 +558,13 @@ App.get_theme = (zone) => {
   let hue3 = (base_hue + 240 + random() * 40 - 20) % 360
   let particle_hue = random() * 360
   let shapes = [`circle`, `square`, `triangle`, `star`]
-  let shape = shapes[Math.floor(random() * shapes.length)]
+  let shape = shapes[Shared.random_int({min: 0, max: shapes.length - 1, rand: random})]
 
   return {
-    letter: `hsl(${Math.round(hue1)}, ${Math.round(70 + random() * 30)}%, ${Math.round(60 + random() * 20)}%)`,
-    word: `hsl(${Math.round(hue2)}, ${Math.round(70 + random() * 30)}%, ${Math.round(60 + random() * 20)}%)`,
-    sequence: `hsl(${Math.round(hue3)}, ${Math.round(70 + random() * 30)}%, ${Math.round(60 + random() * 20)}%)`,
-    particles: `hsl(${Math.round(particle_hue)}, ${Math.round(80 + random() * 20)}%, ${Math.round(30 + random() * 20)}%)`,
+    letter: `hsl(${Math.round(hue1)}, ${Shared.random_int({min: 70, max: 100, rand: random})}%, ${Shared.random_int({min: 60, max: 80, rand: random})}%)`,
+    word: `hsl(${Math.round(hue2)}, ${Shared.random_int({min: 70, max: 100, rand: random})}%, ${Shared.random_int({min: 60, max: 80, rand: random})}%)`,
+    sequence: `hsl(${Math.round(hue3)}, ${Shared.random_int({min: 70, max: 100, rand: random})}%, ${Shared.random_int({min: 60, max: 80, rand: random})}%)`,
+    particles: `hsl(${Math.round(particle_hue)}, ${Shared.random_int({min: 80, max: 100, rand: random})}%, ${Shared.random_int({min: 30, max: 50, rand: random})}%)`,
     shape,
   }
 }
