@@ -1,5 +1,6 @@
 App.audio_context = window.AudioContext || window.webkitAudioContext
 App.volume_level = 0.5
+App.audio_started = false
 
 App.init_audio = () => {
   if (!App.audio_ctx) {
@@ -9,10 +10,14 @@ App.init_audio = () => {
   if (App.audio_ctx.state === `suspended`) {
     App.audio_ctx.resume()
   }
+
+  App.audio_started = true
 }
 
 App.play_warp_drive = () => {
-  App.init_audio()
+  if (!App.audio_started) {
+    return
+  }
 
   let duration = 1.5
   let start_time = App.audio_ctx.currentTime
@@ -80,8 +85,8 @@ App.setup_sound = () => {
       App.sound_btn.textContent = `🔇`
     }
 
-    if (!App.sound_enabled() && App.gain_node) {
-      App.gain_node.gain.setTargetAtTime(0, App.audio_ctx.currentTime, 0.01)
+    if (!App.sound_enabled()) {
+      App.mute_beep()
     }
 
     App.sound_btn.blur()
@@ -89,11 +94,17 @@ App.setup_sound = () => {
 }
 
 App.mute_beep = () => {
+  if (!App.gain_node) {
+    return
+  }
+
   App.gain_node.gain.setTargetAtTime(0, App.audio_ctx.currentTime, 0.01)
 }
 
 App.play_beep = (seed = `normal`) => {
-  App.init_audio()
+  if (!App.audio_started) {
+    return
+  }
 
   if (App.volume_level === 0) {
     return

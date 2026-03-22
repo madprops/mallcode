@@ -399,6 +399,7 @@ App.handle_press = (e, is_local = true) => {
   }
 
   App.particle_mesh.material.size = 0.5
+  App.init_audio()
 
   App.max_press_timeout = setTimeout(() => {
     App.handle_release(null, true)
