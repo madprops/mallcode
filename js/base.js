@@ -18,20 +18,15 @@ App.remote_lock_time = -Shared.lock_time
 App.last_typist_was_local = true
 App.restore_username_delay = Shared.lock_time
 App.modal_open = false
+App.moving = false
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
     App.username_info_el.innerText = ``
   }, App.restore_username_delay)
 
-  App.zone_change_debouncer = Shared.create_debouncer(() => {
-    let letter = App.letter_dial_el.value
-    let speed = App.speed_dial_el.value
-    let new_zone = `${letter}${speed}`
-
-    if ((new_zone !== App.zone) && App.ws && (App.ws.readyState === WebSocket.OPEN)) {
-      App.ws.send(JSON.stringify({type: `RESTORE_ZONE`, zone: new_zone}))
-    }
+  App.zone_dial_debouncer = Shared.create_debouncer(() => {
+    App.zone_dial_action()
   }, 250)
 }
 
@@ -94,6 +89,7 @@ App.setup_socket = () => {
       App.update_sequence_display()
 
       App.zone = data.zone
+      App.moving = false
       App.zone_settings = Shared.zone_settings[parseInt(App.zone.charAt(1))]
       App.max_press_duration = App.zone_settings.max_press
       App.input_throttle_ms = App.zone_settings.throttle
@@ -329,7 +325,11 @@ App.handle_press = (e, is_local = true) => {
     return
   }
 
-  if (e && ((e.target.id === `zone-dial-letter`) || (e.target.id === `zone-dial-speed`))) {
+  if (e && ((e.target === App.letter_dial_el) || (e.target === App.speed_dial_el))) {
+    return
+  }
+
+  if (e && e.target.tagName === `OPTION`) {
     return
   }
 
@@ -402,11 +402,19 @@ App.handle_press = (e, is_local = true) => {
 }
 
 App.handle_release = (e, is_local = true) => {
+  if (App.moving) {
+    return
+  }
+
   if (e && (e.target === App.sound_btn)) {
     return
   }
 
-  if (e && ((e.target.id === `zone-dial-letter`) || (e.target.id === `zone-dial-speed`))) {
+  if (e && ((e.target === App.letter_dial_el) || (e.target === App.speed_dial_el))) {
+    return
+  }
+
+  if (e && e.target.tagName === `OPTION`) {
     return
   }
 
@@ -445,7 +453,7 @@ App.setup_events = () => {
       return
     }
 
-    if ((e.target.id === `zone-dial-letter`) || (e.target.id === `zone-dial-speed`)) {
+    if ((e.target === App.letter_dial_el) || (e.target === App.speed_dial_el)) {
       return
     }
 
@@ -467,7 +475,7 @@ App.setup_events = () => {
       return
     }
 
-    if ((e.target.id === `zone-dial-letter`) || (e.target.id === `zone-dial-speed`)) {
+    if ((e.target === App.letter_dial_el) || (e.target === App.speed_dial_el)) {
       return
     }
 
@@ -484,7 +492,7 @@ App.setup_events = () => {
       return
     }
 
-    if ((e.target.id === `zone-dial-letter`) || (e.target.id === `zone-dial-speed`)) {
+    if ((e.target === App.letter_dial_el) || (e.target === App.speed_dial_el)) {
       return
     }
 
@@ -580,20 +588,32 @@ App.setup_dials = () => {
     App.speed_dial_el.appendChild(opt)
   }
 
-  DOM.ev(App.letter_dial_el, `change`, () => {
+  DOM.ev(App.letter_dial_el, `input`, () => {
+    App.moving = true
     App.defocus_dial()
-    App.zone_change_debouncer.call()
+    App.zone_dial_debouncer.call()
   })
 
-  DOM.ev(App.speed_dial_el, `change`, () => {
+  DOM.ev(App.speed_dial_el, `input`, () => {
+    App.moving = true
     App.defocus_dial()
-    App.zone_change_debouncer.call()
+    App.zone_dial_debouncer.call()
   })
 }
 
 App.defocus_dial = () => {
   App.letter_dial_el.blur()
   App.speed_dial_el.blur()
+}
+
+App.zone_dial_action = () => {
+  let letter = App.letter_dial_el.value
+  let speed = App.speed_dial_el.value
+  let new_zone = `${letter}${speed}`
+
+  if ((new_zone !== App.zone) && App.ws && (App.ws.readyState === WebSocket.OPEN)) {
+    App.ws.send(JSON.stringify({type: `RESTORE_ZONE`, zone: new_zone}))
+  }
 }
 
 App.start = () => {
