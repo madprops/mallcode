@@ -124,54 +124,62 @@ App.play_beep = (seed = `normal`) => {
   let hash = Shared.get_string_hash(seed)
   let rng = Shared.create_seeded_random(hash)
   let start_time = App.audio_ctx.currentTime
-  let osc = App.audio_ctx.createOscillator()
+  App.active_osc = App.audio_ctx.createOscillator()
   App.gain_node = App.audio_ctx.createGain()
   let filter = App.audio_ctx.createBiquadFilter()
   filter.type = `lowpass`
   let instrument_type = Math.floor(rng() * 4)
-  let duration
-  let attack
-  let start_freq = 200 + rng() * 600
+  // 10ms attack prevents popping but feels instantly responsive
+  let attack = 0.01
+  let start_freq = 400 + rng() * 400
 
   if (instrument_type === 0) {
-    osc.type = `sine`
-    duration = 0.2 + rng() * 0.15
-    attack = 0.01
-    filter.frequency.value = start_freq * 2
-    osc.frequency.setValueAtTime(start_freq, start_time)
-  }
-  else if (instrument_type === 1) {
-    osc.type = `triangle`
-    duration = 0.1 + rng() * 0.1
-    attack = 0.005
-    filter.frequency.value = start_freq * 1.5
-    osc.frequency.setValueAtTime(start_freq, start_time)
-  }
-  else if (instrument_type === 2) {
-    osc.type = `sine`
-    duration = 0.25 + rng() * 0.1
-    attack = 0.03
-    filter.frequency.value = start_freq
-    osc.frequency.setValueAtTime(start_freq, start_time)
-    osc.frequency.linearRampToValueAtTime(start_freq * 1.02, start_time + duration / 2)
-    osc.frequency.linearRampToValueAtTime(start_freq, start_time + duration)
-  }
-  else {
-    osc.type = `triangle`
-    duration = 0.15 + rng() * 0.1
-    attack = 0.01
-    filter.frequency.value = start_freq * 3
-    filter.frequency.exponentialRampToValueAtTime(start_freq, start_time + 0.1)
-    osc.frequency.setValueAtTime(start_freq, start_time)
+    App.active_osc.type = `sine`
+    filter.frequency.value = 20000
   }
 
-  let release = 0.04
+  else if (instrument_type === 1) {
+    App.active_osc.type = `triangle`
+    filter.frequency.value = start_freq * 3
+  }
+
+  else if (instrument_type === 2) {
+    App.active_osc.type = `square`
+    filter.frequency.value = start_freq * 1.5
+  }
+
+  else {
+    App.active_osc.type = `sawtooth`
+    filter.frequency.value = start_freq * 1.2
+  }
+
+  App.active_osc.frequency.setValueAtTime(start_freq, start_time)
   App.gain_node.gain.setValueAtTime(0, start_time)
   App.gain_node.gain.linearRampToValueAtTime(App.volume_level, start_time + attack)
-  App.gain_node.gain.setTargetAtTime(0, start_time + duration, release / 3)
-  osc.connect(filter)
+  App.active_osc.connect(filter)
   filter.connect(App.gain_node)
   App.gain_node.connect(App.audio_ctx.destination)
-  osc.start(start_time)
-  osc.stop(start_time + duration + release * 3)
+  App.active_osc.start(start_time)
+}
+
+App.stop_beep = () => {
+  if (!App.audio_started) {
+    return
+  }
+
+  if (!App.active_osc) {
+    return
+  }
+
+  let stop_time = App.audio_ctx.currentTime
+
+  // 20ms release cuts off cleanly without a popping artifact
+  let release = 0.02
+
+  App.gain_node.gain.cancelScheduledValues(stop_time)
+  App.gain_node.gain.setValueAtTime(App.gain_node.gain.value, stop_time)
+  App.gain_node.gain.linearRampToValueAtTime(0, stop_time + release)
+  App.active_osc.stop(stop_time + release + 0.01)
+  App.active_osc = null
+  App.gain_node = null
 }
