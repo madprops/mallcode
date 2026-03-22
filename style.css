@@ -181,3 +181,7 @@ body, html {
 .fade {
     animation: fadeOut 2200ms ease-out forwards;
 }
+
+a.modal-link:hover, a.modal-link:link, a.modal-link:visited {
+    color: inherit;
+}

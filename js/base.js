@@ -160,9 +160,19 @@ App.setup_socket = () => {
   }
 }
 
+App.clean_html = (text) => {
+  return text.replace(/\</, `&lt;`, `g`)
+}
+
+App.urlize = (text) => {
+  return text.replace(/(https?:\/\/[^\s]+)/g, `<a class="modal-link" href="$1" target="_blank">$1</a>`)
+}
+
 App.show_modal = (text = ``) => {
   if (text) {
-    App.modal_el.textContent = text
+    let clean = App.clean_html(text)
+    let urlized = App.urlize(clean)
+    App.modal_el.innerHTML = urlized
   }
 
   DOM.show(App.overlay_el)
