@@ -329,7 +329,7 @@ App.handle_press = (e, is_local = true) => {
     return
   }
 
-  if (e && e.target.tagName === `OPTION`) {
+  if (e && (e.target.tagName === `OPTION`)) {
     return
   }
 
@@ -414,7 +414,7 @@ App.handle_release = (e, is_local = true) => {
     return
   }
 
-  if (e && e.target.tagName === `OPTION`) {
+  if (e && (e.target.tagName === `OPTION`)) {
     return
   }
 
