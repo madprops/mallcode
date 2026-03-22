@@ -111,7 +111,7 @@ App.get_zone_state = (zone) => {
       last_active_ws: null,
       lock_expires: 0,
       control_start_time: 0,
-      settings
+      settings,
     }
   }
 
@@ -271,7 +271,7 @@ App.setup_sockets = () => {
         }
       }
       else if (z_state.last_active_ws === ws) {
-        if (!z_state.current_sequence && !z_state.is_pressed && signal === `DOWN`) {
+        if (!z_state.current_sequence && !z_state.is_pressed && (signal === `DOWN`)) {
           z_state.control_start_time = now
         }
 
