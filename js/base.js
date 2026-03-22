@@ -25,6 +25,7 @@ App.moving = false
 App.current_user = ``
 App.username = ``
 App.version = `0.0.0`
+App.ls_storage = `mallcode_v1`
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
@@ -612,6 +613,52 @@ You might encounter other users.
 Each user has a name and sound.`
 
   App.show_modal(text)
+}
+
+App.load_storage = async () => {
+  return new Promise((resolve) => {
+    let request = window.indexedDB.open(App.ls_storage, 1)
+
+    request.onupgradeneeded = (e) => {
+      let db = e.target.result
+      if (!db.objectStoreNames.contains(`store`)) {
+        db.createObjectStore(`store`)
+      }
+    }
+
+    request.onsuccess = (e) => {
+      App.db = e.target.result
+      let tx = App.db.transaction(`store`, `readonly`)
+      let store = tx.objectStore(`store`)
+      let get_req = store.get(`data`)
+
+      get_req.onsuccess = () => {
+        App.storage = get_req.result || {}
+        resolve()
+      }
+
+      get_req.onerror = () => {
+        App.storage = {}
+        resolve()
+      }
+    }
+
+    request.onerror = () => {
+      console.error(`Error loading IndexedDB`)
+      App.storage = {}
+      resolve()
+    }
+  })
+}
+
+App.save_storage = () => {
+  if (!App.db || !App.storage) {
+    return
+  }
+
+  let tx = App.db.transaction(`store`, `readwrite`)
+  let store = tx.objectStore(`store`)
+  store.put(App.storage, `data`)
 }
 
 App.start = () => {
