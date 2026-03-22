@@ -604,8 +604,8 @@ App.show_menu = () => {
 This is a Morse Code MMO.
 234 Zones. A letter and a speed number.
 For example: A2, K4, V9, F3, T8.
-Lower zones are slower, more forgiving.
-Higher zones are closer to real speed.
+Lower numbers mean slower, more forgiving.
+Higher numbers mean closer to real speed.
 Each zone has its own theme.
 The zones remember the words.
 You might encounter other users.
