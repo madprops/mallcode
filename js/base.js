@@ -17,6 +17,7 @@ App.current_word = ``
 App.remote_lock_time = -Shared.lock_time
 App.last_typist_was_local = true
 App.restore_username_delay = Shared.lock_time
+App.zone_dial_delay = 100
 App.modal_open = false
 App.moving = false
 App.current_user = ``
@@ -28,7 +29,7 @@ App.create_debouncers = () => {
 
   App.zone_dial_debouncer = Shared.create_debouncer(() => {
     App.zone_dial_action()
-  }, 250)
+  }, App.zone_dial_delay)
 }
 
 App.setup_socket = () => {
