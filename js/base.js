@@ -22,6 +22,7 @@ App.reconnect_delay = 5 * 1000
 App.modal_open = false
 App.moving = false
 App.current_user = ``
+App.username = ``
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
@@ -93,6 +94,7 @@ App.setup_socket = () => {
       App.update_sequence_display()
 
       App.zone = data.zone
+      App.username = data.username
       App.moving = false
       App.zone_settings = Shared.zone_settings[parseInt(App.zone.charAt(1))]
       App.max_press_duration = App.zone_settings.max_press
@@ -625,12 +627,12 @@ App.start = () => {
   App.setup_canvas()
   App.setup_events()
   App.setup_sound()
-  App.create_debouncers()
   App.animate()
   App.started = true
 }
 
 App.init = () => {
+  App.create_debouncers()
   App.setup_dials()
   App.setup_socket()
 }

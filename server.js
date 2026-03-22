@@ -343,7 +343,7 @@ App.setup_sockets = () => {
 
     App.broadcast_zone_count(ws.zone)
     App.broadcast_zone_words(ws.zone, ws)
-    ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone}))
+    ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username}))
   })
 }
 
