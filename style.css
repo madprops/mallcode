@@ -179,5 +179,5 @@ body, html {
 }
 
 .fade {
-    animation: fadeOut 3000ms ease-out forwards;
+    animation: fadeOut 2200ms ease-out forwards;
 }

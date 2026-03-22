@@ -334,23 +334,7 @@ App.update_sequence_display = () => {
 }
 
 App.handle_press = (e, is_local = true) => {
-  if (e && (e.target === App.sound_btn)) {
-    return
-  }
-
-  if (e && ((e.target === App.letter_dial_el) || (e.target === App.speed_dial_el))) {
-    return
-  }
-
-  if (e && (e.target.tagName === `OPTION`)) {
-    return
-  }
-
-  if (App.modal_open) {
-    if (e.target.id === `modal-overlay`) {
-      App.hide_modal()
-    }
-
+  if (App.moving || App.modal_open) {
     return
   }
 
@@ -416,23 +400,7 @@ App.handle_press = (e, is_local = true) => {
 }
 
 App.handle_release = (e, is_local = true) => {
-  if (App.moving) {
-    return
-  }
-
-  if (e && (e.target === App.sound_btn)) {
-    return
-  }
-
-  if (e && ((e.target === App.letter_dial_el) || (e.target === App.speed_dial_el))) {
-    return
-  }
-
-  if (e && (e.target.tagName === `OPTION`)) {
-    return
-  }
-
-  if (App.modal_open) {
+  if (App.moving || App.modal_open) {
     return
   }
 
@@ -462,58 +430,22 @@ App.handle_release = (e, is_local = true) => {
 }
 
 App.setup_events = () => {
-  DOM.ev(window, `contextmenu`, (e) => {
-    if (e.target === App.sound_btn) {
-      return
-    }
-
-    if ((e.target === App.letter_dial_el) || (e.target === App.speed_dial_el)) {
-      return
-    }
-
-    if (App.modal_open) {
-      return
-    }
-
+  DOM.ev(App.canvas, `contextmenu`, (e) => {
     e.preventDefault()
     App.handle_press(e)
   })
 
-  DOM.ev(window, `mousedown`, App.handle_press)
-  DOM.ev(window, `mouseup`, App.handle_release)
+  DOM.ev(App.canvas, `mousedown`, App.handle_press)
+  DOM.ev(App.canvas, `mouseup`, App.handle_release)
   DOM.ev(window, `keydown`, App.handle_press)
   DOM.ev(window, `keyup`, App.handle_release)
 
-  DOM.ev(window, `touchstart`, (e) => {
-    if (e.target === App.sound_btn) {
-      return
-    }
-
-    if ((e.target === App.letter_dial_el) || (e.target === App.speed_dial_el)) {
-      return
-    }
-
-    if (App.modal_open) {
-      return
-    }
-
+  DOM.ev(App.canvas, `touchstart`, (e) => {
     e.preventDefault()
     App.handle_press(e)
   }, {passive: false})
 
   DOM.ev(window, `touchend`, (e) => {
-    if (e.target === App.sound_btn) {
-      return
-    }
-
-    if ((e.target === App.letter_dial_el) || (e.target === App.speed_dial_el)) {
-      return
-    }
-
-    if (App.modal_open) {
-      return
-    }
-
     e.preventDefault()
     App.handle_release(e)
   }, {passive: false})
@@ -530,6 +462,14 @@ App.setup_events = () => {
 
   DOM.ev(window, `blur`, () => {
     App.handle_release(null, true)
+  })
+
+  DOM.ev(`#menu`, `click`, () => {
+    App.show_menu()
+  })
+
+  DOM.ev(`#modal-overlay`, `click`, () => {
+    App.hide_modal()
   })
 }
 
@@ -637,8 +577,23 @@ App.hide_cover = () => {
 
     setTimeout(() => {
       cover.remove()
-    }, 3100)
+    }, 2200)
   }, 1000)
+}
+
+App.show_menu = () => {
+  let text = `Mall Code v${App.version}
+This is a Morse Code MMO.
+234 Zones comprised of a letter and a speed number.
+For example: A2, K4, V9, F3, T8.
+Lower zones are slower, more forgiving.
+Higher zones are closer to real speed.
+Each zone has its own theme.
+The zones remember the words.
+You might encounter other users.
+Each user has a name and sound.`
+
+  App.show_modal(text)
 }
 
 App.start = () => {
