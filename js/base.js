@@ -174,7 +174,7 @@ App.urlize = (text) => {
   return text.replace(/(https?:\/\/[^\s]+)/g, `<a class="modal-link" href="$1" target="_blank">$1</a>`)
 }
 
-App.show_modal = (text = ``) => {
+App.show_modal = (text = ``, html = ``) => {
   if (App.is_pressed) {
     App.handle_release(null, true)
   }
@@ -183,6 +183,9 @@ App.show_modal = (text = ``) => {
     let clean = App.clean_html(text)
     let urlized = App.urlize(clean)
     App.modal_el.innerHTML = urlized
+  }
+  else if (html) {
+    App.modal_el.innerHTML = html
   }
 
   DOM.show(App.overlay_el)
@@ -597,17 +600,7 @@ App.setup_dials = () => {
     App.stop_beep()
   })
 
-  let zone_dials = DOM.el(`#zone-dials`)
-  if (zone_dials) {
-    let map_btn = DOM.el(`#zone-selector-btn`)
-    if (!map_btn) {
-      map_btn = DOM.create(`button`)
-      map_btn.id = `zone-selector-btn`
-      map_btn.textContent = `MAP`
-      zone_dials.appendChild(map_btn)
-    }
-    DOM.ev(map_btn, `click`, App.show_zone_selector)
-  }
+  DOM.ev(`#zone-map`, `click`, App.show_zone_map)
 }
 
 App.defocus_dial = () => {
@@ -702,18 +695,19 @@ App.save_storage = () => {
   store.put(App.storage, `data`)
 }
 
-App.show_zone_selector = () => {
+App.show_zone_map = () => {
   if (App.ws && (App.ws.readyState === WebSocket.OPEN)) {
     App.ws.send(JSON.stringify({type: `GET_ZONES`}))
   }
 }
 
 App.build_zone_selector = (zones_info) => {
-  let html = `<div class="zone-selector-title">Select a Zone</div><div class="zone-selector-grid">`
+  let html = `<div class="zone-selector-title">Zone Map</div><div class="zone-selector-grid">`
   let now = Date.now()
 
   for (let i = 0; i < 26; i++) {
     let letter = String.fromCharCode(65 + i)
+
     for (let speed = 1; speed <= 9; speed++) {
       let zone = `${letter}${speed}`
       let info = zones_info[zone] || {last_activity: 0, words: 0}
@@ -733,10 +727,9 @@ App.build_zone_selector = (zones_info) => {
   }
 
   html += `</div>`
-  App.show_modal(``)
-  App.modal_el.innerHTML = html
-
+  App.show_modal(``, html)
   let btns = DOM.els(`.zone-btn`, App.modal_el)
+
   for (let btn of btns) {
     DOM.ev(btn, `click`, () => {
       let zone = btn.dataset.zone
