@@ -288,7 +288,7 @@ App.create_text_texture = (text, is_word = false, is_sequence = false) => {
   }
   else if (is_sequence) {
     ctx.font = `bold 100px sans-serif`
-    ctx.fillStyle = theme.sequence
+    ctx.fillStyle = App.get_user_color(App.current_user)
   }
   else {
     ctx.font = `bold 180px sans-serif`
@@ -522,13 +522,19 @@ App.animate = () => {
   App.renderer.render(App.scene, App.camera)
 }
 
+App.get_user_color = (name = `nobody`) => {
+  let seed = Shared.get_string_hash(name)
+  let random = Shared.create_seeded_random(seed)
+  let base_hue = random() * 360
+  return `hsl(${Math.round(base_hue)}, ${Shared.random_int({min: 80, max: 100, rand: random})}%, ${Shared.random_int({min: 55, max: 75, rand: random})}%)`
+}
+
 App.get_theme = (zone) => {
   let seed = Shared.get_string_hash(zone)
   let random = Shared.create_seeded_random(seed)
   let base_hue = random() * 360
   let hue1 = base_hue
   let hue2 = (base_hue + 120 + random() * 40 - 20) % 360
-  let hue3 = (base_hue + 240 + random() * 40 - 20) % 360
   let particle_hue = random() * 360
   let shapes = [`circle`, `square`, `triangle`, `star`]
   let shape = shapes[Shared.random_int({min: 0, max: shapes.length - 1, rand: random})]
@@ -536,9 +542,8 @@ App.get_theme = (zone) => {
   return {
     letter: `hsl(${Math.round(hue1)}, ${Shared.random_int({min: 70, max: 100, rand: random})}%, ${Shared.random_int({min: 60, max: 80, rand: random})}%)`,
     word: `hsl(${Math.round(hue2)}, ${Shared.random_int({min: 70, max: 100, rand: random})}%, ${Shared.random_int({min: 60, max: 80, rand: random})}%)`,
-    sequence: `hsl(${Math.round(hue3)}, ${Shared.random_int({min: 70, max: 100, rand: random})}%, ${Shared.random_int({min: 60, max: 80, rand: random})}%)`,
-    particles: `hsl(${Math.round(particle_hue)}, ${Shared.random_int({min: 80, max: 100, rand: random})}%, ${Shared.random_int({min: 30, max: 50, rand: random})}%)`,
-    shape,
+    particles: `hsl(${Math.round(particle_hue)}, ${Shared.random_int({min: 80, max: 100, rand: random})}%, ${Shared.random_int({min: 55, max: 75, rand: random})}%)`,
+    shape: shape
   }
 }
 
