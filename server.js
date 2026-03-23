@@ -13,6 +13,9 @@ App.shared = require(`./js/shared.js`)
 App.zone_states = {}
 App.next_client_id = 1
 App.nouns = new Set()
+App.adjectives = new Set()
+App.verbs = new Set()
+App.adverbs = new Set()
 App.default_speed = 3
 App.block_seconds = 60
 App.spam_limit = 10
@@ -30,21 +33,48 @@ App.get_version = () => {
   }
 }
 
-App.get_nouns = () => {
-  try {
-    let nouns_data = fs.readFileSync(path.join(__dirname, `nouns.txt`), `utf8`)
+App.get_words = () => {
+  App.load_words(`nouns`)
+  App.load_words(`adjectives`)
+  App.load_words(`verbs`)
+  App.load_words(`adverbs`)
+}
 
-    nouns_data.split(`\n`).forEach(line => {
+App.load_words = (what) => {
+  try {
+    let data = fs.readFileSync(path.join(__dirname, `${what}.txt`), `utf8`)
+
+    data.split(`\n`).forEach(line => {
       let word = line.trim()
 
       if (word) {
-        App.nouns.add(word)
+        App[what].add(word)
       }
     })
   }
   catch (err) {
-    console.error(`Error loading nouns.txt:`, err)
+    console.error(`Error loading ${what}.txt:`, err)
   }
+}
+
+App.word_match = (word) => {
+  if (App.nouns.has(word)) {
+    return true
+  }
+
+  if (App.adjectives.has(word)) {
+    return true
+  }
+
+  if (App.verbs.has(word)) {
+    return true
+  }
+
+  if (App.adverbs.has(word)) {
+    return true
+  }
+
+  return false
 }
 
 App.get_zone_data = () => {
@@ -234,7 +264,7 @@ App.process_word = (zone, current_word, ws) => {
     }
   }
 
-  if ((current_word.length >= 3) && App.nouns.has(current_word.toLowerCase())) {
+  if ((current_word.length >= 3) && App.word_match(current_word.toLowerCase())) {
     if (!App.zone_data[zone]) {
       App.zone_data[zone] = {words: []}
     }
@@ -518,7 +548,7 @@ App.block_message = (ws, seconds) => {
 }
 
 App.get_version()
-App.get_nouns()
+App.get_words()
 App.get_zone_data()
 App.setup_sockets()
 App.setup_server()
