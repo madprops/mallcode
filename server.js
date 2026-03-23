@@ -345,7 +345,7 @@ App.setup_sockets = () => {
           ws.penalty_expires = now + App.block_seconds * 1000
           App.blocked_ips[ws.ip] = ws.penalty_expires
           App.force_release(ws, ws.zone)
-          App.block_message(App.block_seconds)
+          App.block_message(ws, App.block_seconds)
           return
         }
 
@@ -353,7 +353,7 @@ App.setup_sockets = () => {
           ws.penalty_expires = now + App.soft_block_seconds * 1000
           App.blocked_ips[ws.ip] = ws.penalty_expires
           App.force_release(ws, ws.zone)
-          App.block_message(App.soft_block_seconds)
+          App.block_message(ws, App.soft_block_seconds)
           return
         }
       }
@@ -513,7 +513,7 @@ App.send_message = (ws, text) => {
   }))
 }
 
-App.block_message = (seconds) => {
+App.block_message = (ws, seconds) => {
   App.send_message(ws, `You have been blocked for ${seconds} seconds.`)
 }
 
