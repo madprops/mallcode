@@ -394,6 +394,9 @@ App.handle_press = (e, is_local = true) => {
 
   if (is_local) {
     App.last_typist_was_local = true
+    App.current_user = App.username
+    App.username_info_el.textContent = App.username
+    App.username_debouncer.call()
   }
 
   if (is_local && ((now - App.last_input_time) < App.input_throttle_ms)) {
