@@ -136,14 +136,15 @@ body, html {
     user-select: none;
 }
 
-.zone-selector-title {
+.zone-map-title {
     font-size: 24px;
     margin-bottom: 20px;
     color: #fff;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    user-select: none;
 }
 
-.zone-selector-grid {
+.zone-map-grid {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
     gap: 8px;
@@ -168,20 +169,20 @@ body, html {
     z-index: 2;
 }
 
-.zone-selector-grid::-webkit-scrollbar {
+.zone-map-grid::-webkit-scrollbar {
     width: 8px;
 }
 
-.zone-selector-grid::-webkit-scrollbar-track {
+.zone-map-grid::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.3);
 }
 
-.zone-selector-grid::-webkit-scrollbar-thumb {
+.zone-map-grid::-webkit-scrollbar-thumb {
     background: #00ffcc;
     border-radius: 4px;
 }
 
-#zone-selector-btn {
+#zone-map-btn {
     background: rgba(10, 10, 15, 0.8);
     color: #fff;
     border: 1px solid #555;
@@ -196,7 +197,7 @@ body, html {
     transition: all 0.2s ease-in-out;
 }
 
-#zone-selector-btn:hover {
+#zone-map-btn:hover {
     background: rgba(255, 255, 255, 0.1);
 }
 
