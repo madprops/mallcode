@@ -73,12 +73,15 @@ App.save_zone_data = () => {
   fs.writeFileSync(App.data_file, JSON.stringify(App.zone_data, null, 2), `utf8`)
 }
 
-App.update_zone_activity = (zone) => {
+App.update_zone_activity = (zone, activity = false) => {
   if (!App.zone_data[zone]) {
     App.zone_data[zone] = {words: [], last_activity: 0}
   }
 
-  App.zone_data[zone].last_activity = Date.now()
+  if (activity) {
+    App.zone_data[zone].last_activity = Date.now()
+  }
+
   App.zone_data_changed = true
 }
 
@@ -328,10 +331,11 @@ App.setup_sockets = () => {
 
       if (signal === `GET_ZONES`) {
         let zones_info = {}
+
         for (let z in App.zone_data) {
           zones_info[z] = {
             last_activity: App.zone_data[z].last_activity,
-            words: App.zone_data[z].words.length
+            words: App.zone_data[z].words.length,
           }
         }
         ws.send(JSON.stringify({type: `ZONES_INFO`, zones: zones_info}))
@@ -352,7 +356,7 @@ App.setup_sockets = () => {
         return
       }
 
-      App.update_zone_activity(ws.zone)
+      App.update_zone_activity(ws.zone, true)
 
       let z_state = App.get_zone_state(ws.zone)
 
