@@ -145,6 +145,9 @@ App.setup_socket = () => {
     else if (data.type === `WORDS`) {
       App.update_words_display(data.words)
     }
+    else if (data.type === `ZONES_INFO`) {
+      App.build_zone_selector(data.zones)
+    }
   }
 
   App.ws.onclose = () => {
@@ -593,6 +596,18 @@ App.setup_dials = () => {
   DOM.ev(App.speed_dial_el, `click`, () => {
     App.stop_beep()
   })
+
+  let zone_dials = DOM.el(`#zone-dials`)
+  if (zone_dials) {
+    let map_btn = DOM.el(`#zone-selector-btn`)
+    if (!map_btn) {
+      map_btn = DOM.create(`button`)
+      map_btn.id = `zone-selector-btn`
+      map_btn.textContent = `MAP`
+      zone_dials.appendChild(map_btn)
+    }
+    DOM.ev(map_btn, `click`, App.show_zone_selector)
+  }
 }
 
 App.defocus_dial = () => {
@@ -688,14 +703,49 @@ App.save_storage = () => {
 }
 
 App.show_zone_selector = () => {
-  // request zone info from the server
-  // this includes every zone in the data with the "last_activity" property and the number of words they have.
-  // Make a modal widget that will show buttons for all the zones A-Z
-  // and their respective speeds. So 234 zones.
-  // Each zone is gonna be colored coded.
-  // Ranging tons from green to red, red meaning more activity.
-  // To calculate the activity use the last_activity and the number of words to produce a coeficient.
-  // Clicking the zone buttons changes to the zone and closes the modal.
+  if (App.ws && (App.ws.readyState === WebSocket.OPEN)) {
+    App.ws.send(JSON.stringify({type: `GET_ZONES`}))
+  }
+}
+
+App.build_zone_selector = (zones_info) => {
+  let html = `<div class="zone-selector-title">Select a Zone</div><div class="zone-selector-grid">`
+  let now = Date.now()
+
+  for (let i = 0; i < 26; i++) {
+    let letter = String.fromCharCode(65 + i)
+    for (let speed = 1; speed <= 9; speed++) {
+      let zone = `${letter}${speed}`
+      let info = zones_info[zone] || {last_activity: 0, words: 0}
+
+      let time_since_active = now - info.last_activity
+      let days_since_active = time_since_active / (1000 * 60 * 60 * 24)
+      let word_coef = Math.min(1, info.words / 10)
+      let time_coef = info.last_activity > 0 ? Math.max(0, 1 - (days_since_active / 7)) : 0
+      let activity = info.last_activity > 0 ? (word_coef * 0.5) + (time_coef * 0.5) : 0
+
+      let hue = Math.round(120 - (activity * 120))
+      let color = `hsl(${hue}, 100%, 60%)`
+      let bg = `hsl(${hue}, 50%, 15%)`
+
+      html += `<button class="zone-btn" data-zone="${zone}" style="color: ${color}; background-color: ${bg}; border-color: ${color}">${zone}</button>`
+    }
+  }
+
+  html += `</div>`
+  App.show_modal(``)
+  App.modal_el.innerHTML = html
+
+  let btns = DOM.els(`.zone-btn`, App.modal_el)
+  for (let btn of btns) {
+    DOM.ev(btn, `click`, () => {
+      let zone = btn.dataset.zone
+      App.letter_dial_el.value = zone.charAt(0)
+      App.speed_dial_el.value = zone.charAt(1)
+      App.zone_dial_action()
+      App.hide_modal()
+    })
+  }
 }
 
 App.start = () => {
