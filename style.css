@@ -170,6 +170,11 @@ body, html {
     z-index: 2;
 }
 
+.zone-map-current {
+    border-color: #00aaff !important;
+    border-width: 2px !important;
+}
+
 .zone-map-grid::-webkit-scrollbar {
     width: 8px;
 }
@@ -181,12 +186,6 @@ body, html {
 .zone-map-grid::-webkit-scrollbar-thumb {
     background: #00ffcc;
     border-radius: 4px;
-}
-
-.zone-map-current {
-    border-color: #00aaff !important;
-    border-radius: 0 !important;
-    border-width: 2px !important;
 }
 
 #zone-map-btn:hover {
