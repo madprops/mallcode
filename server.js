@@ -19,6 +19,8 @@ App.spam_limit = 10
 App.blocked_ips = {}
 App.transmission_limit = 60
 App.soft_block_seconds = 10
+App.zone_data_changed = false
+App.save_data_interval = 2 * 1000
 
 App.get_version = () => {
   try {
@@ -69,6 +71,15 @@ App.get_zone_data = () => {
 
 App.save_zone_data = () => {
   fs.writeFileSync(App.data_file, JSON.stringify(App.zone_data, null, 2), `utf8`)
+}
+
+App.update_zone_activity = (zone) => {
+  if (!App.zone_data[zone]) {
+    App.zone_data[zone] = {words: []}
+  }
+
+  App.zone_data[zone].last_activity = Date.now()
+  App.zone_data_changed = true
 }
 
 App.setup_server = () => {
@@ -262,7 +273,7 @@ App.process_word = (zone, current_word, ws) => {
       App.zone_data[zone].words.pop()
     }
 
-    App.save_zone_data()
+    App.zone_data_changed = true
     App.broadcast_zone_words(zone)
   }
 }
@@ -308,6 +319,8 @@ App.setup_sockets = () => {
             App.broadcast_zone_count(ws.zone)
             App.broadcast_zone_words(ws.zone, ws)
           }
+
+          App.update_zone_activity(ws.zone)
         }
 
         return
@@ -326,6 +339,8 @@ App.setup_sockets = () => {
       if (ws.penalty_expires && (now < ws.penalty_expires)) {
         return
       }
+
+      App.update_zone_activity(ws.zone)
 
       let z_state = App.get_zone_state(ws.zone)
 
@@ -483,6 +498,13 @@ App.start_server = () => {
       ws.ping()
     })
   }, 30 * 1000)
+
+  setInterval(() => {
+    if (App.zone_data_changed) {
+      App.save_zone_data()
+      App.zone_data_changed = false
+    }
+  }, App.save_data_interval)
 }
 
 App.default_zone = () => {
