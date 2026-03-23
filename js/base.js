@@ -99,6 +99,8 @@ App.setup_socket = () => {
         App.start()
       }
 
+      App.moving = false
+
       if (App.is_pressed) {
         App.handle_release(null, false)
       }
@@ -108,7 +110,6 @@ App.setup_socket = () => {
 
       App.zone = data.zone
       App.username = data.username
-      App.moving = false
       App.zone_settings = Shared.zone_settings[parseInt(App.zone.charAt(1))]
       App.max_press_duration = App.zone_settings.max_press
       App.input_throttle_ms = App.zone_settings.throttle
@@ -171,6 +172,10 @@ App.urlize = (text) => {
 }
 
 App.show_modal = (text = ``) => {
+  if (App.is_pressed) {
+    App.handle_release(null, true)
+  }
+
   if (text) {
     let clean = App.clean_html(text)
     let urlized = App.urlize(clean)
