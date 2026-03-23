@@ -153,7 +153,7 @@ body, html {
     padding: 4px;
 }
 
-.zone-btn {
+.zone-map-btn {
     padding: 10px 5px;
     font-size: 16px;
     font-family: monospace;
@@ -162,9 +162,10 @@ body, html {
     border: 1px solid;
     border-radius: 4px;
     transition: transform 0.1s;
+    min-width: 40px;
 }
 
-.zone-btn:hover {
+.zone-map-btn:hover {
     transform: scale(1.1);
     z-index: 2;
 }
@@ -182,19 +183,10 @@ body, html {
     border-radius: 4px;
 }
 
-#zone-map-btn {
-    background: rgba(10, 10, 15, 0.8);
-    color: #fff;
-    border: 1px solid #555;
-    padding: 2px 16px;
-    font-size: 18px;
-    font-family: monospace;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    cursor: pointer;
-    outline: none;
-    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.05);
-    transition: all 0.2s ease-in-out;
+.zone-map-current {
+    border-color: #00aaff !important;
+    border-radius: 0 !important;
+    border-width: 2px !important;
 }
 
 #zone-map-btn:hover {

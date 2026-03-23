@@ -728,14 +728,14 @@ App.build_zone_selector = (zones_info) => {
       let info = zones_info[zone] || {last_activity: 0}
       let colors = App.get_zone_colors(info.last_activity, now)
       let is_current = zone === App.zone
-      let cls = is_current ? `zone-btn current-zone` : `zone-btn`
+      let cls = is_current ? `zone-map-btn zone-map-current` : `zone-map-btn`
       html += `<button class="${cls}" data-zone="${zone}" style="color: ${colors.color}; background-color: ${colors.bg}; border-color: ${is_current ? `#00aaff` : colors.color}">${zone}</button>`
     }
   }
 
   html += `</div>`
   App.show_modal(``, html)
-  let btns = DOM.els(`.zone-btn`, App.modal_el)
+  let btns = DOM.els(`.zone-map-btn`, App.modal_el)
 
   setTimeout(() => {
     let active_btn = DOM.el(`[data-zone="${App.zone}"]`, App.modal_el)
@@ -759,7 +759,13 @@ App.build_zone_selector = (zones_info) => {
       btn.style.color = colors.color
       btn.style.backgroundColor = colors.bg
       let is_current = zone === App.zone
-      btn.style.borderColor = is_current ? `#00aaff` : colors.color
+
+      if (is_current) {
+        btn.classList.add(`zone-map-current`)
+      }
+      else {
+        btn.classList.remove(`zone-map-current`)
+      }
     }
   }, 10 * 1000)
 
