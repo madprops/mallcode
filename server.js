@@ -333,6 +333,10 @@ App.setup_sockets = () => {
         }
       }
       else if (z_state.last_active_ws === ws) {
+        if (now > z_state.lock_expires) {
+          z_state.takeover_time = now
+        }
+
         if (!z_state.current_sequence && !z_state.is_pressed && (signal === `DOWN`)) {
           z_state.control_start_time = now
         }
@@ -347,7 +351,9 @@ App.setup_sockets = () => {
 
         if ((now - z_state.takeover_time) > (App.transmission_limit * 1000)) {
           ws.penalty_expires = now + App.soft_block_seconds * 1000
+          App.blocked_ips[ws.ip] = ws.penalty_expires
           App.force_release(ws, ws.zone)
+          App.send_message(ws, `Transmission limit reached. You have been blocked for ${App.soft_block_seconds} seconds.`)
           return
         }
       }
