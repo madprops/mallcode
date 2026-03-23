@@ -121,6 +121,11 @@ App.play_beep = (seed = `normal`) => {
     return
   }
 
+  // Prevent orphaned oscillators by stopping the active one first
+  if (App.active_osc) {
+    App.stop_beep()
+  }
+
   let hash = Shared.get_string_hash(seed)
   let rng = Shared.create_seeded_random(hash)
   let start_time = App.audio_ctx.currentTime
@@ -129,25 +134,24 @@ App.play_beep = (seed = `normal`) => {
   let filter = App.audio_ctx.createBiquadFilter()
   filter.type = `lowpass`
   let instrument_type = Math.floor(rng() * 4)
+
   // 10ms attack prevents popping but feels instantly responsive
   let attack = 0.01
+
   let start_freq = 400 + rng() * 400
 
   if (instrument_type === 0) {
     App.active_osc.type = `sine`
     filter.frequency.value = 20000
   }
-
   else if (instrument_type === 1) {
     App.active_osc.type = `triangle`
     filter.frequency.value = start_freq * 3
   }
-
   else if (instrument_type === 2) {
     App.active_osc.type = `square`
     filter.frequency.value = start_freq * 1.5
   }
-
   else {
     App.active_osc.type = `sawtooth`
     filter.frequency.value = start_freq * 1.2
