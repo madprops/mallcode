@@ -687,6 +687,17 @@ App.save_storage = () => {
   store.put(App.storage, `data`)
 }
 
+App.show_zone_selector = () => {
+  // request zone info from the server
+  // this includes every zone in the data with the "last_activity" property and the number of words they have.
+  // Make a modal widget that will show buttons for all the zones A-Z
+  // and their respective speeds. So 234 zones.
+  // Each zone is gonna be colored coded.
+  // Ranging tons from green to red, red meaning more activity.
+  // To calculate the activity use the last_activity and the number of words to produce a coeficient.
+  // Clicking the zone buttons changes to the zone and closes the modal.
+}
+
 App.start = () => {
   App.setup_canvas()
   App.setup_events()

@@ -75,7 +75,7 @@ App.save_zone_data = () => {
 
 App.update_zone_activity = (zone) => {
   if (!App.zone_data[zone]) {
-    App.zone_data[zone] = {words: []}
+    App.zone_data[zone] = {words: [], last_activity: 0}
   }
 
   App.zone_data[zone].last_activity = Date.now()
