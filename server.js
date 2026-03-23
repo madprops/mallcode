@@ -17,6 +17,8 @@ App.default_speed = 3
 App.block_seconds = 60
 App.spam_limit = 10
 App.blocked_ips = {}
+App.transmission_limit = 60
+App.soft_block_seconds = 10
 
 App.get_version = () => {
   try {
@@ -122,6 +124,7 @@ App.get_zone_state = (zone) => {
       last_active_ws: null,
       lock_expires: 0,
       control_start_time: 0,
+      takeover_time: 0,
       settings,
     }
   }
@@ -341,11 +344,18 @@ App.setup_sockets = () => {
           App.send_message(ws, `You have been blocked for ${App.block_seconds} seconds.`)
           return
         }
+
+        if ((now - z_state.takeover_time) > (App.transmission_limit * 1000)) {
+          ws.penalty_expires = now + App.soft_block_seconds * 1000
+          App.force_release(ws, ws.zone)
+          return
+        }
       }
 
       if (z_state.last_active_ws !== ws) {
         z_state.last_active_ws = ws
         z_state.control_start_time = now
+        z_state.takeover_time = now
       }
 
       z_state.lock_expires = now + 3000
@@ -485,6 +495,7 @@ App.force_release = (ws, zone) => {
     z_state.last_active_ws = null
     z_state.lock_expires = 0
     z_state.control_start_time = 0
+    z_state.takeover_time = 0
     App.send_sequence({username: ws.username, zone})
   }
 }
