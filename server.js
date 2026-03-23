@@ -72,6 +72,16 @@ App.save_zone_data = () => {
 }
 
 App.setup_server = () => {
+  App.app.use((req, res, next) => {
+    let cookies = req.headers.cookie || ``
+
+    if (!cookies.includes(`date_join=`)) {
+      res.cookie(`date_join`, Date.now().toString(), {maxAge: 10 * 365 * 24 * 60 * 60 * 1000 })
+    }
+
+    next()
+  })
+
   App.app.use(App.express.static(__dirname))
 
   App.app.get(`/`, (req, res) => {
@@ -259,10 +269,13 @@ App.process_word = (zone, current_word, ws) => {
 
 App.setup_sockets = () => {
   App.wss.on(`connection`, (ws, req) => {
+    let cookies = req.headers.cookie || ``
+    let date_join_match = cookies.match(/(?:^|;\s*)date_join=([^;]+)/)
+    ws.date_join = date_join_match ? parseInt(date_join_match[1], 10) : Date.now()
     ws.is_alive = true
     ws.id = App.next_client_id++
     ws.ip = req.headers[`x-forwarded-for`] || req.socket.remoteAddress
-    ws.username = App.shared.random_word(3, ws.ip)
+    ws.username = App.shared.random_word(3, ws.date_join || ws.ip)
     ws.zone = App.default_zone()
     ws.unit_duration = null
     ws.penalty_expires = App.blocked_ips[ws.ip] || 0
