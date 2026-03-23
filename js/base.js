@@ -557,7 +557,7 @@ App.get_theme = (zone) => {
     letter: `hsl(${Math.round(hue1)}, ${Shared.random_int({min: 70, max: 100, rand: random})}%, ${Shared.random_int({min: 60, max: 80, rand: random})}%)`,
     word: `hsl(${Math.round(hue2)}, ${Shared.random_int({min: 70, max: 100, rand: random})}%, ${Shared.random_int({min: 60, max: 80, rand: random})}%)`,
     particles: `hsl(${Math.round(particle_hue)}, ${Shared.random_int({min: 80, max: 100, rand: random})}%, ${Shared.random_int({min: 55, max: 75, rand: random})}%)`,
-    shape: shape
+    shape,
   }
 }
 
@@ -713,7 +713,7 @@ App.get_zone_colors = (last_activity, current_time) => {
   let hue = Math.round(120 - activity * 120)
   let color = `hsl(${hue}, 100%, 60%)`
   let bg = `hsl(${hue}, 50%, 15%)`
-  return {color: color, bg: bg}
+  return {color, bg}
 }
 
 App.build_zone_selector = (zones_info) => {

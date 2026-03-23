@@ -90,7 +90,7 @@ App.setup_server = () => {
     let cookies = req.headers.cookie || ``
 
     if (!cookies.includes(`date_join=`)) {
-      res.cookie(`date_join`, Date.now().toString(), {maxAge: 10 * 365 * 24 * 60 * 60 * 1000 })
+      res.cookie(`date_join`, Date.now().toString(), {maxAge: 10 * 365 * 24 * 60 * 60 * 1000})
     }
 
     next()
@@ -337,6 +337,7 @@ App.setup_sockets = () => {
             last_activity: App.zone_data[z].last_activity,
           }
         }
+
         ws.send(JSON.stringify({type: `ZONES_INFO`, zones: zones_info}))
         return
       }
