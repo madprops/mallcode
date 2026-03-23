@@ -711,17 +711,14 @@ App.build_zone_selector = (zones_info) => {
     for (let speed = 1; speed <= 9; speed++) {
       let zone = `${letter}${speed}`
       let info = zones_info[zone] || {last_activity: 0, words: 0}
-
       let time_since_active = now - info.last_activity
       let days_since_active = time_since_active / (1000 * 60 * 60 * 24)
       let word_coef = Math.min(1, info.words / 10)
       let time_coef = info.last_activity > 0 ? Math.max(0, 1 - (days_since_active / 7)) : 0
       let activity = info.last_activity > 0 ? (word_coef * 0.5) + (time_coef * 0.5) : 0
-
       let hue = Math.round(120 - (activity * 120))
       let color = `hsl(${hue}, 100%, 60%)`
       let bg = `hsl(${hue}, 50%, 15%)`
-
       html += `<button class="zone-btn" data-zone="${zone}" style="color: ${color}; background-color: ${bg}; border-color: ${color}">${zone}</button>`
     }
   }
