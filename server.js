@@ -16,6 +16,7 @@ App.nouns = new Set()
 App.default_speed = 3
 App.block_seconds = 60
 App.spam_limit = 10
+App.blocked_ips = {}
 
 App.get_version = () => {
   try {
@@ -255,7 +256,7 @@ App.setup_sockets = () => {
     ws.username = App.shared.random_word(3, ws.ip)
     ws.zone = App.default_zone()
     ws.unit_duration = null
-    ws.penalty_expires = 0
+    ws.penalty_expires = App.blocked_ips[ws.ip] || 0
 
     ws.on(`pong`, () => {
       ws.is_alive = true
@@ -296,6 +297,10 @@ App.setup_sockets = () => {
 
       let now = Date.now()
 
+      if (App.blocked_ips[ws.ip] && (now < App.blocked_ips[ws.ip])) {
+        ws.penalty_expires = App.blocked_ips[ws.ip]
+      }
+
       if (ws.penalty_expires && (now < ws.penalty_expires)) {
         return
       }
@@ -331,6 +336,7 @@ App.setup_sockets = () => {
 
         if ((now - z_state.control_start_time) > (App.spam_limit * 1000)) {
           ws.penalty_expires = now + App.block_seconds * 1000
+          App.blocked_ips[ws.ip] = ws.penalty_expires
           App.force_release(ws, ws.zone)
           App.send_message(ws, `You have been blocked for ${App.block_seconds} seconds.`)
           return
@@ -425,6 +431,14 @@ App.start_server = () => {
   })
 
   setInterval(() => {
+    let now = Date.now()
+
+    for (let ip in App.blocked_ips) {
+      if (now > App.blocked_ips[ip]) {
+        delete App.blocked_ips[ip]
+      }
+    }
+
     App.wss.clients.forEach((ws) => {
       if (!ws.is_alive) {
         return ws.terminate()
@@ -433,7 +447,7 @@ App.start_server = () => {
       ws.is_alive = false
       ws.ping()
     })
-  }, 30000)
+  }, 30 * 1000)
 }
 
 App.default_zone = () => {
