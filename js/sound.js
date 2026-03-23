@@ -97,19 +97,11 @@ App.setup_sound = () => {
     App.refresh_sound_icon()
 
     if (!App.sound_enabled()) {
-      App.mute_beep()
+      App.stop_beep()
     }
 
     App.sound_btn.blur()
   })
-}
-
-App.mute_beep = () => {
-  if (!App.gain_node) {
-    return
-  }
-
-  App.gain_node.gain.setTargetAtTime(0, App.audio_ctx.currentTime, 0.01)
 }
 
 App.play_beep = (seed = `normal`) => {

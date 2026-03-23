@@ -37,7 +37,7 @@ App.create_debouncers = () => {
   }, App.zone_dial_delay)
 
   App.beep_debouncer = Shared.create_debouncer(() => {
-    if (App.current_user) {
+    if (App.current_user && App.is_pressed) {
       App.play_beep(App.current_user)
     }
   }, App.beep_delay)
@@ -442,7 +442,7 @@ App.handle_release = (e, is_local = true) => {
     App.ws.send(JSON.stringify({type: `UP`}))
   }
 
-  App.mute_beep()
+  App.stop_beep()
   App.particle_mesh.material.size = 0.15
 }
 
@@ -571,6 +571,14 @@ App.setup_dials = () => {
     App.moving = true
     App.defocus_dial()
     App.zone_dial_debouncer.call()
+  })
+
+  DOM.ev(App.letter_dial_el, `click`, () => {
+    App.stop_beep()
+  })
+
+  DOM.ev(App.speed_dial_el, `click`, () => {
+    App.stop_beep()
   })
 }
 
