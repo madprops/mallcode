@@ -42,7 +42,7 @@ App.get_words = () => {
 
 App.load_words = (what) => {
   try {
-    let data = fs.readFileSync(path.join(__dirname, `${what}.txt`), `utf8`)
+    let data = fs.readFileSync(path.join(__dirname, `words/${what}.txt`), `utf8`)
 
     data.split(`\n`).forEach(line => {
       let word = line.trim()
