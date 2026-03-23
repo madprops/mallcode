@@ -727,13 +727,23 @@ App.build_zone_selector = (zones_info) => {
       let zone = `${letter}${speed}`
       let info = zones_info[zone] || {last_activity: 0}
       let colors = App.get_zone_colors(info.last_activity, now)
-      html += `<button class="zone-btn" data-zone="${zone}" style="color: ${colors.color}; background-color: ${colors.bg}; border-color: ${colors.color}">${zone}</button>`
+      let is_current = zone === App.zone
+      let cls = is_current ? `zone-btn current-zone` : `zone-btn`
+      html += `<button class="${cls}" data-zone="${zone}" style="color: ${colors.color}; background-color: ${colors.bg}; border-color: ${is_current ? `#00aaff` : colors.color}">${zone}</button>`
     }
   }
 
   html += `</div>`
   App.show_modal(``, html)
   let btns = DOM.els(`.zone-btn`, App.modal_el)
+
+  setTimeout(() => {
+    let active_btn = DOM.el(`[data-zone="${App.zone}"]`, App.modal_el)
+
+    if (active_btn) {
+      active_btn.scrollIntoView({behavior: `smooth`, block: `center`, inline: `center`})
+    }
+  }, 10)
 
   if (App.zone_refresh_interval) {
     clearInterval(App.zone_refresh_interval)
@@ -748,7 +758,8 @@ App.build_zone_selector = (zones_info) => {
       let colors = App.get_zone_colors(info.last_activity, current_time)
       btn.style.color = colors.color
       btn.style.backgroundColor = colors.bg
-      btn.style.borderColor = colors.color
+      let is_current = zone === App.zone
+      btn.style.borderColor = is_current ? `#00aaff` : colors.color
     }
   }, 10 * 1000)
 
