@@ -12,10 +12,7 @@ App.shared = require(`./js/shared.js`)
 
 App.zone_states = {}
 App.next_client_id = 1
-App.nouns = new Set()
-App.adjectives = new Set()
-App.verbs = new Set()
-App.adverbs = new Set()
+App.words = new Set()
 App.default_speed = 3
 App.block_seconds = 60
 App.spam_limit = 10
@@ -34,47 +31,26 @@ App.get_version = () => {
 }
 
 App.get_words = () => {
-  App.load_words(`nouns`)
-  App.load_words(`adjectives`)
-  App.load_words(`verbs`)
-  App.load_words(`adverbs`)
-}
-
-App.load_words = (what) => {
   try {
-    let data = fs.readFileSync(path.join(__dirname, `words/${what}.txt`), `utf8`)
+    let data = fs.readFileSync(path.join(__dirname, `words.txt`), `utf8`)
 
     data.split(`\n`).forEach(line => {
       let word = line.trim()
 
       if (word) {
-        App[what].add(word)
+        App.words.add(word)
       }
     })
+
+    console.log(`Loaded ${App.words.size} words.`)
   }
   catch (err) {
-    console.error(`Error loading ${what}.txt:`, err)
+    console.error(`Error loading words.txt:`, err)
   }
 }
 
 App.word_match = (word) => {
-  if (App.nouns.has(word)) {
-    return true
-  }
-
-  if (App.adjectives.has(word)) {
-    return true
-  }
-
-  if (App.verbs.has(word)) {
-    return true
-  }
-
-  if (App.adverbs.has(word)) {
-    return true
-  }
-
-  return false
+  return App.words.has(word)
 }
 
 App.get_zone_data = () => {
