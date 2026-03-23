@@ -701,6 +701,21 @@ App.show_zone_map = () => {
   }
 }
 
+App.get_zone_colors = (last_activity, current_time) => {
+  let activity = 0
+
+  if (last_activity > 0) {
+    let time_since_active = current_time - last_activity
+    let fraction_of_hour = time_since_active / 3600000
+    activity = Math.max(0, 1 - fraction_of_hour)
+  }
+
+  let hue = Math.round(120 - activity * 120)
+  let color = `hsl(${hue}, 100%, 60%)`
+  let bg = `hsl(${hue}, 50%, 15%)`
+  return {color: color, bg: bg}
+}
+
 App.build_zone_selector = (zones_info) => {
   let html = `<div class="zone-map-title">Zone Map</div><div class="zone-map-grid">`
   let now = Date.now()
@@ -710,21 +725,9 @@ App.build_zone_selector = (zones_info) => {
 
     for (let speed = 1; speed <= 9; speed++) {
       let zone = `${letter}${speed}`
-      let info = zones_info[zone] || {last_activity: 0, words: 0}
-      let activity = 0
-
-      if (info.last_activity > 0) {
-        let time_since_active = now - info.last_activity
-        let days_since_active = time_since_active / 86400000
-        let word_coef = Math.min(1, info.words / 10)
-        let time_coef = Math.max(0, 1 - days_since_active / 7)
-        activity = word_coef * 0.5 + time_coef * 0.5
-      }
-
-      let hue = Math.round(120 - activity * 120)
-      let color = `hsl(${hue}, 100%, 60%)`
-      let bg = `hsl(${hue}, 50%, 15%)`
-      html += `<button class="zone-btn" data-zone="${zone}" style="color: ${color}; background-color: ${bg}; border-color: ${color}">${zone}</button>`
+      let info = zones_info[zone] || {last_activity: 0}
+      let colors = App.get_zone_colors(info.last_activity, now)
+      html += `<button class="zone-btn" data-zone="${zone}" style="color: ${colors.color}; background-color: ${colors.bg}; border-color: ${colors.color}">${zone}</button>`
     }
   }
 
@@ -732,12 +735,30 @@ App.build_zone_selector = (zones_info) => {
   App.show_modal(``, html)
   let btns = DOM.els(`.zone-btn`, App.modal_el)
 
+  if (App.zone_refresh_interval) {
+    clearInterval(App.zone_refresh_interval)
+  }
+
+  App.zone_refresh_interval = setInterval(() => {
+    let current_time = Date.now()
+
+    for (let btn of btns) {
+      let zone = btn.dataset.zone
+      let info = zones_info[zone] || {last_activity: 0}
+      let colors = App.get_zone_colors(info.last_activity, current_time)
+      btn.style.color = colors.color
+      btn.style.backgroundColor = colors.bg
+      btn.style.borderColor = colors.color
+    }
+  }, 10 * 1000)
+
   for (let btn of btns) {
     DOM.ev(btn, `click`, () => {
       let zone = btn.dataset.zone
       App.letter_dial_el.value = zone.charAt(0)
       App.speed_dial_el.value = zone.charAt(1)
       App.zone_dial_action()
+      clearInterval(App.zone_refresh_interval)
       App.hide_modal()
     })
   }

@@ -335,7 +335,6 @@ App.setup_sockets = () => {
         for (let z in App.zone_data) {
           zones_info[z] = {
             last_activity: App.zone_data[z].last_activity,
-            words: App.zone_data[z].words.length,
           }
         }
         ws.send(JSON.stringify({type: `ZONES_INFO`, zones: zones_info}))
