@@ -83,7 +83,7 @@ App.setup_socket = () => {
       App.update_sequence_display()
     }
     else if (data.type === `LETTER`) {
-      App.spawn_sprite(data.char, `letter`)
+      App.spawn_sprite(data.letter, `letter`)
       App.current_sequence = ``
       App.update_sequence_display()
     }

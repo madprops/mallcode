@@ -128,6 +128,53 @@ App.get_zone_state = (zone) => {
   return App.zone_states[zone]
 }
 
+App.get_last_username = (zone) => {
+  let z_state = App.zone_states[zone]
+  return z_state.last_active_ws ? z_state.last_active_ws.username : ``
+}
+
+App.send_letter = (args = {}) => {
+  let def_args = {
+    letter: ``,
+    username: ``,
+    zone: ``,
+  }
+
+  if (!args.username) {
+    args.username = App.get_last_username(args.zone)
+  }
+
+  App.shared.def_args(def_args, args)
+  let msg = JSON.stringify({type: `LETTER`, letter: args.letter, username: args.username})
+
+  App.wss.clients.forEach((c) => {
+    if ((c.readyState === WebSocket.OPEN) && (c.zone === args.zone)) {
+      c.send(msg)
+    }
+  })
+}
+
+App.send_sequence = (args = {}) => {
+  let def_args = {
+    sequence: ``,
+    username: ``,
+    zone: ``,
+  }
+
+  if (!args.username) {
+    args.username = App.get_last_username(args.zone)
+  }
+
+  App.shared.def_args(def_args, args)
+  let msg_seq = JSON.stringify({type: `SEQUENCE`, sequence: args.sequence, username: args.username})
+
+  App.wss.clients.forEach((c) => {
+    if ((c.readyState === WebSocket.OPEN) && (c.zone === args.zone)) {
+      c.send(msg_seq)
+    }
+  })
+}
+
 App.resolve_letter = (zone) => {
   let z_state = App.zone_states[zone]
 
@@ -135,19 +182,18 @@ App.resolve_letter = (zone) => {
     return
   }
 
-  let letter = App.shared.morse_code[z_state.current_sequence] || `@`
+  let letter = App.shared.morse_code[z_state.current_sequence] || ``
 
   if (letter !== `@`) {
     z_state.current_word += letter
   }
 
-  let msg = JSON.stringify({type: `LETTER`, char: letter, username: z_state.last_active_ws ? z_state.last_active_ws.username : ``})
-
-  App.wss.clients.forEach((c) => {
-    if ((c.readyState === WebSocket.OPEN) && (c.zone === zone)) {
-      c.send(msg)
-    }
-  })
+  if (letter) {
+    App.send_letter({letter, zone})
+  }
+  else {
+    App.send_sequence({zone})
+  }
 
   z_state.current_sequence = ``
   z_state.control_start_time = Date.now()
@@ -354,14 +400,7 @@ App.setup_sockets = () => {
             }
           })
 
-          let msg_seq = JSON.stringify({type: `SEQUENCE`, sequence: z_state.current_sequence, username: ws.username})
-
-          App.wss.clients.forEach((client) => {
-            if ((client.readyState === WebSocket.OPEN) && (client.zone === ws.zone)) {
-              client.send(msg_seq)
-            }
-          })
-
+          App.send_sequence({sequence: z_state.current_sequence, username: ws.username, zone: ws.zone})
           z_state.letter_timeout = setTimeout(() => App.resolve_letter(ws.zone), ws.unit_duration * z_state.settings.letter_mult)
         }
       }
@@ -432,13 +471,7 @@ App.force_release = (ws, zone) => {
     z_state.last_active_ws = null
     z_state.lock_expires = 0
     z_state.control_start_time = 0
-    let msg_seq = JSON.stringify({type: `SEQUENCE`, sequence: ``, username: ws.username})
-
-    App.wss.clients.forEach((client) => {
-      if ((client.readyState === WebSocket.OPEN) && (client.zone === zone)) {
-        client.send(msg_seq)
-      }
-    })
+    App.send_sequence({username: ws.username, zone})
   }
 }
 
