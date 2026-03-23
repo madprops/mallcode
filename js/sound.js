@@ -113,17 +113,16 @@ App.mute_beep = () => {
 }
 
 App.play_beep = (seed = `normal`) => {
+  if (App.active_osc) {
+    App.stop_beep()
+  }
+
   if (!App.audio_started) {
     return
   }
 
   if (App.volume_level === 0) {
     return
-  }
-
-  // Prevent orphaned oscillators by stopping the active one first
-  if (App.active_osc) {
-    App.stop_beep()
   }
 
   let hash = Shared.get_string_hash(seed)
@@ -167,10 +166,6 @@ App.play_beep = (seed = `normal`) => {
 }
 
 App.stop_beep = () => {
-  if (!App.audio_started) {
-    return
-  }
-
   if (!App.active_osc) {
     return
   }
