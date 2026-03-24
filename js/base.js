@@ -486,7 +486,10 @@ App.setup_events = () => {
   }, {passive: false})
 
   DOM.ev(window, `touchend`, (e) => {
-    e.preventDefault()
+    if (e.target === App.canvas) {
+      e.preventDefault()
+    }
+
     App.handle_release(e)
   }, {passive: false})
 
