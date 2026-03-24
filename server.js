@@ -263,7 +263,7 @@ App.resolve_word = (zone) => {
 App.help_text = `https://www.youtube.com/watch?v=spdfnqS3bDg`
 
 App.process_word = (zone, current_word, ws) => {
-  if (current_word === `HELP`) {
+  if ([`HELP`, `SOS`].includes(current_word)) {
     if (ws && (ws.readyState === WebSocket.OPEN)) {
       App.send_message(ws, App.help_text)
     }
