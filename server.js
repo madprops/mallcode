@@ -281,6 +281,10 @@ App.process_word = (zone, current_word, ws) => {
   }
 }
 
+App.go_to_zone = (ws) => {
+  ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username, version: App.version}))
+}
+
 App.setup_sockets = () => {
   App.wss.on(`connection`, (ws, req) => {
     let cookies = req.headers.cookie || ``
@@ -315,7 +319,7 @@ App.setup_sockets = () => {
           let old_zone = ws.zone
           App.force_release(ws, old_zone)
           ws.zone = data.zone
-          ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, version: App.version}))
+          App.go_to_zone(ws)
 
           if (old_zone !== ws.zone) {
             App.broadcast_zone_count(old_zone)
@@ -485,7 +489,7 @@ App.setup_sockets = () => {
 
     App.broadcast_zone_count(ws.zone)
     App.broadcast_zone_words(ws.zone, ws)
-    ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username, version: App.version}))
+    App.go_to_zone(ws)
   })
 }
 
