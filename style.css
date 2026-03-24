@@ -1,5 +1,6 @@
 :root {
   --hud_top: 12px;
+  --hud_side: 12px;
 }
 
 body, html {
@@ -121,14 +122,14 @@ body, html {
 #top-left {
     position: absolute;
     top: var(--hud_top);
-    left: 20px;
+    left: var(--hud_side);
     z-index: 10;
 }
 
 #top-right {
     position: absolute;
     top: var(--hud_top);
-    right: 20px;
+    right: var(--hud_side);
     z-index: 10;
 }
 
@@ -236,10 +237,10 @@ a.modal-link:hover, a.modal-link:link, a.modal-link:visited {
     opacity: 0.5;
 }
 
-#menu {
+#about {
     position: fixed;
-    bottom: 8px;
-    right: 8px;
+    bottom: var(--hud_top);
+    right: 20px;
     z-index: 100;
     color: white;
     user-select: none;
@@ -248,4 +249,11 @@ a.modal-link:hover, a.modal-link:link, a.modal-link:visited {
 
 #menu:hover {
     font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    #top-left {
+        top: auto;
+        bottom: var(--hud_side);
+    }
 }

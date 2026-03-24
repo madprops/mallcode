@@ -504,7 +504,7 @@ App.setup_events = () => {
     App.handle_release(null, true)
   })
 
-  DOM.ev(`#menu`, `click`, () => {
+  DOM.ev(`#about`, `click`, () => {
     App.show_menu()
   })
 
