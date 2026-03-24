@@ -760,6 +760,63 @@ App.build_zone_selector = (zones_info) => {
   App.show_modal(``, html)
   let btns = DOM.els(`.zone-map-btn`, App.modal_el)
 
+  let grid_el = DOM.el(`.zone-map-grid`, App.modal_el)
+  let is_down = false
+  let start_y
+  let scroll_top
+  let has_dragged = false
+
+  let start_drag = (e) => {
+    is_down = true
+    has_dragged = false
+    start_y = e.pageY || (e.touches && e.touches[0].pageY)
+    scroll_top = grid_el.scrollTop
+    grid_el.style.cursor = `grabbing`
+    grid_el.style.userSelect = `none`
+  }
+
+  let end_drag = () => {
+    is_down = false
+    grid_el.style.cursor = `grab`
+    grid_el.style.userSelect = ``
+  }
+
+  let move_drag = (e) => {
+    if (!is_down) {
+      return
+    }
+
+    let page_y = e.pageY || (e.touches && e.touches[0].pageY)
+
+    if (page_y === undefined) {
+      return
+    }
+
+    let walk = page_y - start_y
+
+    if (Math.abs(walk) > 5) {
+      has_dragged = true
+
+      if (e.cancelable && (e.type === `touchmove`)) {
+        e.preventDefault()
+      }
+    }
+
+    grid_el.scrollTop = scroll_top - walk
+  }
+
+  grid_el.style.cursor = `grab`
+
+  DOM.ev(grid_el, `mousedown`, start_drag)
+  DOM.ev(grid_el, `mouseleave`, end_drag)
+  DOM.ev(grid_el, `mouseup`, end_drag)
+  DOM.ev(grid_el, `mousemove`, move_drag)
+
+  DOM.ev(grid_el, `touchstart`, start_drag, {passive: true})
+  DOM.ev(grid_el, `touchend`, end_drag)
+  DOM.ev(grid_el, `touchcancel`, end_drag)
+  DOM.ev(grid_el, `touchmove`, move_drag, {passive: false})
+
   setTimeout(() => {
     let active_btn = DOM.el(`[data-zone="${App.zone}"]`, App.modal_el)
 
@@ -793,7 +850,13 @@ App.build_zone_selector = (zones_info) => {
   }, 10 * 1000)
 
   for (let btn of btns) {
-    DOM.ev(btn, `click`, () => {
+    DOM.ev(btn, `click`, (e) => {
+      if (has_dragged) {
+        e.preventDefault()
+        e.stopPropagation()
+        return
+      }
+
       let zone = btn.dataset.zone
       App.letter_dial_el.value = zone.charAt(0)
       App.speed_dial_el.value = zone.charAt(1)
