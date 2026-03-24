@@ -167,6 +167,7 @@ App.stop_beep = () => {
     catch (e) {
       console.warn(`Failed to stop oscillator:`, e)
     }
+
     App.active_osc = null
   }
 }

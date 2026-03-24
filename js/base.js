@@ -521,7 +521,7 @@ App.setup_events = () => {
 
   // Also ensure the AudioContext is actually running
   document.addEventListener(`visibilitychange`, () => {
-    if (document.visibilityState === `visible` && App.audio_ctx) {
+    if ((document.visibilityState === `visible`) && App.audio_ctx) {
       App.audio_ctx.resume()
     }
   })
