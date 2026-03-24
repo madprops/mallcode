@@ -155,6 +155,7 @@ App.play_beep = (seed = `normal`) => {
   filter.connect(App.gain_node)
   App.gain_node.connect(App.audio_ctx.destination)
   App.active_osc.start(start_time)
+  App.stop_beep_debouncer.call()
 }
 
 App.stop_beep = () => {

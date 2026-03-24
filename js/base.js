@@ -20,6 +20,7 @@ App.restore_username_delay = Shared.lock_time
 App.zone_dial_delay = 100
 App.reconnect_delay = 5 * 1000
 App.beep_delay = 10
+App.stop_beep_delay = 1 * 1000
 App.modal_open = false
 App.moving = false
 App.current_user = ``
@@ -41,6 +42,12 @@ App.create_debouncers = () => {
       App.play_beep(App.current_user)
     }
   }, App.beep_delay)
+
+  App.stop_beep_debouncer = Shared.create_debouncer(() => {
+    if (App.current_user && App.is_pressed) {
+      App.stop_beep()
+    }
+  }, App.stop_beep_delay)
 }
 
 App.setup_socket = () => {
