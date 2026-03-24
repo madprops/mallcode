@@ -662,7 +662,7 @@ Higher numbers mean closer to real speed.
 Each zone has its own theme.
 The zones remember the words.
 You might encounter other users.
-Each user has a name and sound.`
+Each user has a personality.`
 
   App.show_modal(text)
 }
