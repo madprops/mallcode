@@ -231,3 +231,37 @@ body, html {
 a.modal-link:hover, a.modal-link:link, a.modal-link:visited {
     color: inherit;
 }
+
+#info {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.separator {
+    opacity: 0.5;
+}
+
+#menu {
+    position: fixed;
+    bottom: 8px;
+    right: 8px;
+    z-index: 100;
+    color: white;
+    user-select: none;
+    cursor: pointer;
+}
+
+#menu:hover {
+    font-weight: bold;
+}

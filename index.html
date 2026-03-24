@@ -30,13 +30,30 @@
                 <select id="zone-dial-speed" class="dial" title="Zone Speed"></select>
             </div>
 
-            <div id="zone-map" class="hud-text hud-button" title="Zone Map">MAP</div>
-            <div id="menu" class="hud-button" title="Information">🔳</div>
+            <div id="zone-map" class="hud-button" title="Zone Map">🔳</div>
         </div>
 
         <div id="modal-overlay" class="hidden">
             <div id="modal-content"></div>
         </div>
+
+        <div id="menu">?</div>
+
+		<template id="info-template">
+			<div id="info">
+				<div class="info-item">
+					<div class="info-label">Online:</div>
+					<div id="global-count" class="info-value"></div>
+				</div>
+
+				<div class="separator">|</div>
+
+				<div class="info-item">
+					<div class="info-label">Here:</div>
+					<div id="zone-count" class="info-value"></div>
+				</div>
+			</div>
+		</template>
 
         <canvas id="glcanvas"></canvas>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>

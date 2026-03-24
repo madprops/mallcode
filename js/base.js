@@ -2,7 +2,8 @@ App.started = false
 App.zone = ``
 App.max_press_timeout = null
 App.last_input_time = 0
-App.online_count = 1
+App.online_count_zone = 1
+App.online_count_global = 1
 App.last_focus_time = 0
 App.zone_info_el = DOM.el(`#zone-info`)
 App.username_info_el = DOM.el(`#username-info`)
@@ -121,7 +122,7 @@ App.setup_socket = () => {
       App.max_press_duration = App.zone_settings.max_press
       App.input_throttle_ms = App.zone_settings.throttle
       App.unit_duration = App.zone_settings.unit_duration
-      App.zone_info_el.textContent = `Users: ${App.online_count}`
+      App.refresh_info()
       App.play_warp_drive()
 
       if (App.letter_dial_el) {
@@ -146,8 +147,9 @@ App.setup_socket = () => {
       App.show_modal(data.text)
     }
     else if (data.type === `USERS`) {
-      App.online_count = data.count
-      App.zone_info_el.textContent = `Users: ${App.online_count}`
+      App.online_count_zone = data.count_zone
+      App.online_count_global = data.count_global
+      App.refresh_info()
     }
     else if (data.type === `WORDS`) {
       App.update_words_display(data.words)
@@ -799,6 +801,18 @@ App.build_zone_selector = (zones_info) => {
       clearInterval(App.zone_refresh_interval)
       App.hide_modal()
     })
+  }
+}
+
+App.refresh_info = () => {
+  let template = DOM.el(`#info-template`)
+
+  if (template) {
+    let clone = template.content.cloneNode(true)
+    DOM.el(`#global-count`, clone).textContent = App.online_count_global
+    DOM.el(`#zone-count`, clone).textContent = App.online_count_zone
+    App.zone_info_el.innerHTML = ``
+    App.zone_info_el.appendChild(clone)
   }
 }
 

@@ -104,17 +104,22 @@ App.setup_server = () => {
 }
 
 App.broadcast_zone_count = (zone) => {
-  let count = 0
+  let count_zone = 0
+  let count_global = 0
 
   App.wss.clients.forEach((client) => {
-    if ((client.readyState === WebSocket.OPEN) && (client.zone === zone)) {
-      count++
+    if ((client.readyState === WebSocket.OPEN)) {
+      if (client.zone === zone) {
+        count_zone += 1
+      }
+
+      count_global += 1
     }
   })
 
   App.wss.clients.forEach((client) => {
     if ((client.readyState === WebSocket.OPEN) && (client.zone === zone)) {
-      client.send(JSON.stringify({type: `USERS`, count}))
+      client.send(JSON.stringify({type: `USERS`, count_zone, count_global}))
     }
   })
 }
