@@ -21,6 +21,7 @@ App.transmission_limit = 60
 App.soft_block_seconds = 10
 App.zone_data_changed = false
 App.save_data_interval = 2 * 1000
+App.max_words = 10
 
 App.get_version = () => {
   try {
@@ -275,10 +276,10 @@ App.process_word = (zone, current_word, ws) => {
     }
 
     App.zone_data[zone].words = App.zone_data[zone].words.filter(w => w !== current_word)
-    App.zone_data[zone].words.unshift(current_word)
+    App.zone_data[zone].words.push(current_word)
 
-    if (App.zone_data[zone].words.length > 10) {
-      App.zone_data[zone].words.pop()
+    if (App.zone_data[zone].words.length > App.max_words) {
+      App.zone_data[zone].words.shift()
     }
 
     App.zone_data_changed = true
