@@ -740,7 +740,7 @@ App.get_zone_colors = (last_activity, current_time) => {
 }
 
 App.build_zone_selector = (zones_info) => {
-  let html = `<div class="zone-map-title">Zone Map</div><div class="zone-map-grid">`
+  let html = `<div class="zone-map-grid">`
   let now = Date.now()
 
   for (let i = 0; i < 26; i++) {
