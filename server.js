@@ -298,7 +298,7 @@ App.setup_sockets = () => {
     ws.is_alive = true
     ws.id = App.next_client_id++
     ws.ip = req.headers[`x-forwarded-for`] || req.socket.remoteAddress
-    ws.username = App.shared.random_word(3, ws.date_join || ws.ip)
+    ws.username = App.shared.random_word(3, ws.date_join || ws.ip, true)
     ws.zone = App.default_zone()
     ws.unit_duration = null
     ws.penalty_expires = App.blocked_ips[ws.ip] || 0

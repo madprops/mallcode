@@ -92,7 +92,7 @@ Shared.create_seeded_random = (seed) => {
   }
 }
 
-Shared.random_word = (parts = 3, seed = null) => {
+Shared.random_word = (parts = 3, seed = null, capitalize = false) => {
   let cons = `bcdfghjklmnpqrstvwxyz`
   let vowels = `aeiou`
   let rng = seed ? Shared.create_seeded_random(Shared.get_string_hash(seed.toString())) : Math.random
@@ -110,6 +110,10 @@ Shared.random_word = (parts = 3, seed = null) => {
     }
 
     cons_next = !cons_next
+  }
+
+  if (capitalize) {
+    word = word.charAt(0).toUpperCase() + word.slice(1)
   }
 
   return word
