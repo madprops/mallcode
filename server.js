@@ -108,7 +108,7 @@ App.broadcast_zone_count = (zone) => {
   let count_global = 0
 
   App.wss.clients.forEach((client) => {
-    if ((client.readyState === WebSocket.OPEN)) {
+    if (client.readyState === WebSocket.OPEN) {
       if (client.zone === zone) {
         count_zone += 1
       }
