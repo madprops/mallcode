@@ -504,6 +504,20 @@ App.setup_events = () => {
       App.hide_modal()
     }
   })
+
+  // Force a release if we regain focus and were stuck in a pressed state
+  window.addEventListener(`focus`, () => {
+    if (App.is_pressed) {
+      App.handle_release(null, true)
+    }
+  })
+
+  // Also ensure the AudioContext is actually running
+  document.addEventListener(`visibilitychange`, () => {
+    if (document.visibilityState === `visible` && App.audio_ctx) {
+      App.audio_ctx.resume()
+    }
+  })
 }
 
 App.animate = () => {

@@ -158,19 +158,14 @@ App.play_beep = (seed = `normal`) => {
 }
 
 App.stop_beep = () => {
-  if (!App.active_osc) {
-    return
+  if (App.active_osc) {
+    try {
+      App.active_osc.stop()
+      App.active_osc.disconnect()
+    }
+    catch (e) {
+      console.warn(`Failed to stop oscillator:`, e)
+    }
+    App.active_osc = null
   }
-
-  let stop_time = App.audio_ctx.currentTime
-
-  // 20ms release cuts off cleanly without a popping artifact
-  let release = 0.02
-
-  App.gain_node.gain.cancelScheduledValues(stop_time)
-  App.gain_node.gain.setValueAtTime(App.gain_node.gain.value, stop_time)
-  App.gain_node.gain.linearRampToValueAtTime(0, stop_time + release)
-  App.active_osc.stop(stop_time + release + 0.01)
-  App.active_osc = null
-  App.gain_node = null
 }
