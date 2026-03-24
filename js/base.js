@@ -10,6 +10,7 @@ App.username_info_el = DOM.el(`#username-info`)
 App.sound_btn = DOM.el(`#sound-toggle`)
 App.overlay_el = DOM.el(`#modal-overlay`)
 App.modal_el = DOM.el(`#modal-content`)
+App.words_container_el = DOM.el(`#words-container`)
 App.protocol = window.location.protocol === `https:` ? `wss:` : `ws:`
 App.is_pressed = false
 App.press_start_time = 0
@@ -206,25 +207,8 @@ App.hide_modal = () => {
   App.modal_open = false
 }
 
-let words_container = DOM.el(`#words-container`)
-
-if (!words_container) {
-  words_container = DOM.create(`div`)
-  words_container.id = `words-container`
-  words_container.style.position = `absolute`
-  words_container.style.left = `20px`
-  words_container.style.top = `50%`
-  words_container.style.transform = `translateY(-50%)`
-  words_container.style.color = `#ffffff`
-  words_container.style.fontFamily = `sans-serif`
-  words_container.style.fontSize = `24px`
-  words_container.style.pointerEvents = `none`
-  words_container.style.zIndex = `10`
-  document.body.appendChild(words_container)
-}
-
 App.update_words_display = (words) => {
-  words_container.innerHTML = words.map(w => `<div>${w}</div>`).join(``)
+  App.words_container_el.innerHTML = words.map(w => `<div>${w}</div>`).join(``)
 }
 
 App.create_particle_texture = (theme) => {
