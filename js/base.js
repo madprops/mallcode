@@ -764,7 +764,7 @@ App.build_zone_selector = (zones_info) => {
     let active_btn = DOM.el(`[data-zone="${App.zone}"]`, App.modal_el)
 
     if (active_btn) {
-      active_btn.scrollIntoView({behavior: `smooth`, block: `center`, inline: `center`})
+      active_btn.scrollIntoView({behavior: `instant`, block: `center`, inline: `center`})
     }
   }, 10)
 
