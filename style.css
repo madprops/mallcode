@@ -240,7 +240,7 @@ a.modal-link:hover, a.modal-link:link, a.modal-link:visited {
 #about {
     position: fixed;
     bottom: var(--hud_top);
-    right: 20px;
+    right: var(--hud_side);
     z-index: 100;
     color: white;
     user-select: none;
