@@ -288,23 +288,66 @@ App.create_text_texture = (text, is_word = false, is_sequence = false) => {
   let theme = App.get_theme(App.zone)
 
   if (is_word) {
-    ctx.font = `bold 80px sans-serif`
+    ctx.font = `bold 80px system-ui, sans-serif`
     ctx.fillStyle = theme.word
+    ctx.textAlign = `center`
+    ctx.textBaseline = `middle`
+    ctx.shadowColor = ctx.fillStyle
+    ctx.shadowBlur = 30
+    ctx.fillText(text, text_canvas.width / 2, text_canvas.height / 2)
   }
   else if (is_sequence) {
-    ctx.font = `bold 100px sans-serif`
     ctx.fillStyle = App.get_user_color(App.current_user)
+    ctx.shadowColor = ctx.fillStyle
+    ctx.shadowBlur = 10
+
+    const dot_diameter = 20
+    const dot_radius = dot_diameter / 2
+    const dash_width = dot_diameter * 2
+    const dash_height = dot_diameter
+    const spacing = dot_diameter
+
+    let total_width = 0
+
+    if (text.length > 0) {
+      for (const char of text) {
+        if (char === `.`) {
+          total_width += dot_diameter
+        }
+        else if (char === `-`) {
+          total_width += dash_width
+        }
+      }
+
+      total_width += (text.length - 1) * spacing
+    }
+
+    let current_x = (text_canvas.width - total_width) / 2
+    let center_y = text_canvas.height / 2
+
+    for (let char of text) {
+      if (char === `.`) {
+        ctx.beginPath()
+        ctx.arc(current_x + dot_radius, center_y, dot_radius, 0, Math.PI * 2)
+        ctx.fill()
+        current_x += dot_diameter + spacing
+      }
+      else if (char === `-`) {
+        ctx.fillRect(current_x, center_y - dash_height / 2, dash_width, dash_height)
+        current_x += dash_width + spacing
+      }
+    }
   }
   else {
-    ctx.font = `bold 180px sans-serif`
+    ctx.font = `bold 180px system-ui, sans-serif`
     ctx.fillStyle = theme.letter
+    ctx.textAlign = `center`
+    ctx.textBaseline = `middle`
+    ctx.shadowColor = ctx.fillStyle
+    ctx.shadowBlur = 30
+    ctx.fillText(text, text_canvas.width / 2, text_canvas.height / 2)
   }
 
-  ctx.textAlign = `center`
-  ctx.textBaseline = `middle`
-  ctx.shadowColor = ctx.fillStyle
-  ctx.shadowBlur = is_sequence ? 10 : 30
-  ctx.fillText(text, text_canvas.width / 2, text_canvas.height / 2)
   return new THREE.CanvasTexture(text_canvas)
 }
 
