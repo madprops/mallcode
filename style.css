@@ -246,13 +246,17 @@ a.modal-link:hover, a.modal-link:link, a.modal-link:visited {
     opacity: 0.5;
 }
 
-#about {
-    position: fixed;
+#bottom-right {
+    position: absolute;
     bottom: var(--hud_top);
     right: var(--hud_side);
     z-index: 100;
     color: white;
-    user-select: none;
+}
+
+.strikethrough {
+    text-decoration: line-through;
+    opacity: 0.5;
     cursor: pointer;
 }
 

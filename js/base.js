@@ -28,6 +28,7 @@ App.moving = false
 App.current_user = ``
 App.username = ``
 App.version = `0.0.0`
+App.effects = true
 App.ls_storage = `mallcode_v1`
 
 App.create_debouncers = () => {
@@ -501,6 +502,17 @@ App.setup_events = () => {
     }
   })
 
+  DOM.ev(`#effects-toggle`, `click`, () => {
+    App.effects = !App.effects
+
+    if (App.storage) {
+      App.storage.effects = App.effects
+      App.save_storage()
+    }
+
+    App.refresh_effects_icon()
+  })
+
   // Force a release if we regain focus and were stuck in a pressed state
   window.addEventListener(`focus`, () => {
     if (App.is_pressed) {
@@ -519,8 +531,12 @@ App.setup_events = () => {
 App.animate = () => {
   requestAnimationFrame(App.animate)
   let delta = App.clock.getDelta()
-  App.particle_mesh.rotation.y += 0.02 * delta
-  App.particle_mesh.rotation.x += 0.01 * delta
+
+  if (App.effects) {
+    App.particle_mesh.rotation.y += 0.02 * delta
+    App.particle_mesh.rotation.x += 0.01 * delta
+  }
+
   let target_z = App.is_pressed ? 35 : 40
   App.camera.position.z = THREE.MathUtils.lerp(App.camera.position.z, target_z, 0.15)
 
@@ -676,6 +692,10 @@ App.load_storage = async () => {
 
         if (App.storage.volume_level !== undefined) {
           App.volume_level = App.storage.volume_level
+        }
+
+        if (App.storage.effects !== undefined) {
+          App.effects = App.storage.effects
         }
 
         resolve()
@@ -874,10 +894,22 @@ App.start = () => {
   App.started = true
 }
 
+App.refresh_effects_icon = () => {
+  let el = DOM.el(`#effects-toggle`)
+
+  if (App.effects) {
+    el.classList.remove(`strikethrough`)
+  }
+  else {
+    el.classList.add(`strikethrough`)
+  }
+}
+
 App.init = async () => {
   await App.load_storage()
   App.create_debouncers()
   App.setup_dials()
   App.setup_socket()
   App.hide_cover()
+  App.refresh_effects_icon()
 }
