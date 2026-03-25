@@ -28,7 +28,7 @@ App.moving = false
 App.current_user = ``
 App.username = ``
 App.version = `0.0.0`
-App.effects = true
+App.animation = true
 App.ls_storage = `mallcode_v1`
 
 App.create_debouncers = () => {
@@ -502,11 +502,11 @@ App.setup_events = () => {
     }
   })
 
-  DOM.ev(`#effects-toggle`, `click`, () => {
-    App.effects = !App.effects
+  DOM.ev(`#animate-toggle`, `click`, () => {
+    App.animation = !App.animation
 
     if (App.storage) {
-      App.storage.effects = App.effects
+      App.storage.animate = App.animation
       App.save_storage()
     }
 
@@ -532,7 +532,7 @@ App.animate = () => {
   requestAnimationFrame(App.animate)
   let delta = App.clock.getDelta()
 
-  if (App.effects) {
+  if (App.animation) {
     App.particle_mesh.rotation.y += 0.02 * delta
     App.particle_mesh.rotation.x += 0.01 * delta
   }
@@ -694,8 +694,8 @@ App.load_storage = async () => {
           App.volume_level = App.storage.volume_level
         }
 
-        if (App.storage.effects !== undefined) {
-          App.effects = App.storage.effects
+        if (App.storage.animate !== undefined) {
+          App.animation = App.storage.animate
         }
 
         resolve()
@@ -895,9 +895,9 @@ App.start = () => {
 }
 
 App.refresh_effects_icon = () => {
-  let el = DOM.el(`#effects-toggle`)
+  let el = DOM.el(`#animate-toggle`)
 
-  if (App.effects) {
+  if (App.animation) {
     el.classList.remove(`strikethrough`)
   }
   else {
