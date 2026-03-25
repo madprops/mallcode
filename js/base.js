@@ -727,7 +727,9 @@ Higher numbers mean closer to real speed.
 Each zone has its own theme.
 The zones remember the words.
 You might encounter other users.
-Each user has a personality.`
+Each user has a personality.
+Developed by Merkoba in 2026.
+github.com/madprops/mallcode`
 
   App.show_modal(text)
 }
