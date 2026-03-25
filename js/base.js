@@ -275,6 +275,7 @@ App.setup_canvas = () => {
   let texture = App.create_particle_texture(theme)
   App.particles_material = new THREE.PointsMaterial({size: 0.15, color: new THREE.Color(theme.particles), map: texture, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false})
   App.particle_mesh = new THREE.Points(App.particles_geometry, App.particles_material)
+  App.particle_mesh.visible = App.animation
   App.scene.add(App.particle_mesh)
   App.sprites = []
   App.active_sequence_sprite = null
@@ -302,16 +303,16 @@ App.create_text_texture = (text, is_word = false, is_sequence = false) => {
     ctx.shadowColor = ctx.fillStyle
     ctx.shadowBlur = 10
 
-    const dot_diameter = 20
-    const dot_radius = dot_diameter / 2
-    const dash_width = dot_diameter * 2
-    const dash_height = dot_diameter
-    const spacing = dot_diameter
+    let dot_diameter = 18
+    let dot_radius = dot_diameter / 2
+    let dash_width = dot_diameter * 2
+    let dash_height = dot_diameter * 0.9
+    let spacing = dot_diameter
 
     let total_width = 0
 
     if (text.length > 0) {
-      for (const char of text) {
+      for (let char of text) {
         if (char === `.`) {
           total_width += dot_diameter
         }
@@ -554,6 +555,10 @@ App.setup_events = () => {
       App.save_storage()
     }
 
+    if (App.particle_mesh) {
+      App.particle_mesh.visible = App.animation
+    }
+
     App.refresh_effects_icon()
   })
 
@@ -582,18 +587,31 @@ App.animate = () => {
   }
 
   let target_z = App.is_pressed ? 35 : 40
-  App.camera.position.z = THREE.MathUtils.lerp(App.camera.position.z, target_z, 0.15)
+
+  if (App.animation) {
+    App.camera.position.z = THREE.MathUtils.lerp(App.camera.position.z, target_z, 0.15)
+  }
+  else {
+    App.camera.position.z = 40
+  }
 
   for (let i = App.sprites.length - 1; i >= 0; i--) {
     let s = App.sprites[i]
-    s.position.add(s.userData.velocity)
+
+    if (App.animation) {
+      s.position.add(s.userData.velocity)
+    }
+
     s.userData.age += delta
     let decay_amount = s.userData.decay_rate * delta
     s.userData.life -= decay_amount
     let fade_in = Math.min(1.0, s.userData.age * 3.0)
     s.material.opacity = Math.max(0, fade_in * s.userData.life)
-    s.scale.x += decay_amount * s.userData.growth
-    s.scale.y += decay_amount * s.userData.growth * 0.25
+
+    if (App.animation) {
+      s.scale.x += decay_amount * s.userData.growth
+      s.scale.y += decay_amount * s.userData.growth * 0.25
+    }
 
     if (s.userData.life <= 0) {
       App.scene.remove(s)
