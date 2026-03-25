@@ -30,7 +30,8 @@ App.username = ``
 App.version = `0.0.0`
 App.animation = true
 App.ls_storage = `mallcode_v1`
-App.font_string = `imported_font, system-ui, sans-serif`
+App.font_string = `noto_font, system-ui, sans-serif`
+App.words = []
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
@@ -210,6 +211,7 @@ App.hide_modal = () => {
 }
 
 App.update_words_display = (words) => {
+  App.words = words
   App.words_container_el.innerHTML = words.map(w => `<div>${w}</div>`).join(``)
 }
 
@@ -962,10 +964,10 @@ App.refresh_effects_icon = () => {
   let el = DOM.el(`#animate-toggle`)
 
   if (App.animation) {
-    el.classList.remove(`strikethrough`)
+    el.textContent = `Animated`
   }
   else {
-    el.classList.add(`strikethrough`)
+    el.textContent = `Solid`
   }
 }
 

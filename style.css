@@ -1,11 +1,16 @@
 @font-face {
-  font-family: "imported_font";
+  font-family: "noto_font";
   src: url("fonts/noto.ttf") format("truetype");
 }
 
 @font-face {
   font-family: "piss_font";
   src: url("fonts/piss.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "nova_font";
+  src: url("fonts/nova.ttf") format("truetype");
 }
 
 :root {
@@ -20,7 +25,7 @@ body, html {
     height: 100%;
     overflow: hidden;
     background-color: #020208;
-    font-family: "imported_font", sans-serif;
+    font-family: "noto_font", sans-serif;
 }
 
 #glcanvas {
@@ -57,6 +62,7 @@ body, html {
     box-shadow: 0 0 20px rgba(0, 255, 204, 0.2), inset 0 0 15px rgba(0, 255, 204, 0.1);
     animation: subtlePulse 3s infinite alternate ease-in-out;
     white-space: pre-wrap;
+    font-family: piss_font;
 }
 
 @keyframes subtlePulse {
@@ -260,9 +266,8 @@ a.modal-link:hover, a.modal-link:link, a.modal-link:visited {
     color: white;
 }
 
-.strikethrough {
-    text-decoration: line-through;
-    opacity: 0.5;
+.disabled {
+    opacity: 0.7;
     cursor: pointer;
 }
 
