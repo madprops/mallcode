@@ -1,6 +1,11 @@
 @font-face {
   font-family: "imported_font";
-  src: url("NotoSans-Regular.ttf") format("truetype");
+  src: url("fonts/noto.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "piss_font";
+  src: url("fonts/piss.ttf") format("truetype");
 }
 
 :root {

@@ -30,6 +30,7 @@ App.username = ``
 App.version = `0.0.0`
 App.animation = true
 App.ls_storage = `mallcode_v1`
+App.font_string = `imported_font, system-ui, sans-serif`
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
@@ -288,7 +289,7 @@ App.create_text_texture = (text, is_word = false, is_sequence = false) => {
   let theme = App.get_theme(App.zone)
 
   if (is_word) {
-    ctx.font = `bold 80px system-ui, sans-serif`
+    ctx.font = `bold 80px ${App.font_string}`
     ctx.fillStyle = theme.word
     ctx.textAlign = `center`
     ctx.textBaseline = `middle`
@@ -339,7 +340,7 @@ App.create_text_texture = (text, is_word = false, is_sequence = false) => {
     }
   }
   else {
-    ctx.font = `bold 180px system-ui, sans-serif`
+    ctx.font = `bold 180px ${App.font_string}`
     ctx.fillStyle = theme.letter
     ctx.textAlign = `center`
     ctx.textBaseline = `middle`
