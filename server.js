@@ -266,7 +266,7 @@ App.help_text = `https://www.youtube.com/watch?v=spdfnqS3bDg`
 App.process_word = (zone, current_word, ws) => {
   if ([`HELP`, `SOS`].includes(current_word)) {
     if (ws && (ws.readyState === WebSocket.OPEN)) {
-      App.send_message(ws, App.help_text)
+      App.send_message(ws, App.help_text, true)
     }
   }
 
@@ -573,15 +573,16 @@ App.force_release = (ws, zone) => {
   }
 }
 
-App.send_message = (ws, text) => {
+App.send_message = (ws, text, pissed = false) => {
   ws.send(JSON.stringify({
     type: `MODAL`,
     text,
+    pissed,
   }))
 }
 
 App.block_message = (ws, seconds) => {
-  App.send_message(ws, `You have been blocked for ${seconds} seconds.`)
+  App.send_message(ws, `You have been blocked for ${seconds} seconds`)
 }
 
 App.get_version()

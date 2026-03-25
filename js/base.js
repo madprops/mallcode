@@ -148,7 +148,15 @@ App.setup_socket = () => {
       App.particles_material.needsUpdate = true
     }
     else if (data.type === `MODAL`) {
-      App.show_modal(data.text)
+      let cls = ``
+      let clean_url = false
+
+      if (data.pissed) {
+        cls = `pissed`
+        clean_url = true
+      }
+
+      App.show_modal({text: data.text, class: cls, clean_url})
     }
     else if (data.type === `USERS`) {
       App.online_count_zone = data.count_zone
@@ -183,22 +191,48 @@ App.clean_html = (text) => {
   return text.replace(/>/g, `&gt;`)
 }
 
-App.urlize = (text) => {
-  return text.replace(/(https?:\/\/[^\s]+)/g, `<a class="modal-link" href="$1" target="_blank">$1</a>`)
+App.urlize = (text, clean = false) => {
+  let label = text
+  let cls = `modal-link`
+
+  if (clean) {
+    label = label.replace(/[^a-zA-Z0-9]/g, ` `)
+    label = label.replace(/\s+/g, ` `)
+    label = label.trim()
+    cls = ` clean-link`
+  }
+
+  return text.replace(/(https?:\/\/[^\s]+)/g, `<a class="${cls}" href="$1" target="_blank">${label}</a>`)
 }
 
-App.show_modal = (text = ``, html = ``) => {
+App.show_modal = (args = {}) => {
+  let def_args = {
+    text: ``,
+    html: ``,
+    class: ``,
+    clean_url: false,
+  }
+
+  Shared.def_args(def_args, args)
+
   if (App.is_pressed) {
     App.handle_release(null, true)
   }
 
-  if (text) {
-    let clean = App.clean_html(text)
-    let urlized = App.urlize(clean)
+  if (args.text) {
+    let clean = App.clean_html(args.text)
+    let urlized = App.urlize(clean, args.clean_url)
     App.modal_el.innerHTML = urlized
   }
-  else if (html) {
-    App.modal_el.innerHTML = html
+  else if (args.html) {
+    App.modal_el.innerHTML = args.html
+  }
+
+  if (args.class) {
+    App.modal_el.classList.add(args.class)
+  }
+  else {
+    App.modal_el.className = ``
   }
 
   DOM.show(App.overlay_el)
@@ -733,7 +767,7 @@ Each user has a personality.
 Developed by Merkoba in 2026.
 github.com/madprops/mallcode`
 
-  App.show_modal(text)
+  App.show_modal({text})
 }
 
 App.load_storage = async () => {
@@ -830,7 +864,7 @@ App.build_zone_selector = (zones_info) => {
   }
 
   html += `</div>`
-  App.show_modal(``, html)
+  App.show_modal({html})
   let btns = DOM.els(`.zone-map-btn`, App.modal_el)
 
   let grid_el = DOM.el(`.zone-map-grid`, App.modal_el)

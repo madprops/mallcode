@@ -243,6 +243,10 @@ Shared.def_args = (def, args) => {
   }
 }
 
+Shared.is_url = (text) => {
+  return text.startsWith(`http://`) || text.startsWith(`https://`)
+}
+
 if ((typeof module !== `undefined`) && module.exports) {
   module.exports = Shared
 }
