@@ -964,10 +964,10 @@ App.refresh_effects_icon = () => {
   let el = DOM.el(`#animate-toggle`)
 
   if (App.animation) {
-    el.textContent = `Animated`
+    el.classList.remove(`disabled`)
   }
   else {
-    el.textContent = `Solid`
+    el.classList.add(`disabled`)
   }
 }
 

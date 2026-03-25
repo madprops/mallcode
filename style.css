@@ -266,8 +266,9 @@ a.modal-link:hover, a.modal-link:link, a.modal-link:visited {
     color: white;
 }
 
-.disabled {
-    opacity: 0.7;
+.strikethrough {
+    text-decoration: line-through;
+    opacity: 0.5;
     cursor: pointer;
 }
 
