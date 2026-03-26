@@ -935,7 +935,7 @@ Each zone has its own theme.
 The zones remember the words.
 You might encounter other users.
 Each user has a personality.
-Iambic keys: z/x and left/right
+Iambic keys: z/x and left/right.
 Developed by Merkoba in 2026.
 github.com/madprops/mallcode`
 
