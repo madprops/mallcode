@@ -45,6 +45,10 @@ Actions.register_word(`j4`, `hi`, () => {
 Actions.register_code(`k3`, `..-..`, () => {
   Actions.execute_command(`unlock computer`)
 })
+
+Actions.register_word(`any`, `rec`, () => {
+  Actions.execute_command(`capture video`)
+})
 ```
 
 This means you could use this as a semi-secure interface to access or trigger things.

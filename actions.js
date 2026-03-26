@@ -42,13 +42,24 @@ Actions.check_code = (ws, zone, code) => {
 }
 
 Actions.get = (items, zone, word) => {
-  let base = items[zone.toUpperCase()]
+  zone = zone.toUpperCase()
+  word = word.toUpperCase()
+
+  let base = items[zone]
+
+  if (base && base[word]) {
+    return base[word]
+  }
+
+  base = items[`ANY`]
 
   if (!base) {
     return
   }
 
-  return base[word.toUpperCase()]
+  if (base && base[word]) {
+    return base[word]
+  }
 }
 
 Actions.get_word = (zone, word) => {
@@ -85,6 +96,10 @@ Actions.register_all = () => {
 
   Actions.register_code(`k3`, `..-..`, () => {
     Actions.execute_command(`notify-send civilization`)
+  })
+
+  Actions.register_word(`any`, `rec`, () => {
+    Actions.execute_command(`notify-send recording`)
   })
 }
 
