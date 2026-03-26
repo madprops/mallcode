@@ -102,7 +102,28 @@ App.setup_socket = () => {
       App.update_sequence_display()
     }
     else if (data.type === `WORD`) {
-      App.spawn_sprite(data.word, `word`)
+      let found = false
+
+      if (data.word.length === 1) {
+        for (let i = App.sprites.length - 1; i >= 0; i--) {
+          let s = App.sprites[i]
+
+          if ((s.userData.type === `letter`) && (s.userData.text === data.word)) {
+            s.userData.type = `word`
+            s.userData.decay_rate = 0.25
+            s.userData.growth = 2
+            let old_map = s.material.map
+            s.material.map = App.create_text_texture(data.word, false, false, true)
+            old_map.dispose()
+            found = true
+            break
+          }
+        }
+      }
+
+      if (!found) {
+        App.spawn_sprite(data.word, `word`)
+      }
     }
     else if (data.type === `ZONE`) {
       if (data.version) {
@@ -319,7 +340,7 @@ App.setup_canvas = () => {
   App.active_sequence_sprite = null
 }
 
-App.create_text_texture = (text, is_word = false, is_sequence = false) => {
+App.create_text_texture = (text, is_word = false, is_sequence = false, force_word_color = false) => {
   let text_canvas = DOM.create(`canvas`)
   text_canvas.width = 1024
   text_canvas.height = 256
@@ -390,7 +411,7 @@ App.create_text_texture = (text, is_word = false, is_sequence = false) => {
   }
   else {
     ctx.font = `bold 180px ${App.font_string}`
-    ctx.fillStyle = theme.letter
+    ctx.fillStyle = force_word_color ? theme.word : theme.letter
     ctx.textAlign = `center`
     ctx.textBaseline = `middle`
     ctx.shadowColor = ctx.fillStyle
@@ -419,7 +440,7 @@ App.spawn_sprite = (text, type) => {
     }
 
     sprite.position.set((Math.random() - 0.5) * 20, (Math.random() - 0.5) * 10, type === `word` ? 20 : 0)
-    sprite.userData = {velocity: new THREE.Vector3((Math.random() - 0.5) * 0.05, Math.random() * 0.05 + 0.02, 0.05), life: 1.0, decay_rate: type === `word` ? 0.25 : 0.5, age: 0, growth: type === `word` ? 2 : 10}
+    sprite.userData = {text, type, velocity: new THREE.Vector3((Math.random() - 0.5) * 0.05, Math.random() * 0.05 + 0.02, 0.05), life: 1.0, decay_rate: type === `word` ? 0.25 : 0.5, age: 0, growth: type === `word` ? 2 : 10}
     App.sprites.push(sprite)
   }
 
