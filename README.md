@@ -25,11 +25,6 @@ An interface for encounters, learning, hints, narrative, drama, triggers, ominou
 
 It's a high effort and low throughput communication platform. This mode of communication filters a lot of boring superflous messages while making every formed word have some weight.
 
-There are 234 zones. From A-Z, each with a speed, from 1-9, for example A5, K9, B4, F6.
-
-Each zone has its own color theme.
-Each player has its own randomly generated name, color, and sound.
-
 You can visit and lurk here and maybe you'll encounter somebody online, and you can use this to practice morse code.
 
 ---
