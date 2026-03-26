@@ -1,6 +1,6 @@
 {
   "name": "mallcode",
-  "version": "3.5.0",
+  "version": "3.6.0",
   "description": "A multiplayer morse code experience using WebSockets",
   "main": "server.js",
   "scripts": {

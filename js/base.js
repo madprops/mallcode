@@ -9,7 +9,8 @@ App.zone_info_el = DOM.el(`#zone-info`)
 App.username_info_el = DOM.el(`#username-info`)
 App.sound_btn = DOM.el(`#sound-toggle`)
 App.overlay_el = DOM.el(`#modal-overlay`)
-App.modal_el = DOM.el(`#modal-content`)
+App.modal_el = DOM.el(`#modal-content-normal`)
+App.modal_el_pissed = DOM.el(`#modal-content-pissed`)
 App.words_container_el = DOM.el(`#words-container`)
 App.seq_el = DOM.el(`#seq-btn`)
 App.protocol = window.location.protocol === `https:` ? `wss:` : `ws:`
@@ -150,15 +151,7 @@ App.setup_socket = () => {
       App.particles_material.needsUpdate = true
     }
     else if (data.type === `MODAL`) {
-      let cls = ``
-      let clean_url = false
-
-      if (data.pissed) {
-        cls = `pissed`
-        clean_url = true
-      }
-
-      App.show_modal({text: data.text, class: cls, clean_url})
+      App.show_modal({text: data.text, pissed: data.pissed})
     }
     else if (data.type === `USERS`) {
       App.online_count_zone = data.count_zone
@@ -211,11 +204,22 @@ App.show_modal = (args = {}) => {
   let def_args = {
     text: ``,
     html: ``,
-    class: ``,
-    clean_url: false,
+    pissed: false,
   }
 
   Shared.def_args(def_args, args)
+  let container
+
+  if (args.pissed) {
+    DOM.show(App.modal_el_pissed)
+    DOM.hide(App.modal_el)
+    container = App.modal_el_pissed
+  }
+  else {
+    DOM.hide(App.modal_el_pissed)
+    DOM.show(App.modal_el)
+    container = App.modal_el
+  }
 
   if (App.is_pressed) {
     App.handle_release(null, true)
@@ -223,18 +227,11 @@ App.show_modal = (args = {}) => {
 
   if (args.text) {
     let clean = App.clean_html(args.text)
-    let urlized = App.urlize(clean, args.clean_url)
-    App.modal_el.innerHTML = urlized
+    let urlized = App.urlize(clean, args.pissed)
+    container.innerHTML = urlized
   }
   else if (args.html) {
-    App.modal_el.innerHTML = args.html
-  }
-
-  if (args.class) {
-    App.modal_el.classList.add(args.class)
-  }
-  else {
-    App.modal_el.className = ``
+    container.innerHTML = args.html
   }
 
   DOM.show(App.overlay_el)
