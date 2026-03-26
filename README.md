@@ -42,3 +42,5 @@ Actions.register(`j4`, `hi`, () => {
   Actions.execute_command(`notify-send hello`)
 })
 ```
+
+This means you could use this as a semi-secure interface to access or trigger things.
