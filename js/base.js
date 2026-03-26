@@ -365,6 +365,16 @@ App.create_text_texture = (text, is_word = false, is_sequence = false) => {
     let current_x = (text_canvas.width - total_width) / 2
     let center_y = text_canvas.height / 2
 
+    let dash_y_offset = 0
+    let offset = dot_radius * 1.5
+
+    if (App.seq === 2) {
+      dash_y_offset = -offset
+    }
+    else if (App.seq === 3) {
+      dash_y_offset = offset
+    }
+
     for (let char of text) {
       if (char === `.`) {
         ctx.beginPath()
@@ -373,7 +383,7 @@ App.create_text_texture = (text, is_word = false, is_sequence = false) => {
         current_x += dot_diameter + spacing
       }
       else if (char === `-`) {
-        ctx.fillRect(current_x, center_y - dash_height / 2, dash_width, dash_height)
+        ctx.fillRect(current_x, center_y - dash_height / 2 + dash_y_offset, dash_width, dash_height)
         current_x += dash_width + spacing
       }
     }
@@ -1018,19 +1028,29 @@ App.refresh_effects_icon = () => {
 App.cycle_seq = () => {
   if (App.seq === 1) {
     App.seq = 2
-    App.seq_el.textContent = `Slope`
   }
   else if (App.seq === 2) {
     App.seq = 3
-    App.seq_el.textContent = `Under`
   }
   else if (App.seq === 3) {
     App.seq = 1
-    App.seq_el.textContent = `Normal`
   }
 
+  App.refresh_seq()
   App.storage.sequence = App.seq
   App.save_storage()
+}
+
+App.refresh_seq = () => {
+  if (App.seq === 1) {
+    App.seq_el.textContent = `Line`
+  }
+  else if (App.seq === 2) {
+    App.seq_el.textContent = `Above`
+  }
+  else if (App.seq === 3) {
+    App.seq_el.textContent = `Below`
+  }
 }
 
 App.init = async () => {
@@ -1040,4 +1060,5 @@ App.init = async () => {
   App.setup_socket()
   App.hide_cover()
   App.refresh_effects_icon()
+  App.refresh_seq()
 }
