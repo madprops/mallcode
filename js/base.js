@@ -154,6 +154,7 @@ App.setup_socket = () => {
       App.max_press_duration = App.zone_settings.max_press
       App.input_throttle_ms = App.zone_settings.throttle
       App.unit_duration = App.zone_settings.unit_duration
+      App.iambic_duration = App.zone_settings.iambic_duration
       App.refresh_info()
       App.play_warp_drive()
 
@@ -553,10 +554,10 @@ App.iambic_loop = () => {
   }
 
   App.last_iambic_sent = send_type
-  let active_duration = App.unit_duration
+  let active_duration = App.iambic_duration
 
   if (send_type === `dash`) {
-    active_duration = App.unit_duration * 3
+    active_duration = App.iambic_duration * 3
   }
 
   App.trigger_down(true)
@@ -567,7 +568,7 @@ App.iambic_loop = () => {
 
     App.iambic_timeout = setTimeout(() => {
       App.iambic_loop()
-    }, App.unit_duration)
+    }, App.iambic_duration)
   }, active_duration)
 }
 

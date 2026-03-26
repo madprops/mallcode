@@ -1,4 +1,4 @@
-const Shared = {}
+let Shared = {}
 
 Shared.morse_code = {
   ".-":         `A`,
@@ -83,17 +83,15 @@ Shared.morse_code = {
 }
 
 Shared.zone_settings = {
-  // Slow/Forgiving
-  1: {unit_duration: 350, letter_mult: 5.0, word_mult: 10, max_press: 2000, throttle: 60, forgiving: true},
-  2: {unit_duration: 300, letter_mult: 4.5, word_mult: 9, max_press: 1800, throttle: 50, forgiving: true},
-  3: {unit_duration: 250, letter_mult: 4.0, word_mult: 8, max_press: 1500, throttle: 40, forgiving: true},
-  4: {unit_duration: 200, letter_mult: 4.0, word_mult: 8, max_press: 1200, throttle: 35, forgiving: false},
-  5: {unit_duration: 180, letter_mult: 3.5, word_mult: 7, max_press: 1000, throttle: 30, forgiving: false},
-  6: {unit_duration: 150, letter_mult: 3.5, word_mult: 7, max_press: 800, throttle: 25, forgiving: false},
-  7: {unit_duration: 120, letter_mult: 3.0, word_mult: 7, max_press: 700, throttle: 20, forgiving: false},
-  8: {unit_duration: 100, letter_mult: 3.0, word_mult: 7, max_press: 600, throttle: 15, forgiving: false},
-  9: {unit_duration: 80, letter_mult: 3.0, word_mult: 7, max_press: 500, throttle: 10, forgiving: false},
-  // Pro/Realistic
+  1: {unit_duration: 350, iambic_duration: 150, letter_mult: 5.0, word_mult: 10, max_press: 2000, throttle: 60, forgiving: true},
+  2: {unit_duration: 300, iambic_duration: 130, letter_mult: 4.5, word_mult: 9, max_press: 1800, throttle: 50, forgiving: true},
+  3: {unit_duration: 250, iambic_duration: 110, letter_mult: 4.0, word_mult: 8, max_press: 1500, throttle: 40, forgiving: true},
+  4: {unit_duration: 200, iambic_duration: 90, letter_mult: 4.0, word_mult: 8, max_press: 1200, throttle: 35, forgiving: false},
+  5: {unit_duration: 180, iambic_duration: 80, letter_mult: 3.5, word_mult: 7, max_press: 1000, throttle: 30, forgiving: false},
+  6: {unit_duration: 150, iambic_duration: 70, letter_mult: 3.5, word_mult: 7, max_press: 800, throttle: 25, forgiving: false},
+  7: {unit_duration: 120, iambic_duration: 60, letter_mult: 3.0, word_mult: 7, max_press: 700, throttle: 20, forgiving: false},
+  8: {unit_duration: 100, iambic_duration: 50, letter_mult: 3.0, word_mult: 7, max_press: 600, throttle: 15, forgiving: false},
+  9: {unit_duration: 80, iambic_duration: 40, letter_mult: 3.0, word_mult: 7, max_press: 500, throttle: 10, forgiving: false},
 }
 
 Shared.lock_time = 3000
@@ -126,6 +124,7 @@ Shared.random_word = (parts = 3, seed = null, capitalize = false) => {
   let word = ``
 
   for (let i = 0; i < parts * 2; i++) {
+
     if (!cons_next) {
       let index = Math.floor(rng() * cons.length)
       word += cons[index]
@@ -146,6 +145,7 @@ Shared.random_word = (parts = 3, seed = null, capitalize = false) => {
 }
 
 Shared.create_debouncer = (func, delay) => {
+
   if (typeof func !== `function`) {
     console.error(`Invalid debouncer function`)
     return
@@ -177,6 +177,7 @@ Shared.create_debouncer = (func, delay) => {
   }
 
   obj.call_2 = (...args) => {
+
     if (timer) {
       return
     }
@@ -207,6 +208,7 @@ Shared.random_int = (args = {}) => {
     let available = []
 
     for (let i = args.min; i <= args.max; i++) {
+
       if (!args.exclude.includes(i)) {
         available.push(i)
       }
@@ -236,7 +238,9 @@ Shared.random_int = (args = {}) => {
 }
 
 Shared.def_args = (def, args) => {
+
   for (let key in def) {
+
     if ((args[key] === undefined) && (def[key] !== undefined)) {
       args[key] = def[key]
     }
