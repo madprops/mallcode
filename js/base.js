@@ -665,13 +665,11 @@ App.handle_release = (e, is_local = true) => {
   let is_dash = false
 
   if (is_local && e && (e.type === `keyup`)) {
-    let key = e.key
-
-    if (key === `a` || key === `A` || key === `,` || key === `ArrowLeft`) {
+    if ([`a`, `A`, `ArrowLeft`].includes(e.key)) {
       is_iambic = true
       is_dot = true
     }
-    else if (key === `z` || key === `Z` || key === `.` || key === `ArrowRight`) {
+    else if ([`z`, `Z`, `ArrowRight`].includes(e.key)) {
       is_iambic = true
       is_dash = true
     }

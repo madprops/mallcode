@@ -303,3 +303,7 @@ a.clean-link:hover {
         bottom: var(--hud_side);
     }
 }
+
+.glow:hover {
+    text-shadow: 0 0 0.18rem currentcolor;
+}
