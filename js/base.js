@@ -604,11 +604,11 @@ App.handle_press = (e, is_local = true) => {
   let is_dash = false
 
   if (is_local && e && (e.type === `keydown`)) {
-    if ([`a`, `A`, `ArrowLeft`].includes(e.key)) {
+    if ([`z`, `Z`, `ArrowLeft`].includes(e.key)) {
       is_iambic = true
       is_dot = true
     }
-    else if ([`z`, `Z`, `ArrowRight`].includes(e.key)) {
+    else if ([`x`, `X`, `ArrowRight`].includes(e.key)) {
       is_iambic = true
       is_dash = true
     }
@@ -666,11 +666,11 @@ App.handle_release = (e, is_local = true) => {
   let is_dash = false
 
   if (is_local && e && (e.type === `keyup`)) {
-    if ([`a`, `A`, `ArrowLeft`].includes(e.key)) {
+    if ([`z`, `Z`, `ArrowLeft`].includes(e.key)) {
       is_iambic = true
       is_dot = true
     }
-    else if ([`z`, `Z`, `ArrowRight`].includes(e.key)) {
+    else if ([`x`, `X`, `ArrowRight`].includes(e.key)) {
       is_iambic = true
       is_dash = true
     }
@@ -935,7 +935,7 @@ Each zone has its own theme.
 The zones remember the words.
 You might encounter other users.
 Each user has a personality.
-Iambic keys: z/x and Left/Right
+Iambic keys: z/x and left/right
 Developed by Merkoba in 2026.
 github.com/madprops/mallcode`
 
