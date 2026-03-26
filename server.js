@@ -9,6 +9,7 @@ let fs = require(`fs`)
 App.server = http.createServer(App.app)
 App.wss = new WebSocket.Server({server: App.server})
 App.shared = require(`./js/shared.js`)
+App.actions = require(`./actions.js`)
 
 App.zone_states = {}
 App.next_client_id = 1
@@ -248,9 +249,9 @@ App.resolve_word = (zone) => {
     return
   }
 
-  let current_word = z_state.current_word
+  let word = z_state.current_word
   z_state.current_word = ``
-  let msg = JSON.stringify({type: `WORD`, word: current_word, username: z_state.last_active_ws ? z_state.last_active_ws.username : ``})
+  let msg = JSON.stringify({type: `WORD`, word, username: z_state.last_active_ws ? z_state.last_active_ws.username : ``})
 
   App.wss.clients.forEach((c) => {
     if ((c.readyState === WebSocket.OPEN) && (c.zone === zone)) {
@@ -258,25 +259,27 @@ App.resolve_word = (zone) => {
     }
   })
 
-  App.process_word(zone, current_word, z_state.last_active_ws)
+  App.process_word(zone, word, z_state.last_active_ws)
 }
 
 App.help_text = `https://www.youtube.com/watch?v=spdfnqS3bDg`
 
-App.process_word = (zone, current_word, ws) => {
-  if ([`HELP`, `SOS`].includes(current_word)) {
+App.process_word = (zone, word, ws) => {
+  App.actions.check(ws, zone, word)
+
+  if ([`HELP`, `SOS`].includes(word)) {
     if (ws && (ws.readyState === WebSocket.OPEN)) {
       App.send_message(ws, App.help_text, true)
     }
   }
 
-  if ((current_word.length >= 3) && App.word_match(current_word.toLowerCase())) {
+  if ((word.length >= 3) && App.word_match(word.toLowerCase())) {
     if (!App.zone_data[zone]) {
       App.zone_data[zone] = {words: []}
     }
 
-    App.zone_data[zone].words = App.zone_data[zone].words.filter(w => w !== current_word)
-    App.zone_data[zone].words.push(current_word)
+    App.zone_data[zone].words = App.zone_data[zone].words.filter(w => w !== word)
+    App.zone_data[zone].words.push(word)
 
     if (App.zone_data[zone].words.length > App.max_words) {
       App.zone_data[zone].words.shift()
