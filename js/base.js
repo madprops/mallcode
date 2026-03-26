@@ -1043,7 +1043,7 @@ App.cycle_seq = () => {
 
 App.refresh_seq = () => {
   if (App.seq === 1) {
-    App.seq_el.textContent = `Line`
+    App.seq_el.textContent = `Base`
   }
   else if (App.seq === 2) {
     App.seq_el.textContent = `Above`
