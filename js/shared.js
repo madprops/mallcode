@@ -124,7 +124,6 @@ Shared.random_word = (parts = 3, seed = null, capitalize = false) => {
   let word = ``
 
   for (let i = 0; i < parts * 2; i++) {
-
     if (!cons_next) {
       let index = Math.floor(rng() * cons.length)
       word += cons[index]
@@ -145,7 +144,6 @@ Shared.random_word = (parts = 3, seed = null, capitalize = false) => {
 }
 
 Shared.create_debouncer = (func, delay) => {
-
   if (typeof func !== `function`) {
     console.error(`Invalid debouncer function`)
     return
@@ -177,7 +175,6 @@ Shared.create_debouncer = (func, delay) => {
   }
 
   obj.call_2 = (...args) => {
-
     if (timer) {
       return
     }
@@ -208,7 +205,6 @@ Shared.random_int = (args = {}) => {
     let available = []
 
     for (let i = args.min; i <= args.max; i++) {
-
       if (!args.exclude.includes(i)) {
         available.push(i)
       }
@@ -238,9 +234,7 @@ Shared.random_int = (args = {}) => {
 }
 
 Shared.def_args = (def, args) => {
-
   for (let key in def) {
-
     if ((args[key] === undefined) && (def[key] !== undefined)) {
       args[key] = def[key]
     }
