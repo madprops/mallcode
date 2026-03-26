@@ -9,8 +9,7 @@ App.zone_info_el = DOM.el(`#zone-info`)
 App.username_info_el = DOM.el(`#username-info`)
 App.sound_btn = DOM.el(`#sound-toggle`)
 App.overlay_el = DOM.el(`#modal-overlay`)
-App.modal_el = DOM.el(`#modal-content-normal`)
-App.modal_el_pissed = DOM.el(`#modal-content-pissed`)
+App.modal_el = DOM.el(`#modal-content`)
 App.words_container_el = DOM.el(`#words-container`)
 App.seq_el = DOM.el(`#seq-btn`)
 App.protocol = window.location.protocol === `https:` ? `wss:` : `ws:`
@@ -208,34 +207,38 @@ App.show_modal = (args = {}) => {
   }
 
   Shared.def_args(def_args, args)
-  let container
-
-  if (args.pissed) {
-    DOM.show(App.modal_el_pissed)
-    DOM.hide(App.modal_el)
-    container = App.modal_el_pissed
-  }
-  else {
-    DOM.hide(App.modal_el_pissed)
-    DOM.show(App.modal_el)
-    container = App.modal_el
-  }
 
   if (App.is_pressed) {
     App.handle_release(null, true)
   }
 
-  if (args.text) {
-    let clean = App.clean_html(args.text)
-    let urlized = App.urlize(clean, args.pissed)
-    container.innerHTML = urlized
-  }
-  else if (args.html) {
-    container.innerHTML = args.html
-  }
-
   DOM.show(App.overlay_el)
   App.modal_open = true
+
+  let content = ``
+
+  if (args.text) {
+    content = App.urlize(App.clean_html(args.text), args.pissed)
+  }
+  else if (args.html) {
+    content = args.html
+  }
+
+  let container = App.modal_el
+
+  if (args.pissed) {
+    container.classList.add(`pissed`)
+    container.classList.add(`font-loading`)
+
+    document.fonts.load(`1em piss_font`).then(() => {
+      container.innerHTML = content
+      container.classList.remove(`font-loading`)
+    })
+  }
+  else {
+    container.classList.remove(`pissed`)
+    container.innerHTML = content
+  }
 }
 
 App.hide_modal = () => {

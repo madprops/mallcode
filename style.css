@@ -6,6 +6,7 @@
 @font-face {
   font-family: "piss_font";
   src: url("fonts/piss.ttf") format("truetype");
+  font-display: block;
 }
 
 @font-face {
@@ -46,7 +47,7 @@ body, html {
     backdrop-filter: blur(4px);
 }
 
-.modal-content {
+#modal-content {
     background: linear-gradient(135deg, #111118, #1a1a2e);
     color: #00ffcc;
     padding: 20px 20px;
@@ -66,6 +67,10 @@ body, html {
 
 .pissed {
     font-family: "piss_font", sans-serif;
+}
+
+.font-loading {
+    visibility: hidden;
 }
 
 @keyframes subtlePulse {
