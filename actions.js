@@ -51,7 +51,7 @@ Actions.get = (items, zone, word) => {
     return base[word]
   }
 
-  base = items[`ANY`]
+  base = items.ANY
 
   if (!base) {
     return
