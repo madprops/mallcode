@@ -11,6 +11,7 @@ App.sound_btn = DOM.el(`#sound-toggle`)
 App.overlay_el = DOM.el(`#modal-overlay`)
 App.modal_el = DOM.el(`#modal-content`)
 App.words_container_el = DOM.el(`#words-container`)
+App.seq_el = DOM.el(`#seq-btn`)
 App.protocol = window.location.protocol === `https:` ? `wss:` : `ws:`
 App.is_pressed = false
 App.press_start_time = 0
@@ -32,6 +33,7 @@ App.animation = true
 App.ls_storage = `mallcode_v1`
 App.font_string = `noto_font, system-ui, sans-serif`
 App.words = []
+App.seq = 1
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
@@ -587,7 +589,7 @@ App.setup_events = () => {
     App.animation = !App.animation
 
     if (App.storage) {
-      App.storage.animate = App.animation
+      App.storage.animation = App.animation
       App.save_storage()
     }
 
@@ -596,6 +598,10 @@ App.setup_events = () => {
     }
 
     App.refresh_effects_icon()
+  })
+
+  DOM.ev(App.seq_el, `click`, () => {
+    App.cycle_seq()
   })
 
   // Force a release if we regain focus and were stuck in a pressed state
@@ -794,8 +800,12 @@ App.load_storage = async () => {
           App.volume_level = App.storage.volume_level
         }
 
-        if (App.storage.animate !== undefined) {
-          App.animation = App.storage.animate
+        if (App.storage.animation !== undefined) {
+          App.animation = App.storage.animation
+        }
+
+        if (App.storage.sequence !== undefined) {
+          App.seq = App.storage.sequence
         }
 
         resolve()
@@ -1003,6 +1013,24 @@ App.refresh_effects_icon = () => {
   else {
     el.classList.add(`disabled`)
   }
+}
+
+App.cycle_seq = () => {
+  if (App.seq === 1) {
+    App.seq = 2
+    App.seq_el.textContent = `Slope`
+  }
+  else if (App.seq === 2) {
+    App.seq = 3
+    App.seq_el.textContent = `Under`
+  }
+  else if (App.seq === 3) {
+    App.seq = 1
+    App.seq_el.textContent = `Normal`
+  }
+
+  App.storage.sequence = App.seq
+  App.save_storage()
 }
 
 App.init = async () => {
