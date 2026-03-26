@@ -1,5 +1,5 @@
 const {exec} = require(`child_process`)
-const Actions = {items: {}}
+const Actions = {word_map: {}, code_map: {}}
 
 Actions.execute_command = (command) => {
   exec(command, (error, stdout, stderr) => {
@@ -17,8 +17,8 @@ Actions.execute_command = (command) => {
   })
 }
 
-Actions.check = (ws, zone, word) => {
-  let action = Actions.get(zone, word)
+Actions.check_word = (ws, zone, word) => {
+  let action = Actions.get_word(zone, word)
 
   if (!action) {
     return
@@ -29,8 +29,20 @@ Actions.check = (ws, zone, word) => {
   }
 }
 
-Actions.get = (zone, word) => {
-  let base = Actions.items[zone.toUpperCase()]
+Actions.check_code = (ws, zone, code) => {
+  let action = Actions.get_code(zone, code)
+
+  if (!action) {
+    return
+  }
+
+  if (typeof action === `function`) {
+    action(ws, zone, code)
+  }
+}
+
+Actions.get = (items, zone, word) => {
+  let base = items[zone.toUpperCase()]
 
   if (!base) {
     return
@@ -39,20 +51,40 @@ Actions.get = (zone, word) => {
   return base[word.toUpperCase()]
 }
 
-Actions.register = (zone, word, action) => {
+Actions.get_word = (zone, word) => {
+  return Actions.get(Actions.word_map, zone, word)
+}
+
+Actions.get_code = (zone, word) => {
+  return Actions.get(Actions.code_map, zone, word)
+}
+
+Actions.register = (items, zone, word, action) => {
   zone = zone.toUpperCase()
   word = word.toUpperCase()
 
-  if (!Actions.items[zone]) {
-    Actions.items[zone] = {}
+  if (!items[zone]) {
+    items[zone] = {}
   }
 
-  Actions.items[zone][word] = action
+  items[zone][word] = action
+}
+
+Actions.register_word = (zone, word, action) => {
+  Actions.register(Actions.word_map, zone, word, action)
+}
+
+Actions.register_code = (zone, word, action) => {
+  Actions.register(Actions.code_map, zone, word, action)
 }
 
 Actions.register_all = () => {
-  Actions.register(`j4`, `hi`, () => {
+  Actions.register_word(`j4`, `hi`, () => {
     Actions.execute_command(`notify-send hello`)
+  })
+
+  Actions.register_code(`k3`, `..-..`, () => {
+    Actions.execute_command(`notify-send civilization`)
   })
 }
 

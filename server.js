@@ -223,6 +223,7 @@ App.resolve_letter = (zone) => {
     return
   }
 
+  App.actions.check_code(z_state.last_active_ws, zone, z_state.current_sequence)
   let letter = App.shared.morse_code[z_state.current_sequence] || ``
 
   if (letter !== `@`) {
@@ -250,6 +251,7 @@ App.resolve_word = (zone) => {
   }
 
   let word = z_state.current_word
+  App.actions.check_word(z_state.last_active_ws, zone, word)
   z_state.current_word = ``
   let msg = JSON.stringify({type: `WORD`, word, username: z_state.last_active_ws ? z_state.last_active_ws.username : ``})
 
@@ -265,8 +267,6 @@ App.resolve_word = (zone) => {
 App.help_text = `https://www.youtube.com/watch?v=spdfnqS3bDg`
 
 App.process_word = (zone, word, ws) => {
-  App.actions.check(ws, zone, word)
-
   if ([`HELP`, `SOS`].includes(word)) {
     if (ws && (ws.readyState === WebSocket.OPEN)) {
       App.send_message(ws, App.help_text, true)
