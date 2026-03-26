@@ -44,3 +44,7 @@ Actions.register(`j4`, `hi`, () => {
 ```
 
 This means you could use this as a semi-secure interface to access or trigger things.
+
+---
+
+Invest in Mall Code to put a network enabled morse code communication system in all living rooms and airplanes.
