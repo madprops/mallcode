@@ -14,6 +14,11 @@ App.words_container_el = DOM.el(`#words-container`)
 App.seq_el = DOM.el(`#seq-btn`)
 App.protocol = window.location.protocol === `https:` ? `wss:` : `ws:`
 App.is_pressed = false
+App.paddle_dot_down = false
+App.paddle_dash_down = false
+App.is_iambic_keying = false
+App.last_iambic_sent = null
+App.iambic_timeout = null
 App.press_start_time = 0
 App.current_sequence = ``
 App.current_word = ``
@@ -469,6 +474,103 @@ App.update_sequence_display = () => {
   }
 }
 
+App.trigger_down = (is_local = true) => {
+  if (App.is_pressed) {
+    return
+  }
+
+  let now = performance.now()
+
+  if (is_local) {
+    App.last_typist_was_local = true
+    App.current_user = App.username
+    App.username_info_el.textContent = App.username
+    App.username_debouncer.call()
+  }
+
+  App.last_input_time = now
+  App.is_pressed = true
+  App.press_start_time = now
+  App.last_typist_was_local = is_local
+
+  if ((is_local !== false) && App.ws && (App.ws.readyState === WebSocket.OPEN)) {
+    App.ws.send(JSON.stringify({type: `DOWN`}))
+  }
+
+  if (App.sound_enabled() && App.current_user) {
+    App.beep_debouncer.call()
+  }
+
+  App.particle_mesh.material.size = 0.5
+  App.init_audio()
+  clearTimeout(App.max_press_timeout)
+
+  App.max_press_timeout = setTimeout(() => {
+    App.handle_release(null, true)
+  }, App.max_press_duration)
+}
+
+App.trigger_up = (is_local = true) => {
+  if (!App.is_pressed) {
+    return
+  }
+
+  let now = performance.now()
+  App.is_pressed = false
+  clearTimeout(App.max_press_timeout)
+  App.last_input_time = now
+
+  if ((is_local !== false) && App.ws && (App.ws.readyState === WebSocket.OPEN)) {
+    App.ws.send(JSON.stringify({type: `UP`}))
+  }
+
+  App.stop_beep()
+  App.particle_mesh.material.size = 0.15
+}
+
+App.iambic_loop = () => {
+  if (!App.paddle_dot_down && !App.paddle_dash_down) {
+    App.is_iambic_keying = false
+    App.last_iambic_sent = null
+    return
+  }
+
+  let send_type = null
+
+  if (App.paddle_dot_down && App.paddle_dash_down) {
+    if (App.last_iambic_sent === `dot`) {
+      send_type = `dash`
+    }
+    else {
+      send_type = `dot`
+    }
+  }
+  else if (App.paddle_dot_down) {
+    send_type = `dot`
+  }
+  else if (App.paddle_dash_down) {
+    send_type = `dash`
+  }
+
+  App.last_iambic_sent = send_type
+  let active_duration = App.unit_duration
+
+  if (send_type === `dash`) {
+    active_duration = App.unit_duration * 3
+  }
+
+  App.trigger_down(true)
+  clearTimeout(App.iambic_timeout)
+
+  App.iambic_timeout = setTimeout(() => {
+    App.trigger_up(true)
+
+    App.iambic_timeout = setTimeout(() => {
+      App.iambic_loop()
+    }, App.unit_duration)
+  }, active_duration)
+}
+
 App.handle_press = (e, is_local = true) => {
   if (App.moving || App.modal_open) {
     return
@@ -496,8 +598,19 @@ App.handle_press = (e, is_local = true) => {
     return
   }
 
-  if (App.is_pressed) {
-    return
+  let is_iambic = false
+  let is_dot = false
+  let is_dash = false
+
+  if (is_local && e && (e.type === `keydown`)) {
+    if ([`a`, `A`, `ArrowLeft`].includes(e.key)) {
+      is_iambic = true
+      is_dot = true
+    }
+    else if ([`z`, `Z`, `ArrowRight`].includes(e.key)) {
+      is_iambic = true
+      is_dash = true
+    }
   }
 
   let now = performance.now()
@@ -506,36 +619,32 @@ App.handle_press = (e, is_local = true) => {
     return
   }
 
-  if (is_local) {
-    App.last_typist_was_local = true
-    App.current_user = App.username
-    App.username_info_el.textContent = App.username
-    App.username_debouncer.call()
+  if (is_iambic) {
+    if (is_dot) {
+      App.paddle_dot_down = true
+    }
+
+    if (is_dash) {
+      App.paddle_dash_down = true
+    }
+
+    if (!App.is_iambic_keying) {
+      App.is_iambic_keying = true
+      App.iambic_loop()
+    }
+
+    return
+  }
+
+  if (App.is_pressed) {
+    return
   }
 
   if (is_local && ((now - App.last_input_time) < App.input_throttle_ms)) {
     return
   }
 
-  App.last_input_time = now
-  App.is_pressed = true
-  App.press_start_time = now
-  App.last_typist_was_local = is_local
-
-  if ((is_local !== false) && App.ws && (App.ws.readyState === WebSocket.OPEN)) {
-    App.ws.send(JSON.stringify({type: `DOWN`}))
-  }
-
-  if (App.sound_enabled() && App.current_user) {
-    App.beep_debouncer.call()
-  }
-
-  App.particle_mesh.material.size = 0.5
-  App.init_audio()
-
-  App.max_press_timeout = setTimeout(() => {
-    App.handle_release(null, true)
-  }, App.max_press_duration)
+  App.trigger_down(is_local)
 }
 
 App.handle_release = (e, is_local = true) => {
@@ -551,21 +660,47 @@ App.handle_release = (e, is_local = true) => {
     e.preventDefault()
   }
 
+  let is_iambic = false
+  let is_dot = false
+  let is_dash = false
+
+  if (is_local && e && (e.type === `keyup`)) {
+    let key = e.key
+
+    if (key === `a` || key === `A` || key === `,` || key === `ArrowLeft`) {
+      is_iambic = true
+      is_dot = true
+    }
+    else if (key === `z` || key === `Z` || key === `.` || key === `ArrowRight`) {
+      is_iambic = true
+      is_dash = true
+    }
+  }
+
+  if (is_iambic) {
+    if (is_dot) {
+      App.paddle_dot_down = false
+    }
+
+    if (is_dash) {
+      App.paddle_dash_down = false
+    }
+
+    return
+  }
+
+  if (!e && is_local) {
+    App.paddle_dot_down = false
+    App.paddle_dash_down = false
+    clearTimeout(App.iambic_timeout)
+    App.is_iambic_keying = false
+  }
+
   if (!App.is_pressed) {
     return
   }
 
-  let now = performance.now()
-  App.is_pressed = false
-  clearTimeout(App.max_press_timeout)
-  App.last_input_time = now
-
-  if ((is_local !== false) && App.ws && (App.ws.readyState === WebSocket.OPEN)) {
-    App.ws.send(JSON.stringify({type: `UP`}))
-  }
-
-  App.stop_beep()
-  App.particle_mesh.material.size = 0.15
+  App.trigger_up(is_local)
 }
 
 App.setup_events = () => {
@@ -801,6 +936,7 @@ Each zone has its own theme.
 The zones remember the words.
 You might encounter other users.
 Each user has a personality.
+Iambic keys: z/x and Left/Right
 Developed by Merkoba in 2026.
 github.com/madprops/mallcode`
 
@@ -813,6 +949,7 @@ App.load_storage = async () => {
 
     request.onupgradeneeded = (e) => {
       let db = e.target.result
+
       if (!db.objectStoreNames.contains(`store`)) {
         db.createObjectStore(`store`)
       }
@@ -884,6 +1021,7 @@ App.get_zone_colors = (last_activity, current_time) => {
   let hue = Math.round(120 - activity * 120)
   let color = `hsl(${hue}, 100%, 60%)`
   let bg = `hsl(${hue}, 50%, 15%)`
+
   return {color, bg}
 }
 
