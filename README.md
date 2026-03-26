@@ -38,8 +38,12 @@ This is done in `actions.js`:
 Actions are registered like this:
 
 ```js
-Actions.register(`j4`, `hi`, () => {
+Actions.register_word(`j4`, `hi`, () => {
   Actions.execute_command(`notify-send hello`)
+})
+
+Actions.register_code(`k3`, `..-..`, () => {
+  Actions.execute_command(`unlock computer`)
 })
 ```
 
