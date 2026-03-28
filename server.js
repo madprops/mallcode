@@ -303,7 +303,17 @@ App.setup_sockets = () => {
     ws.id = App.next_client_id++
     ws.ip = req.headers[`x-forwarded-for`] || req.socket.remoteAddress
     ws.username = App.shared.random_word(3, ws.date_join || ws.ip, true)
-    ws.zone = App.default_zone()
+
+    let req_url = new URL(req.url, `http://localhost`)
+    let req_zone = req_url.searchParams.get(`zone`)
+
+    if (req_zone && /^[A-Z][1-9]$/i.test(req_zone)) {
+      ws.zone = req_zone.toUpperCase()
+    }
+    else {
+      ws.zone = App.default_zone()
+    }
+
     ws.unit_duration = null
     ws.penalty_expires = App.blocked_ips[ws.ip] || 0
 

@@ -65,7 +65,13 @@ App.create_debouncers = () => {
 }
 
 App.setup_socket = () => {
-  App.ws = new WebSocket(`${App.protocol}//${window.location.host}`)
+  let ws_url = `${App.protocol}//${window.location.host}`
+
+  if (App.zone) {
+    ws_url += `/?zone=${App.zone}`
+  }
+
+  App.ws = new WebSocket(ws_url)
 
   App.ws.onopen = () => {
     if (App.zone) {
