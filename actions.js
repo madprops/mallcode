@@ -1,7 +1,9 @@
 const {exec} = require(`child_process`)
 const fs = require(`fs`)
 const path = require(`path`)
-const Actions = {word_map: {}, code_map: {}}
+Shared = require(`./js/shared.js`)
+const Actions = {word_map: {}, code_map: {}, locks: new Map()}
+Actions.lock_delay = 10
 
 Actions.execute_command = (command) => {
   exec(command, (error, stdout, stderr) => {
@@ -19,16 +21,30 @@ Actions.execute_command = (command) => {
   })
 }
 
-Actions.check_word = (ws, zone, word) => {
-  let action = Actions.get_word(zone, word)
+Actions.run = (obj, ws, zone, value) => {
+  let lock_key = `${ws.username}_${zone}_${value}`
+  let now = Date.now()
 
-  if (!action) {
+  if (Actions.locks.has(lock_key)) {
+    let last_time = Actions.locks.get(lock_key)
+
+    if ((now - last_time) < (obj.lock * 1000)) {
+      return
+    }
+  }
+
+  Actions.locks.set(lock_key, now)
+  obj.action(ws, zone, value)
+}
+
+Actions.check_word = (ws, zone, word) => {
+  let obj = Actions.get_word(zone, word)
+
+  if (!obj) {
     return
   }
 
-  if (typeof action === `function`) {
-    action(ws, zone, word)
-  }
+  Actions.run(obj, ws, zone, word)
 }
 
 Actions.check_code = (ws, zone, code) => {
@@ -38,9 +54,7 @@ Actions.check_code = (ws, zone, code) => {
     return
   }
 
-  if (typeof action === `function`) {
-    action(ws, zone, code)
-  }
+  Actions.run(obj, ws, zone, code)
 }
 
 Actions.get = (items, zone, word) => {
@@ -72,7 +86,12 @@ Actions.get_code = (zone, word) => {
   return Actions.get(Actions.code_map, zone, word)
 }
 
-Actions.register = (items, zone, word, action) => {
+Actions.register = (items, zone, word, action, args = {}) => {
+  let def_args = {
+    lock: Actions.lock_delay,
+  }
+
+  Shared.def_args(def_args, args)
   zone = zone.toUpperCase()
   word = word.toUpperCase()
 
@@ -80,7 +99,12 @@ Actions.register = (items, zone, word, action) => {
     items[zone] = {}
   }
 
-  items[zone][word] = action
+  let obj = {
+    action,
+    lock: args.lock,
+  }
+
+  items[zone][word] = obj
 }
 
 Actions.register_word = (zone, word, action) => {
@@ -93,6 +117,9 @@ Actions.register_code = (zone, word, action) => {
 
 Actions.register_all = () => {
   /* Register functions in action_funcs.js
+  Optional arguments object include "lock"
+  lock means how many seconds to block exact command
+  To avoid spam. Default is 60 seconds
 
   Actions.register_word(`j4`, `hi`, (ws, zone, value) => {
     Actions.execute_command(`notify-send hello`)
@@ -104,7 +131,7 @@ Actions.register_all = () => {
 
   Actions.register_word(`any`, `rec`, (ws, zone, value) => {
     Actions.execute_command(`capture video`)
-  }) */
+  }, {lock: 60}) */
 
   let file_path = path.join(__dirname, `action_funcs.js`)
 
