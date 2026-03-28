@@ -33,20 +33,20 @@ You can visit and lurk here and maybe you'll encounter somebody online, and you 
 
 Can be set up to run system commands on specific zones when using certain words.
 
-This is done in `actions.js`:
+This is done in `action_funcs.js`:
 
 Actions are registered like this:
 
 ```js
-Actions.register_word(`j4`, `hi`, () => {
+Actions.register_word(`j4`, `hi`, (ws, zone, value) => {
   Actions.execute_command(`notify-send hello`)
 })
 
-Actions.register_code(`k3`, `..-..`, () => {
+Actions.register_code(`k3`, `..-..`, (ws, zone, value) => {
   Actions.execute_command(`unlock computer`)
 })
 
-Actions.register_word(`any`, `rec`, () => {
+Actions.register_word(`any`, `rec`, (ws, zone, value) => {
   Actions.execute_command(`capture video`)
 })
 ```

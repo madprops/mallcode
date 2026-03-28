@@ -1,4 +1,6 @@
 const {exec} = require(`child_process`)
+const fs = require(`fs`)
+const path = require(`path`)
 const Actions = {word_map: {}, code_map: {}}
 
 Actions.execute_command = (command) => {
@@ -90,17 +92,31 @@ Actions.register_code = (zone, word, action) => {
 }
 
 Actions.register_all = () => {
-  Actions.register_word(`j4`, `hi`, () => {
+  /* Register functions in action_funcs.js
+
+  Actions.register_word(`j4`, `hi`, (ws, zone, value) => {
     Actions.execute_command(`notify-send hello`)
   })
 
-  Actions.register_code(`k3`, `..-..`, () => {
-    Actions.execute_command(`notify-send civilization`)
+  Actions.register_code(`k3`, `..-..`, (ws, zone, value) => {
+    Actions.execute_command(`unlock computer`)
   })
 
-  Actions.register_word(`any`, `rec`, () => {
-    Actions.execute_command(`notify-send recording`)
-  })
+  Actions.register_word(`any`, `rec`, (ws, zone, value) => {
+    Actions.execute_command(`capture video`)
+  }) */
+
+  let file_path = path.join(__dirname, `action_funcs.js`)
+
+  if (fs.existsSync(file_path)) {
+    try {
+      let code = fs.readFileSync(file_path, `utf-8`)
+      eval(code)
+    }
+    catch (error) {
+      console.error(`Error evaluating action_funcs.js:`, error)
+    }
+  }
 }
 
 Actions.register_all()

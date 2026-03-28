@@ -1,6 +1,6 @@
 {
   "name": "mallcode",
-  "version": "3.7.0",
+  "version": "3.8.0",
   "description": "A multiplayer morse code experience using WebSockets",
   "main": "server.js",
   "scripts": {
@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "express": "^4.18.2",
-    "ws": "^8.16.0"
+    "ws": "^8.16.0",
+    "@atproto/api": "^0.13.0"
   },
   "devDependencies": {
     "eslint": "~9.11.1",
