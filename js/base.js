@@ -42,7 +42,6 @@ App.font_string = `noto_font, system-ui, sans-serif`
 App.words = []
 App.seq = 1
 
-
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
     App.username_info_el.textContent = ``
