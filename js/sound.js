@@ -64,7 +64,7 @@ App.play_zone_enter = () => {
     return
   }
 
-  let duration = 1.0
+  let duration = 1.2
   let start_time = App.audio_ctx.currentTime
   let osc_main = App.audio_ctx.createOscillator()
   let osc_sub = App.audio_ctx.createOscillator()
@@ -72,25 +72,68 @@ App.play_zone_enter = () => {
   let filter = App.audio_ctx.createBiquadFilter()
 
   osc_main.type = `sine`
-  // a square wave adds a slight digital/retro presence to the entry chime
-  osc_sub.type = `square`
+  // swapped square for triangle to remove the harsh digital edge
+  osc_sub.type = `triangle`
   filter.type = `bandpass`
 
-  // sweeping the filter up quickly creates a 'materializing' wash effect
+  // sweeping to a lower peak frequency makes it less piercing
   filter.frequency.setValueAtTime(200, start_time)
-  filter.frequency.exponentialRampToValueAtTime(2000, start_time + 0.2)
+  filter.frequency.exponentialRampToValueAtTime(1200, start_time + 0.3)
 
-  // a bright two-tone jump to signal an arrival (A4 jumping to E5)
   osc_main.frequency.setValueAtTime(440, start_time)
-  osc_main.frequency.setValueAtTime(659.25, start_time + 0.15)
+  osc_main.frequency.setValueAtTime(659.25, start_time + 0.2)
 
-  // the sub oscillator follows the same interval an octave lower to thicken the sound
   osc_sub.frequency.setValueAtTime(220, start_time)
-  osc_sub.frequency.setValueAtTime(329.63, start_time + 0.15)
+  osc_sub.frequency.setValueAtTime(329.63, start_time + 0.2)
 
-  // fast attack to immediately catch the ear, followed by a smooth fade out
+  // slower attack and lower peak volume for a gentler swell
   main_gain.gain.setValueAtTime(0, start_time)
-  main_gain.gain.linearRampToValueAtTime(0.2, start_time + 0.05)
+  main_gain.gain.linearRampToValueAtTime(0.12, start_time + 0.15)
+  main_gain.gain.exponentialRampToValueAtTime(0.01, start_time + duration)
+
+  osc_main.connect(main_gain)
+  osc_sub.connect(main_gain)
+  main_gain.connect(filter)
+  filter.connect(App.audio_ctx.destination)
+
+  osc_main.start(start_time)
+  osc_sub.start(start_time)
+
+  osc_main.stop(start_time + duration)
+  osc_sub.stop(start_time + duration)
+}
+
+App.play_zone_leave = () => {
+  if (!App.audio_started) {
+    return
+  }
+
+  let duration = 1.2
+  let start_time = App.audio_ctx.currentTime
+  let osc_main = App.audio_ctx.createOscillator()
+  let osc_sub = App.audio_ctx.createOscillator()
+  let main_gain = App.audio_ctx.createGain()
+  let filter = App.audio_ctx.createBiquadFilter()
+
+  osc_main.type = `sine`
+  // returning to a triangle wave softens the exit so it feels less abrupt
+  osc_sub.type = `triangle`
+  filter.type = `lowpass`
+
+  // sweeping the filter down muffles the sound over time, making it feel distant
+  filter.frequency.setValueAtTime(2000, start_time)
+  filter.frequency.exponentialRampToValueAtTime(100, start_time + duration)
+
+  // a smooth downward frequency slide to simulate powering down or leaving
+  osc_main.frequency.setValueAtTime(440, start_time)
+  osc_main.frequency.exponentialRampToValueAtTime(55, start_time + duration)
+
+  osc_sub.frequency.setValueAtTime(220, start_time)
+  osc_sub.frequency.exponentialRampToValueAtTime(27.5, start_time + duration)
+
+  // quick initial presence, then a long, smooth fade into nothingness
+  main_gain.gain.setValueAtTime(0, start_time)
+  main_gain.gain.linearRampToValueAtTime(0.15, start_time + 0.1)
   main_gain.gain.exponentialRampToValueAtTime(0.01, start_time + duration)
 
   osc_main.connect(main_gain)

@@ -187,6 +187,15 @@ App.setup_socket = () => {
 
       if (data.msg) {
         App.show_update(data.msg)
+
+        if (data.count_zone <= 10) {
+          if (data.msg.includes(`joined`)) {
+            App.play_zone_enter()
+          }
+          else if (data.msg.includes(`left`)) {
+            App.play_zone_leave()
+          }
+        }
       }
 
       App.refresh_info()
