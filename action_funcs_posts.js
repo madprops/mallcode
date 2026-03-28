@@ -29,6 +29,8 @@ let post_words = [
   `please`,
   `meow`,
   `woof`,
+  `yolo`,
+  `xoxo`,
 ]
 
 for (let word of post_words) {
