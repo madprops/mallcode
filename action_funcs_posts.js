@@ -39,3 +39,7 @@ Actions.register_word(`any`, `rofl`, (ws, zone, value) => {
 Actions.register_word(`any`, `ping`, (ws, zone, value) => {
   do_post(ws, zone, value)
 }, {lock: post_lock})
+
+Actions.register_word(`any`, `test`, (ws, zone, value) => {
+  do_post(ws, zone, value)
+}, {lock: post_lock})
