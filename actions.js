@@ -107,12 +107,12 @@ Actions.register = (items, zone, word, action, args = {}) => {
   items[zone][word] = obj
 }
 
-Actions.register_word = (zone, word, action) => {
-  Actions.register(Actions.word_map, zone, word, action)
+Actions.register_word = (zone, word, action, args) => {
+  Actions.register(Actions.word_map, zone, word, action, args)
 }
 
-Actions.register_code = (zone, word, action) => {
-  Actions.register(Actions.code_map, zone, word, action)
+Actions.register_code = (zone, word, action, args) => {
+  Actions.register(Actions.code_map, zone, word, action, args)
 }
 
 Actions.register_all = () => {
