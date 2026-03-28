@@ -1193,7 +1193,7 @@ App.refresh_info = () => {
     let zone_count_container_el = DOM.el(`#zone-count-container`, clone)
     global_count_el.textContent = App.online_count_global
     zone_count_el.textContent = App.online_count_zone
-    let users = App.zone_usernames.join(`, `)
+    let users = App.zone_usernames.join(` ✦ `)
     zone_count_container_el.title = users
     App.zone_info_el.innerHTML = ``
     App.zone_info_el.appendChild(clone)
