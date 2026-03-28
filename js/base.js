@@ -157,6 +157,7 @@ App.setup_socket = () => {
       App.update_sequence_display()
 
       App.zone = data.zone
+      App.update_url()
       App.clear_updates()
       App.username = data.username
       App.zone_settings = Shared.zone_settings[parseInt(App.zone.charAt(1))]
@@ -1253,10 +1254,24 @@ App.clear_updates = () => {
   App.updates_el.innerHTML = ``
 }
 
+App.update_url = () => {
+  let url = new URL(window.location)
+  url.searchParams.set(`zone`, App.zone)
+  window.history.replaceState({}, ``, url)
+}
+
 App.init = async () => {
   await App.load_storage()
   App.create_debouncers()
   App.setup_dials()
+
+  let params = new URLSearchParams(window.location.search)
+  let p_zone = params.get(`zone`)
+
+  if (p_zone && /^[A-Z][1-9]$/i.test(p_zone)) {
+    App.zone = p_zone.toUpperCase()
+  }
+
   App.setup_socket()
   App.hide_cover()
   App.refresh_effects_icon()
