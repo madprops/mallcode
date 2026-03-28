@@ -12,6 +12,7 @@ App.overlay_el = DOM.el(`#modal-overlay`)
 App.modal_el = DOM.el(`#modal-content`)
 App.words_container_el = DOM.el(`#words-container`)
 App.seq_el = DOM.el(`#seq-btn`)
+App.updates_el = DOM.el(`#updates`)
 App.protocol = window.location.protocol === `https:` ? `wss:` : `ws:`
 App.is_pressed = false
 App.paddle_dot_down = false
@@ -29,6 +30,7 @@ App.zone_dial_delay = 100
 App.reconnect_delay = 5 * 1000
 App.beep_delay = 10
 App.stop_beep_delay = 1 * 1000
+App.updates_duration = 60 * 1000
 App.modal_open = false
 App.moving = false
 App.current_user = ``
@@ -39,6 +41,7 @@ App.ls_storage = `mallcode_v1`
 App.font_string = `noto_font, system-ui, sans-serif`
 App.words = []
 App.seq = 1
+
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
@@ -182,6 +185,11 @@ App.setup_socket = () => {
     else if (data.type === `USERS`) {
       App.online_count_zone = data.count_zone
       App.online_count_global = data.count_global
+
+      if (data.msg) {
+        App.show_update(data.msg)
+      }
+
       App.refresh_info()
     }
     else if (data.type === `WORDS`) {
@@ -1209,6 +1217,16 @@ App.refresh_seq = () => {
   else if (App.seq === 3) {
     App.seq_el.textContent = `Below`
   }
+}
+
+App.show_update = (msg) => {
+  let el = DOM.create(`div`)
+  el.textContent = msg
+  App.updates_el.prepend(el)
+
+  setTimeout(() => {
+    el.remove()
+  }, App.updates_duration)
 }
 
 App.init = async () => {

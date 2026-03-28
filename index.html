@@ -17,20 +17,26 @@
             <img id="image" src="image.jpg">
         </div>
 
-        <div id="top-left" class="corner">
+        <div id="top-left" class="corner flex-row-center">
             <div id="sound-toggle" class="hud-button" title="Click to lower or mute">🔊</div>
             <div id="username-info" class="hud-text" title="The user that is talking right now"></div>
         </div>
 
-        <div id="top-right" class="corner">
-            <div id="zone-info" class="hud-text" title="How many users are online in the current zone"></div>
+        <div id="top-right" class="corner flex-column-center">
+            <div id="top-right-top" class="flex-row-center">
+                <div id="zone-info" class="hud-text" title="How many users are online in the current zone"></div>
 
-            <div id="zone-dials">
-                <select id="zone-dial-letter" class="dial" title="Zone Letter"></select>
-                <select id="zone-dial-speed" class="dial" title="Zone Speed"></select>
+                <div id="zone-dials">
+                    <select id="zone-dial-letter" class="dial" title="Zone Letter"></select>
+                    <select id="zone-dial-speed" class="dial" title="Zone Speed"></select>
+                </div>
+
+                <div id="zone-map" class="hud-button" title="Zone Map">🔳</div>
             </div>
 
-            <div id="zone-map" class="hud-button" title="Zone Map">🔳</div>
+            <div id="top-right-below" class="flex-row-center">
+                <div id="updates"></div>
+            </div>
         </div>
 
         <div id="modal-overlay" class="hidden">
@@ -39,7 +45,7 @@
 
         <div id="words-container"></div>
 
-        <div id="bottom-right" class="corner">
+        <div id="bottom-right" class="corner flex-row-center">
             <div id="seq-btn" class="hud-button hud-text glow" title="What kind of sequence to display">Base</div>
             <div id="animate-toggle" class="hud-button hud-text glow" title="Change how many effects remain active">Animate</div>
             <div id="about" class="hud-button hud-text glow" title="About">About</div>

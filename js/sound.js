@@ -59,6 +59,52 @@ App.play_warp_drive = () => {
   osc_sub.stop(start_time + duration)
 }
 
+App.play_zone_enter = () => {
+  if (!App.audio_started) {
+    return
+  }
+
+  let duration = 1.0
+  let start_time = App.audio_ctx.currentTime
+  let osc_main = App.audio_ctx.createOscillator()
+  let osc_sub = App.audio_ctx.createOscillator()
+  let main_gain = App.audio_ctx.createGain()
+  let filter = App.audio_ctx.createBiquadFilter()
+
+  osc_main.type = `sine`
+  // a square wave adds a slight digital/retro presence to the entry chime
+  osc_sub.type = `square`
+  filter.type = `bandpass`
+
+  // sweeping the filter up quickly creates a 'materializing' wash effect
+  filter.frequency.setValueAtTime(200, start_time)
+  filter.frequency.exponentialRampToValueAtTime(2000, start_time + 0.2)
+
+  // a bright two-tone jump to signal an arrival (A4 jumping to E5)
+  osc_main.frequency.setValueAtTime(440, start_time)
+  osc_main.frequency.setValueAtTime(659.25, start_time + 0.15)
+
+  // the sub oscillator follows the same interval an octave lower to thicken the sound
+  osc_sub.frequency.setValueAtTime(220, start_time)
+  osc_sub.frequency.setValueAtTime(329.63, start_time + 0.15)
+
+  // fast attack to immediately catch the ear, followed by a smooth fade out
+  main_gain.gain.setValueAtTime(0, start_time)
+  main_gain.gain.linearRampToValueAtTime(0.2, start_time + 0.05)
+  main_gain.gain.exponentialRampToValueAtTime(0.01, start_time + duration)
+
+  osc_main.connect(main_gain)
+  osc_sub.connect(main_gain)
+  main_gain.connect(filter)
+  filter.connect(App.audio_ctx.destination)
+
+  osc_main.start(start_time)
+  osc_sub.start(start_time)
+
+  osc_main.stop(start_time + duration)
+  osc_sub.stop(start_time + duration)
+}
+
 App.sound_enabled = () => {
   return App.volume_level > 0
 }

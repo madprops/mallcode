@@ -14,8 +14,10 @@ let post_words = [
   `sos`,
   `omg`,
   `wtf`,
+  `lol`,
   `lmao`,
   `rofl`,
+  `kek`,
   `ping`,
   `test`,
   `:d`,
@@ -25,6 +27,8 @@ let post_words = [
   `thanks`,
   `thx`,
   `please`,
+  `meow`,
+  `woof`,
 ]
 
 for (let word of post_words) {

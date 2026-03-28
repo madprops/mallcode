@@ -132,12 +132,8 @@ body, html {
 }
 
 .corner {
-    display: flex;
-    flex-direction: row;
-    gap: 20px;
-    align-items: center;
-    justify-content: center;
     user-select: none;
+    gap: 20px;
 }
 
 #top-left {
@@ -152,6 +148,11 @@ body, html {
     top: var(--hud_top);
     right: var(--hud_side);
     z-index: 10;
+    display: flex;
+}
+
+#top-right-top {
+    gap: 20px;
 }
 
 #words-container {
@@ -306,4 +307,27 @@ a.clean-link:hover {
 
 .glow:hover {
     text-shadow: 0 0 0.18rem currentcolor;
+}
+
+.flex-row-center {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex-column-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#top-right-below {
+    width: 100%;
+    justify-content: flex-end;
+}
+
+#updates {
+    color: white;
 }
