@@ -1,7 +1,7 @@
 const {exec} = require(`child_process`)
 const fs = require(`fs`)
 const path = require(`path`)
-Shared = require(`./js/shared.js`)
+const Shared = require(`./js/shared.js`)
 
 const Actions = {
   word_map: {},
@@ -58,9 +58,9 @@ Actions.check_word = (ws, zone, word) => {
 
 Actions.check_code = (ws, zone, code) => {
   Actions.run_global_codes(ws, zone, code)
-  let action = Actions.get_code(zone, code)
+  let obj = Actions.get_code(zone, code)
 
-  if (!action) {
+  if (!obj) {
     return
   }
 
@@ -156,7 +156,7 @@ Actions.register_all = () => {
   if (fs.existsSync(file_path)) {
     try {
       let code = fs.readFileSync(file_path, `utf-8`)
-      eval(code)
+      eval(code) // eslint-disable-line no-eval
     }
     catch (error) {
       console.error(`Error evaluating action_funcs.js:`, error)

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import fs from "fs"
-import { AtpAgent } from "@atproto/api"
+import {AtpAgent} from "@atproto/api"
 
 async function post_to_bluesky(username, zone, value) {
   if (!username || !zone || !value) {
@@ -35,7 +35,7 @@ async function post_to_bluesky(username, zone, value) {
 
   let response = await agent.post({
     text: post_content,
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
   })
 
   console.log(`Post URI: ${response.uri}`)
