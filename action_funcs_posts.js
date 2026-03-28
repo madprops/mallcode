@@ -46,6 +46,14 @@ let post_words = [
   `1337`,
   `420`,
   `666`,
+  `hot`,
+  `cool`,
+  `awesome`,
+  `amazing`,
+  `grats`,
+  `asl`,
+  `nice`,
+  `dope`,
 ]
 
 for (let word of post_words) {
