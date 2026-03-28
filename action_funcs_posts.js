@@ -31,6 +31,14 @@ let post_words = [
   `woof`,
   `yolo`,
   `xoxo`,
+  `welcome`,
+  `bruh`,
+  `cya`,
+  `sup`,
+  `rip`,
+  `gg`,
+  `oof`,
+  `based`,
 ]
 
 for (let word of post_words) {
