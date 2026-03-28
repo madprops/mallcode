@@ -154,7 +154,7 @@ App.get_zone_state = (zone) => {
 
     App.zone_states[zone] = {
       current_sequence: ``,
-      current_word: ``,
+      letters: [],
       press_start_time: 0,
       letter_timeout: null,
       word_timeout: null,
@@ -227,7 +227,7 @@ App.resolve_letter = (zone) => {
   let letter = App.shared.morse_code[z_state.current_sequence] || ``
 
   if (letter !== `@`) {
-    z_state.current_word += letter
+    z_state.letters.push(letter)
   }
 
   if (letter) {
@@ -246,14 +246,14 @@ App.resolve_letter = (zone) => {
 App.resolve_word = (zone) => {
   let z_state = App.zone_states[zone]
 
-  if (!z_state || !z_state.current_word) {
+  if (!z_state || !z_state.letters.length) {
     return
   }
 
-  let word = z_state.current_word
+  let word = z_state.letters.join(``)
   App.actions.check_word(z_state.last_active_ws, zone, word)
-  z_state.current_word = ``
-  let msg = JSON.stringify({type: `WORD`, word, username: z_state.last_active_ws ? z_state.last_active_ws.username : ``})
+  let msg = JSON.stringify({type: `WORD`, word, letters: z_state.letters, username: z_state.last_active_ws ? z_state.last_active_ws.username : ``})
+  z_state.letters = []
 
   App.wss.clients.forEach((c) => {
     if ((c.readyState === WebSocket.OPEN) && (c.zone === zone)) {
@@ -390,7 +390,7 @@ App.setup_sockets = () => {
           App.resolve_letter(ws.zone)
         }
 
-        if (z_state.current_word) {
+        if (z_state.letters.length) {
           clearTimeout(z_state.word_timeout)
           App.resolve_word(ws.zone)
         }
@@ -564,7 +564,7 @@ App.force_release = (ws, zone) => {
     }
 
     z_state.current_sequence = ``
-    z_state.current_word = ``
+    z_state.letters = []
     z_state.press_start_time = 0
     clearTimeout(z_state.letter_timeout)
     clearTimeout(z_state.word_timeout)

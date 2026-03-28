@@ -2,44 +2,33 @@ function do_post(ws, zone, value) {
   Actions.execute_command(`./post.js "${ws.username}" "${zone}" "${value}"`)
 }
 
-let post_lock = 60
+let post_args = {
+  lock: 60,
+  exclamation: true,
+}
 
-Actions.register_word(`any`, `hi`, (ws, zone, value) => {
-  do_post(ws, zone, value)
-}, {lock: post_lock})
+let post_words = [
+  `hi`,
+  `hello`,
+  `help`,
+  `sos`,
+  `omg`,
+  `wtf`,
+  `lmao`,
+  `rofl`,
+  `ping`,
+  `test`,
+  `:d`,
+  `:3`,
+  `xd`,
+  `bye`,
+  `thanks`,
+  `thx`,
+  `please`,
+]
 
-Actions.register_word(`any`, `hello`, (ws, zone, value) => {
-  do_post(ws, zone, value)
-}, {lock: post_lock})
-
-Actions.register_word(`any`, `help`, (ws, zone, value) => {
-  do_post(ws, zone, value)
-}, {lock: post_lock})
-
-Actions.register_word(`any`, `sos`, (ws, zone, value) => {
-  do_post(ws, zone, value)
-}, {lock: post_lock})
-
-Actions.register_word(`any`, `omg`, (ws, zone, value) => {
-  do_post(ws, zone, value)
-}, {lock: post_lock})
-
-Actions.register_word(`any`, `wtf`, (ws, zone, value) => {
-  do_post(ws, zone, value)
-}, {lock: post_lock})
-
-Actions.register_word(`any`, `lmao`, (ws, zone, value) => {
-  do_post(ws, zone, value)
-}, {lock: post_lock})
-
-Actions.register_word(`any`, `rofl`, (ws, zone, value) => {
-  do_post(ws, zone, value)
-}, {lock: post_lock})
-
-Actions.register_word(`any`, `ping`, (ws, zone, value) => {
-  do_post(ws, zone, value)
-}, {lock: post_lock})
-
-Actions.register_word(`any`, `test`, (ws, zone, value) => {
-  do_post(ws, zone, value)
-}, {lock: post_lock})
+for (let word of post_words) {
+  Actions.register_word(`any`, word, (ws, zone, value) => {
+    do_post(ws, zone, value)
+  }, post_args)
+}

@@ -109,7 +109,7 @@ App.setup_socket = () => {
     else if (data.type === `WORD`) {
       let found = false
 
-      if (data.word.length === 1) {
+      if (data.letters.length === 1) {
         for (let i = App.sprites.length - 1; i >= 0; i--) {
           let s = App.sprites[i]
 

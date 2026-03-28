@@ -79,20 +79,43 @@ Actions.run_global_codes = (ws, zone, word) => {
   }
 }
 
+Actions.get_check = (base, word) => {
+  if (!base || !word) {
+    return
+  }
+
+  let obj = base[word]
+
+  if (obj) {
+    return obj
+  }
+
+  if (word.endsWith(`!`)) {
+    word = word.replace(/!+$/, ``)
+    obj = base[word]
+
+    if (obj && obj.exclamation) {
+      return obj
+    }
+  }
+}
+
 Actions.get = (items, zone, word) => {
   zone = zone.toUpperCase()
   word = word.toUpperCase()
 
   let base = items[zone]
+  let obj = Actions.get_check(base, word)
 
-  if (base && base[word]) {
-    return base[word]
+  if (obj) {
+    return obj
   }
 
   base = items.ANY
+  obj = Actions.get_check(base, word)
 
-  if (base && base[word]) {
-    return base[word]
+  if (obj) {
+    return obj
   }
 }
 
@@ -107,6 +130,7 @@ Actions.get_code = (zone, word) => {
 Actions.register = (items, zone, word, action, args = {}) => {
   let def_args = {
     lock: Actions.lock_delay,
+    exclamation: false,
   }
 
   Shared.def_args(def_args, args)
@@ -120,6 +144,7 @@ Actions.register = (items, zone, word, action, args = {}) => {
   let obj = {
     action,
     lock: args.lock,
+    exclamation: args.exclamation,
   }
 
   items[zone][word] = obj
