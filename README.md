@@ -39,8 +39,8 @@ Actions are registered like this:
 
 ```js
 // Register functions in action_funcs.js
-// Optional arguments object include "lock"
-// lock means how many seconds to block exact command
+// Optional argument objects include "lock"
+// lock means how many seconds to block exact commands
 // To avoid spam. Default is 10 seconds
 
 Actions.register_word(`j4`, `hi`, (ws, zone, value) => {
@@ -54,6 +54,16 @@ Actions.register_code(`k3`, `..-..`, (ws, zone, value) => {
 Actions.register_word(`any`, `rec`, (ws, zone, value) => {
   Actions.execute_command(`capture video`)
 }, {lock: 60})
+
+// This registers a function that runs on any word event
+Actions.register_global_word((ws, zone, value) => {
+  Actions.execute_command(`notify-send word`)
+}, {lock: 3})
+
+// This registers a function that runs on any code event
+Actions.register_global_code((ws, zone, value) => {
+  Actions.execute_command(`notify-send code`)
+}, {lock: 3})
 ```
 
 This means you could use this as a semi-secure interface to access or trigger things.
