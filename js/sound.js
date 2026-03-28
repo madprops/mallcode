@@ -108,7 +108,7 @@ App.play_zone_leave = () => {
     return
   }
 
-  let duration = 1.2
+  let duration = 0.7
   let start_time = App.audio_ctx.currentTime
   let osc_main = App.audio_ctx.createOscillator()
   let osc_sub = App.audio_ctx.createOscillator()
@@ -131,7 +131,7 @@ App.play_zone_leave = () => {
   osc_sub.frequency.setValueAtTime(220, start_time)
   osc_sub.frequency.exponentialRampToValueAtTime(27.5, start_time + duration)
 
-  // quick initial presence, then a long, smooth fade into nothingness
+  // quick initial presence, then a faster fade into nothingness
   main_gain.gain.setValueAtTime(0, start_time)
   main_gain.gain.linearRampToValueAtTime(0.15, start_time + 0.1)
   main_gain.gain.exponentialRampToValueAtTime(0.01, start_time + duration)
