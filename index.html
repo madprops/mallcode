@@ -24,7 +24,7 @@
 
         <div id="top-right" class="corner flex-column-center">
             <div id="top-right-top" class="flex-row-center">
-                <div id="zone-info" class="hud-text" title="How many users are online in the current zone"></div>
+                <div id="zone-info" class="hud-text"></div>
 
                 <div id="zone-dials">
                     <select id="zone-dial-letter" class="dial" title="Zone Letter"></select>
@@ -53,14 +53,14 @@
 
 		<template id="info-template">
 			<div id="info">
-				<div class="info-item">
+				<div class="info-item" title="How many users are online globally">
 					<div class="info-label">Online:</div>
 					<div id="global-count" class="info-value"></div>
 				</div>
 
 				<div class="separator">|</div>
 
-				<div class="info-item">
+				<div class="info-item" title="How many users are online in the current zone">
 					<div class="info-label">Here:</div>
 					<div id="zone-count" class="info-value"></div>
 				</div>
