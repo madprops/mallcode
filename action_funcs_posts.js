@@ -37,6 +37,7 @@ let post_words = [
   `sup`,
   `rip`,
   `gg`,
+  `gm`,
   `oof`,
   `based`,
   `zzz`,
