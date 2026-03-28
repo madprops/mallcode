@@ -89,7 +89,7 @@ App.setup_socket = () => {
       return
     }
 
-    if (data.username) {
+    if (data.username && [`DOWN`, `UP`].includes(data.type)) {
       App.current_user = data.username
       App.username_info_el.textContent = data.username
       App.username_debouncer.call()
