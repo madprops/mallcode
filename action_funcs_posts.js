@@ -26,6 +26,7 @@ let post_words = [
   `bye`,
   `thanks`,
   `thx`,
+  `ty`,
   `please`,
   `pls`,
   `plz`
