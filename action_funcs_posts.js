@@ -42,6 +42,10 @@ let post_words = [
   `based`,
   `zzz`,
   `o7`,
+  `69`,
+  `1337`,
+  `420`,
+  `666`,
 ]
 
 for (let word of post_words) {
