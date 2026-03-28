@@ -151,6 +151,7 @@ App.setup_socket = () => {
       App.update_sequence_display()
 
       App.zone = data.zone
+      App.clear_updates()
       App.username = data.username
       App.zone_settings = Shared.zone_settings[parseInt(App.zone.charAt(1))]
       App.max_press_duration = App.zone_settings.max_press
@@ -185,14 +186,19 @@ App.setup_socket = () => {
       App.online_count_zone = data.count_zone
       App.online_count_global = data.count_global
 
-      if (data.msg) {
-        App.show_update(data.msg)
+      if (data.event && (data.username !== App.username)) {
+        if (data.event === `join`) {
+          App.show_update(`${data.username} enters`)
+        }
+        else if (data.event === `leave`) {
+          App.show_update(`${data.username} leaves`)
+        }
 
         if (data.count_zone <= 10) {
-          if (data.msg.includes(`joined`)) {
+          if (data.event === `join`) {
             App.play_zone_enter()
           }
-          else if (data.msg.includes(`left`)) {
+          else if (data.event === `leave`) {
             App.play_zone_leave()
           }
         }
@@ -1235,6 +1241,10 @@ App.show_update = (msg) => {
   setTimeout(() => {
     el.remove()
   }, App.updates_duration)
+}
+
+App.clear_updates = () => {
+  App.updates_el.innerHTML = ``
 }
 
 App.init = async () => {

@@ -105,7 +105,7 @@ App.setup_server = () => {
   })
 }
 
-App.broadcast_zone_count = (zone, msg = ``) => {
+App.broadcast_zone_count = (zone, username = ``, event = ``) => {
   let count_zone = 0
   let count_global = 0
 
@@ -121,7 +121,7 @@ App.broadcast_zone_count = (zone, msg = ``) => {
 
   App.wss.clients.forEach((client) => {
     if ((client.readyState === WebSocket.OPEN) && (client.zone === zone)) {
-      client.send(JSON.stringify({type: `USERS`, count_zone, count_global, msg}))
+      client.send(JSON.stringify({type: `USERS`, count_zone, count_global, username, event}))
     }
   })
 }
@@ -331,8 +331,8 @@ App.setup_sockets = () => {
           App.go_to_zone(ws)
 
           if (old_zone !== ws.zone) {
-            App.broadcast_zone_count(old_zone, `${ws.username} has left`)
-            App.broadcast_zone_count(ws.zone, `${ws.username} has joined`)
+            App.broadcast_zone_count(old_zone, ws.username, `leave`)
+            App.broadcast_zone_count(ws.zone, ws.username, `join`)
             App.broadcast_zone_words(ws.zone, ws)
           }
 
@@ -493,10 +493,10 @@ App.setup_sockets = () => {
 
     ws.on(`close`, () => {
       App.force_release(ws, ws.zone)
-      App.broadcast_zone_count(ws.zone, `${ws.username} has left`)
+      App.broadcast_zone_count(ws.zone, ws.username, `leave`)
     })
 
-    App.broadcast_zone_count(ws.zone, `${ws.username} has joined`)
+    App.broadcast_zone_count(ws.zone, ws.username, `join`)
     App.broadcast_zone_words(ws.zone, ws)
     App.go_to_zone(ws)
   })
