@@ -4,6 +4,7 @@ App.max_press_timeout = null
 App.last_input_time = 0
 App.online_count_zone = 1
 App.online_count_global = 1
+App.zone_usernames = []
 App.last_focus_time = 0
 App.zone_info_el = DOM.el(`#zone-info`)
 App.username_info_el = DOM.el(`#username-info`)
@@ -192,6 +193,7 @@ App.setup_socket = () => {
     else if (data.type === `USERS`) {
       App.online_count_zone = data.count_zone
       App.online_count_global = data.count_global
+      App.zone_usernames = data.usernames
 
       if (data.event && (data.username !== App.username)) {
         if (data.event === `join`) {
@@ -1186,8 +1188,13 @@ App.refresh_info = () => {
 
   if (template) {
     let clone = template.content.cloneNode(true)
-    DOM.el(`#global-count`, clone).textContent = App.online_count_global
-    DOM.el(`#zone-count`, clone).textContent = App.online_count_zone
+    let global_count_el = DOM.el(`#global-count`, clone)
+    let zone_count_el = DOM.el(`#zone-count`, clone)
+    let zone_count_container_el = DOM.el(`#zone-count-container`, clone)
+    global_count_el.textContent = App.online_count_global
+    zone_count_el.textContent = App.online_count_zone
+    let users = App.zone_usernames.join(`, `)
+    zone_count_container_el.title = users
     App.zone_info_el.innerHTML = ``
     App.zone_info_el.appendChild(clone)
   }
