@@ -195,10 +195,10 @@ App.setup_socket = () => {
 
       if (data.event && (data.username !== App.username)) {
         if (data.event === `join`) {
-          App.show_update(`${data.username} enters`)
+          App.show_update(`${data.username} joined`)
         }
         else if (data.event === `leave`) {
-          App.show_update(`${data.username} leaves`)
+          App.show_update(`${data.username} left`)
         }
 
         if (data.count_zone <= 10) {
