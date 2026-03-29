@@ -231,7 +231,7 @@ App.send_sequence = (args = {}) => {
     sequence: ``,
     username: ``,
     zone: ``,
-    resolve: false
+    resolve: false,
   }
 
   if (!args.username) {
@@ -262,7 +262,7 @@ App.resolve_letter = (zone) => {
     z_state.letters.push(letter)
   }
 
-  App.send_sequence({sequence: z_state.current_sequence, zone: zone, resolve: true})
+  App.send_sequence({sequence: z_state.current_sequence, zone, resolve: true})
 
   z_state.current_sequence = ``
   z_state.control_start_time = Date.now()
