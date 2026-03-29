@@ -326,15 +326,12 @@ App.go_to_zone = (ws, zone) => {
   ws.zone = zone
   ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username, version: App.version}))
 
-  if (old_zone !== ws.zone) {
-    if (old_zone) {
-      App.broadcast_zone_update(old_zone, ws.username, `leave`)
-    }
-
-    App.broadcast_zone_update(ws.zone, ws.username, `join`)
-    App.broadcast_zone_words(ws.zone, ws)
+  if (old_zone) {
+    App.broadcast_zone_update(old_zone, ws.username, `leave`)
   }
 
+  App.broadcast_zone_update(ws.zone, ws.username, `join`)
+  App.broadcast_zone_words(ws.zone, ws)
   App.update_zone_activity(ws.zone)
 }
 
