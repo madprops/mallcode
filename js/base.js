@@ -189,12 +189,24 @@ App.setup_socket = () => {
       App.refresh_info()
       App.play_warp_drive()
 
-      if (App.letter_dial_el) {
-        App.letter_dial_el.value = Shared.is_public_zone(App.zone) ? App.zone.charAt(0) : `0`
-      }
+      if (Shared.is_public_zone(App.zone)) {
+        if (App.letter_dial_el) {
+          App.letter_dial_el.value = App.zone.charAt(0)
+        }
 
-      if (App.speed_dial_el) {
-        App.speed_dial_el.value = Shared.is_public_zone(App.zone) ? App.zone.charAt(1) : `0`
+        if (App.speed_dial_el) {
+          App.speed_dial_el.value = App.zone.charAt(1)
+        }
+
+        DOM.show(App.zone_dials_el)
+        DOM.hide(App.zone_name_el)
+      }
+      else {
+        let theme = App.get_theme(App.zone)
+        App.zone_name_el.textContent = App.zone
+        App.zone_name_el.style.color = theme.particles
+        DOM.show(App.zone_name_el)
+        DOM.hide(App.zone_dials_el)
       }
 
       let theme = App.get_theme(App.zone)
