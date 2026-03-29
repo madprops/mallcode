@@ -24,13 +24,13 @@ For instance you might want to sign your message with a nice name like:
 
 Being a harder and slower mode of communication filters out types of communication users might not desire at that point, like low effort hate, violence, confusion, hostility, or time-wasting messages.
 
-And gives cleanly produced words more weight and meaning.
+And it gives cleanly produced words more weight and meaning.
 
 ---
 
 Connecting this to a social media system, like Bluesky, allows users to broadcast messages that could have meaning to other users.
 
-Not all words are broadcasted to avoid allowing users from sending problematic words, instead some words are manually whitelisted by adding them to a list.
+Not all words are broadcasted, to avoid allowing users from sending problematic words, instead some words are manually whitelisted by adding them to a list.
 
 ![](img/posts_2.png)
 
