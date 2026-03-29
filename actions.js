@@ -197,7 +197,7 @@ Actions.register_all = () => {
 }
 
 Actions.do_post = (ws, zone, value) => {
-  Actions.execute_command(`notify-send "${value}"`)
+  Actions.execute_command(`./post.js "${ws.username}" "${zone}" "${value}"`)
 }
 
 Actions.setup_post = () => {
