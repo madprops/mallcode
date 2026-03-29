@@ -76,4 +76,4 @@ Streams and poll systems can use this as a way to gauge for support on certain t
 
 For instance they could check the Bluesky posts to check for codewords that would be relevant in the moment.
 
-Streamers and organizations could start taking over some zones, or become associated to them.
+Streamers and organizations could start taking over some zones, or become associated with them.
