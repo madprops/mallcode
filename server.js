@@ -23,6 +23,7 @@ App.soft_block_seconds = 10
 App.zone_data_changed = false
 App.save_data_interval = 2 * 1000
 App.max_words = 10
+App.enable_zone_words = true
 
 App.get_version = () => {
   try {
@@ -136,6 +137,10 @@ App.broadcast_zone_update = (zone, username = ``, event = ``) => {
 }
 
 App.broadcast_zone_words = (zone, client = null) => {
+  if (!App.enable_zone_words) {
+    return
+  }
+
   let words = App.zone_data[zone] ? App.zone_data[zone].words : []
   let msg = JSON.stringify({type: `WORDS`, words})
 
@@ -181,27 +186,6 @@ App.get_zone_state = (zone) => {
 App.get_last_username = (zone) => {
   let z_state = App.zone_states[zone]
   return z_state.last_active_ws ? z_state.last_active_ws.username : ``
-}
-
-App.send_letter = (args = {}) => {
-  let def_args = {
-    letter: ``,
-    username: ``,
-    zone: ``,
-  }
-
-  if (!args.username) {
-    args.username = App.get_last_username(args.zone)
-  }
-
-  App.shared.def_args(def_args, args)
-  let msg = JSON.stringify({type: `LETTER`, letter: args.letter, username: args.username})
-
-  App.wss.clients.forEach((c) => {
-    if ((c.readyState === WebSocket.OPEN) && (c.zone === args.zone)) {
-      c.send(msg)
-    }
-  })
 }
 
 App.send_sequence = (args = {}) => {
