@@ -475,6 +475,7 @@ App.setup_sockets = () => {
         }
 
         z_state.is_pressed = false
+        z_state.control_start_time = now
 
         if (z_state.press_start_time) {
           let duration = now - z_state.press_start_time
@@ -576,7 +577,7 @@ App.force_release = (ws, zone) => {
       let msg_up = JSON.stringify({type: `UP`, username: ws.username})
 
       App.wss.clients.forEach((client) => {
-        if ((client !== ws) && (client.readyState === WebSocket.OPEN) && (client.zone === zone)) {
+        if ((client.readyState === WebSocket.OPEN) && (client.zone === zone)) {
           client.send(msg_up)
         }
       })
