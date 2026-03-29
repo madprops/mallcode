@@ -355,10 +355,19 @@ App.setup_sockets = () => {
       }
 
       if (z_state.last_active_ws && (z_state.last_active_ws !== ws)) {
-        App.on_active_ws_different(ws, data, z_state)
+        let can_takeover = App.on_active_ws_different(ws, data, z_state)
+
+        if (!can_takeover) {
+          return
+        }
       }
       else if (z_state.last_active_ws === ws) {
-        App.on_active_ws_same(ws, data, z_state)
+        let is_blocked = App.on_active_ws_same(ws, data, z_state)
+        console.log(is_blocked)
+
+        if (is_blocked) {
+          return
+        }
       }
 
       if (z_state.last_active_ws !== ws) {
@@ -508,7 +517,7 @@ App.on_active_ws_different = (ws, data, z_state) => {
   let now = Date.now()
 
   if (now < z_state.lock_expires) {
-    return
+    return false
   }
 
   z_state.is_pressed = false
@@ -523,6 +532,8 @@ App.on_active_ws_different = (ws, data, z_state) => {
     clearTimeout(z_state.word_timeout)
     App.resolve_word(ws.zone)
   }
+
+  return true
 }
 
 App.on_active_ws_same = (ws, data, z_state) => {
@@ -541,7 +552,7 @@ App.on_active_ws_same = (ws, data, z_state) => {
     App.blocked_ips[ws.ip] = ws.penalty_expires
     App.force_release(ws, ws.zone)
     App.block_message(ws, App.block_seconds)
-    return
+    return true
   }
 
   if ((now - z_state.takeover_time) > (App.transmission_limit * 1000)) {
@@ -549,8 +560,10 @@ App.on_active_ws_same = (ws, data, z_state) => {
     App.blocked_ips[ws.ip] = ws.penalty_expires
     App.force_release(ws, ws.zone)
     App.block_message(ws, App.soft_block_seconds)
-    return
+    return true
   }
+
+  return false
 }
 
 App.start_server = () => {
