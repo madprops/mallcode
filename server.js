@@ -478,18 +478,18 @@ App.on_up = (ws, data, z_state) => {
 
   let now = Date.now()
   z_state.is_pressed = false
-  z_state.control_start_time = now
 
   if (z_state.press_start_time) {
     let duration = now - z_state.press_start_time
     let max_seq_length = 15
 
     if (z_state.current_sequence.length < max_seq_length) {
-      if (duration < ws.unit_duration * 1.5) {
+      if (duration < (ws.unit_duration * 1.5)) {
         z_state.current_sequence += `.`
         let estimated_unit = duration
         ws.unit_duration = ws.unit_duration * 0.7 + estimated_unit * 0.3
       }
+
       else {
         z_state.current_sequence += `-`
         let estimated_unit = duration / 3
@@ -497,8 +497,8 @@ App.on_up = (ws, data, z_state) => {
       }
     }
 
-    let min_u = z_state.settings.forgiving ? 150 : z_state.settings.unit_duration * 0.8
-    let max_u = z_state.settings.forgiving ? 500 : z_state.settings.unit_duration * 1.2
+    let min_u = z_state.settings.forgiving ? 150 : (z_state.settings.unit_duration * 0.8)
+    let max_u = z_state.settings.forgiving ? 500 : (z_state.settings.unit_duration * 1.2)
     ws.unit_duration = Math.max(min_u, Math.min(max_u, ws.unit_duration))
     let msg_up = JSON.stringify({type: `UP`, username: ws.username})
 
