@@ -77,3 +77,13 @@ Streams and poll systems can use this as a way to gauge for support on certain t
 For instance they could check the Bluesky posts to check for codewords that would be relevant in the moment.
 
 Streamers and organizations could start taking over some zones, or become associated with them.
+
+---
+
+This can be connected to an imaginarium to build structures in zones.
+
+For instance if a user is able to write `cemetery` in `K6`, then an AI system would build a cemetery 3D structre in that zone in some sort of walkable video game, maybe a `VR` experience.
+
+This allows users have a say into what exists or what is happening in certain zones, limited by their initiative, and being able to write the words in time.
+
+A user might be able to tap `coke` in the zone, making them now eligible to receive a nice cold `coca cola` drink.
