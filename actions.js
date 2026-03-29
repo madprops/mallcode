@@ -212,6 +212,7 @@ Actions.load_post_words = () => {
   }
 
   let words = fs.readFileSync(file_path, `utf8`)
+
   let new_words = words.split(`\n`)
     .filter(word => word).map(word => word.trim())
 
