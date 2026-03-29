@@ -532,7 +532,7 @@ App.trigger_down = (is_local = true) => {
   App.last_typist_was_local = is_local
 
   if ((is_local !== false) && App.ws && (App.ws.readyState === WebSocket.OPEN)) {
-    App.ws.send(JSON.stringify({type: `DOWN`, gap: gap}))
+    App.ws.send(JSON.stringify({type: `DOWN`, gap}))
   }
 
   if (App.sound_enabled() && App.current_user) {

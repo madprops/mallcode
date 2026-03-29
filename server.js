@@ -248,7 +248,7 @@ App.resolve_letter = (zone) => {
 
   z_state.current_sequence = ``
   z_state.control_start_time = Date.now()
-  let unit = z_state.last_active_ws ? (z_state.last_active_ws.unit_duration || z_state.settings.unit_duration) : z_state.settings.unit_duration
+  let unit = z_state.last_active_ws ? z_state.last_active_ws.unit_duration || z_state.settings.unit_duration : z_state.settings.unit_duration
   let word_delay = (unit * z_state.settings.word_mult) + 250
   z_state.word_timeout = setTimeout(() => App.resolve_word(zone), word_delay)
 }
@@ -364,7 +364,6 @@ App.setup_sockets = () => {
       }
       else if (z_state.last_active_ws === ws) {
         let is_blocked = App.on_active_ws_same(ws, data, z_state)
-        console.log(is_blocked)
 
         if (is_blocked) {
           return
