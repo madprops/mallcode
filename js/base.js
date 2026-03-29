@@ -553,7 +553,7 @@ App.trigger_up = (is_local = true) => {
   let duration = now - App.press_start_time
   App.last_input_time = now
 
-  if (is_local !== false && App.ws && App.ws.readyState === WebSocket.OPEN) {
+  if ((is_local !== false) && App.ws && (App.ws.readyState === WebSocket.OPEN)) {
     App.ws.send(JSON.stringify({type: `UP`, duration}))
   }
 
