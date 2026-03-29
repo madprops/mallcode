@@ -77,6 +77,7 @@ let post_words = [
   `okay`,
   `xxx`,
   `rad`,
+  `what`,
 ]
 
 for (let word of post_words) {

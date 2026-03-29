@@ -248,8 +248,9 @@ App.resolve_letter = (zone) => {
 
   z_state.current_sequence = ``
   z_state.control_start_time = Date.now()
-  let unit = z_state.last_active_ws ? z_state.last_active_ws.unit_duration || z_state.settings.unit_duration : z_state.settings.unit_duration
-  z_state.word_timeout = setTimeout(() => App.resolve_word(zone), unit * z_state.settings.word_mult)
+  let unit = z_state.last_active_ws ? (z_state.last_active_ws.unit_duration || z_state.settings.unit_duration) : z_state.settings.unit_duration
+  let word_delay = (unit * z_state.settings.word_mult) + 250
+  z_state.word_timeout = setTimeout(() => App.resolve_word(zone), word_delay)
 }
 
 App.resolve_word = (zone) => {
@@ -458,6 +459,20 @@ App.on_down = (ws, data, z_state) => {
   z_state.press_start_time = Date.now()
   clearTimeout(z_state.letter_timeout)
   clearTimeout(z_state.word_timeout)
+
+  if ((typeof data.gap === `number`) && (data.gap > 0) && (z_state.current_sequence.length > 0)) {
+    let max_gap = z_state.settings.max_press
+    let safe_gap = Math.min(data.gap, max_gap)
+
+    if (safe_gap < (ws.unit_duration * 2)) {
+      let estimated_unit = safe_gap
+      ws.unit_duration = ws.unit_duration * 0.8 + estimated_unit * 0.2
+      let min_u = z_state.settings.forgiving ? 150 : z_state.settings.unit_duration * 0.8
+      let max_u = z_state.settings.forgiving ? 500 : z_state.settings.unit_duration * 1.2
+      ws.unit_duration = Math.max(min_u, Math.min(max_u, ws.unit_duration))
+    }
+  }
+
   let msg_down = JSON.stringify({type: `DOWN`, username: ws.username})
 
   App.wss.clients.forEach((client) => {
@@ -496,7 +511,6 @@ App.on_up = (ws, data, z_state) => {
         let estimated_unit = duration
         ws.unit_duration = ws.unit_duration * 0.7 + estimated_unit * 0.3
       }
-
       else {
         z_state.current_sequence += `-`
         let estimated_unit = duration / 3
@@ -516,7 +530,8 @@ App.on_up = (ws, data, z_state) => {
     })
 
     App.send_sequence({sequence: z_state.current_sequence, username: ws.username, zone: ws.zone})
-    z_state.letter_timeout = setTimeout(() => App.resolve_letter(ws.zone), ws.unit_duration * z_state.settings.letter_mult)
+    let letter_delay = (ws.unit_duration * z_state.settings.letter_mult) + 250
+    z_state.letter_timeout = setTimeout(() => App.resolve_letter(ws.zone), letter_delay)
   }
 }
 

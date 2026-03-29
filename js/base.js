@@ -520,13 +520,19 @@ App.trigger_down = (is_local = true) => {
     App.username_debouncer.call()
   }
 
+  let gap = 0
+
+  if (App.last_input_time > 0) {
+    gap = now - App.last_input_time
+  }
+
   App.last_input_time = now
   App.is_pressed = true
   App.press_start_time = now
   App.last_typist_was_local = is_local
 
   if ((is_local !== false) && App.ws && (App.ws.readyState === WebSocket.OPEN)) {
-    App.ws.send(JSON.stringify({type: `DOWN`}))
+    App.ws.send(JSON.stringify({type: `DOWN`, gap: gap}))
   }
 
   if (App.sound_enabled() && App.current_user) {
