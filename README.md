@@ -74,8 +74,12 @@ Mall Code can post automatically to `Bluesky`:
 
 ![](posts.png)
 
-To
+To do this, simply create `post_words.txt` and add words to it.
+
+Or copy the default list:
+
+`cat post_words_default.txt > post_words.txt`
 
 ---
 
-Invest in Mall Code to put a network enabled morse code communication system in all living rooms and airplanes.
+Invest in `Mall Code` to put a `network` enabled morse code `communication` system in all `living rooms` and `airplanes`.
