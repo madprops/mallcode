@@ -26,6 +26,7 @@ App.zone_data_changed = false
 App.save_data_interval = 2 * 1000
 App.max_words = 10
 App.enable_zone_words = true
+App.sekrit_delay = 60
 
 App.get_version = () => {
   try {
@@ -68,6 +69,8 @@ App.get_sekrits = () => {
 
     if (fs.existsSync(file)) {
       let data = JSON.parse(fs.readFileSync(file, `utf8`))
+      App.sekrits = {}
+      App.sekrit_zones = new Set()
 
       data.forEach(s => {
         if (s.word && s.zone) {
@@ -75,8 +78,6 @@ App.get_sekrits = () => {
           App.sekrit_zones.add(s.zone.toUpperCase())
         }
       })
-
-      console.log(`Loaded ${Object.keys(App.sekrits).length} sekrits.`)
     }
   }
   catch (err) {
@@ -622,6 +623,8 @@ App.start_server = () => {
       App.zone_data_changed = false
     }
   }, App.save_data_interval)
+
+  setInterval(App.get_sekrits, App.sekrit_delay * 1000)
 }
 
 App.default_zone = () => {
