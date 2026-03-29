@@ -83,3 +83,7 @@ Or copy the default list:
 ---
 
 Invest in `Mall Code` to put a `network` enabled morse code `communication` system in all `living rooms` and `airplanes`.
+
+---
+
+Read some [theories](theory.md).
