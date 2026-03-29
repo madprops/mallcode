@@ -29,7 +29,7 @@ let post_words = [
   `ty`,
   `please`,
   `pls`,
-  `plz`
+  `plz`,
   `meow`,
   `woof`,
   `yolo`,
