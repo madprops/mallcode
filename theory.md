@@ -24,7 +24,7 @@ For instance you might want to sign your message with a nice name like:
 
 Being a harder and slower mode of communication filters out types of communication users might not desire at that point, like low effort hate, violence, confusion, hostility, or time-wasting messages.
 
-And it gives cleanly produced words have more weight and meaning.
+And gives cleanly produced words more weight and meaning.
 
 ---
 
