@@ -108,6 +108,10 @@ App.setup_socket = () => {
       App.handle_release(null, false)
     }
     else if (data.type === `SEQUENCE`) {
+      if ((data.username === App.username) && !data.resolve) {
+        return
+      }
+
       if (data.resolve) {
         let letter = Shared.morse_code[data.sequence] || ``
 
@@ -537,6 +541,10 @@ App.trigger_down = (is_local = true) => {
 
   if (App.last_input_time > 0) {
     gap = now - App.last_input_time
+
+    if (is_local) {
+      App.unit_duration = Shared.process_gap(gap, App.unit_duration, App.current_sequence.length, App.zone_settings)
+    }
   }
 
   App.last_input_time = now
@@ -571,6 +579,13 @@ App.trigger_up = (is_local = true) => {
   clearTimeout(App.max_press_timeout)
   let duration = now - App.press_start_time
   App.last_input_time = now
+
+  if (is_local) {
+    let res = Shared.process_duration(duration, App.unit_duration, App.current_sequence, App.zone_settings)
+    App.unit_duration = res.unit_duration
+    App.current_sequence = res.sequence
+    App.update_sequence_display()
+  }
 
   if ((is_local !== false) && App.ws && (App.ws.readyState === WebSocket.OPEN)) {
     App.ws.send(JSON.stringify({type: `UP`, duration}))

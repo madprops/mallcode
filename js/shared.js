@@ -245,6 +245,48 @@ Shared.is_url = (text) => {
   return text.startsWith(`http://`) || text.startsWith(`https://`)
 }
 
+Shared.process_gap = (gap, unit_duration, sequence_length, settings) => {
+  if ((typeof gap === `number`) && (gap > 0) && (sequence_length > 0)) {
+    let max_gap = settings.max_press
+    let safe_gap = Math.min(gap, max_gap)
+
+    if (safe_gap < (unit_duration * 2)) {
+      let estimated_unit = safe_gap
+      unit_duration = unit_duration * 0.8 + estimated_unit * 0.2
+      let min_u = settings.forgiving ? 150 : settings.unit_duration * 0.8
+      let max_u = settings.forgiving ? 500 : settings.unit_duration * 1.2
+      unit_duration = Math.max(min_u, Math.min(max_u, unit_duration))
+    }
+  }
+
+  return unit_duration
+}
+
+Shared.process_duration = (duration, unit_duration, sequence, settings) => {
+  let max_allowed = settings.max_press + 500
+  let safe_duration = Math.max(10, Math.min(duration, max_allowed))
+  let max_seq_length = 15
+
+  if (sequence.length < max_seq_length) {
+    if (safe_duration < (unit_duration * 1.5)) {
+      sequence += `.`
+      let estimated_unit = safe_duration
+      unit_duration = unit_duration * 0.7 + estimated_unit * 0.3
+    }
+    else {
+      sequence += `-`
+      let estimated_unit = safe_duration / 3
+      unit_duration = unit_duration * 0.7 + estimated_unit * 0.3
+    }
+  }
+
+  let min_u = settings.forgiving ? 150 : settings.unit_duration * 0.8
+  let max_u = settings.forgiving ? 500 : settings.unit_duration * 1.2
+  unit_duration = Math.max(min_u, Math.min(max_u, unit_duration))
+
+  return {unit_duration, sequence}
+}
+
 if ((typeof module !== `undefined`) && module.exports) {
   module.exports = Shared
 }
