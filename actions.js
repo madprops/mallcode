@@ -12,10 +12,12 @@ const Actions = {
 }
 
 Actions.lock_delay = 10
+Actions.post_check_delay = 60
 
 Actions.post_args = {
   lock: 60,
   exclamation: true,
+  type: `post`,
 }
 
 Actions.execute_command = (command) => {
@@ -136,6 +138,7 @@ Actions.register = (items, zone, word, action, args = {}) => {
   let def_args = {
     lock: Actions.lock_delay,
     exclamation: false,
+    type: null,
   }
 
   Shared.def_args(def_args, args)
@@ -150,6 +153,7 @@ Actions.register = (items, zone, word, action, args = {}) => {
     action,
     lock: args.lock,
     exclamation: args.exclamation,
+    type: args.type,
   }
 
   items[zone][word] = obj
@@ -200,7 +204,7 @@ Actions.do_post = (ws, zone, value) => {
   Actions.execute_command(`./post.js "${ws.username}" "${zone}" "${value}"`)
 }
 
-Actions.setup_post = () => {
+Actions.load_post_words = () => {
   let file_path = path.join(__dirname, `post_words.txt`)
 
   if (!fs.existsSync(file_path)) {
@@ -208,17 +212,33 @@ Actions.setup_post = () => {
   }
 
   let words = fs.readFileSync(file_path, `utf8`)
-
-  Actions.post_words = words.split(`\n`)
+  let new_words = words.split(`\n`)
     .filter(word => word).map(word => word.trim())
 
-  console.log(`Post Words: ${Actions.post_words.length}`)
+  let new_words_upper = new_words.map(w => w.toUpperCase())
+
+  if (Actions.word_map.ANY) {
+    for (let word in Actions.word_map.ANY) {
+      let obj = Actions.word_map.ANY[word]
+
+      if ((obj.type === `post`) && !new_words_upper.includes(word)) {
+        delete Actions.word_map.ANY[word]
+      }
+    }
+  }
+
+  Actions.post_words = new_words
 
   for (let word of Actions.post_words) {
     Actions.register_word(`any`, word, (ws, zone, value) => {
       Actions.do_post(ws, zone, value)
     }, Actions.post_args)
   }
+}
+
+Actions.setup_post = () => {
+  Actions.load_post_words()
+  setInterval(Actions.load_post_words, Actions.post_check_delay * 1000)
 }
 
 Actions.setup_post()
