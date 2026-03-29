@@ -15,7 +15,6 @@ App.zone_states = {}
 App.next_client_id = 1
 App.words = new Set()
 App.sekrits = {}
-App.sekrit_zones = new Set()
 App.default_speed = 3
 App.block_seconds = 60
 App.spam_limit = 10
@@ -70,12 +69,14 @@ App.get_sekrits = () => {
     if (fs.existsSync(file)) {
       let data = JSON.parse(fs.readFileSync(file, `utf8`))
       App.sekrits = {}
-      App.sekrit_zones = new Set()
 
       data.forEach(s => {
         if (s.word && s.zone) {
-          App.sekrits[s.word.toUpperCase()] = s.zone.toUpperCase()
-          App.sekrit_zones.add(s.zone.toUpperCase())
+          App.sekrits[s.zone.toUpperCase()] = {
+            word: s.word.toUpperCase(),
+            zone: s.zone.toUpperCase(),
+            speed: s.speed,
+          }
         }
       })
     }
@@ -90,7 +91,7 @@ App.is_public_zone = (zone) => {
     return false
   }
 
-  return /^[A-Z][1-9]$/i.test(zone) && !App.sekrit_zones.has(zone.toUpperCase())
+  return App.shared.is_public_zone(zone) && !App.sekrits[zone.toUpperCase()]
 }
 
 App.word_match = (word) => {
@@ -199,7 +200,10 @@ App.get_zone_state = (zone) => {
   if (!App.zone_states[zone]) {
     let z_num = parseInt(zone.charAt(1))
 
-    if (isNaN(z_num)) {
+    if (App.sekrits[zone] && App.sekrits[zone].speed) {
+      z_num = App.sekrits[zone].speed
+    }
+    else if (isNaN(z_num)) {
       z_num = App.default_speed
     }
 
@@ -296,9 +300,11 @@ App.resolve_word = (zone) => {
 App.help_text = `https://www.youtube.com/watch?v=spdfnqS3bDg`
 
 App.process_word = (zone, word, ws) => {
-  if (App.sekrits[word]) {
-    if (ws && (ws.readyState === WebSocket.OPEN) && (ws.zone !== App.sekrits[word])) {
-      App.go_to_zone(ws, App.sekrits[word])
+  let sekrit = Object.values(App.sekrits).find(s => s.word === word)
+
+  if (sekrit) {
+    if (ws && (ws.readyState === WebSocket.OPEN) && (ws.zone !== sekrit.zone)) {
+      App.go_to_zone(ws, sekrit.zone)
     }
 
     return
@@ -638,7 +644,7 @@ App.default_zone = () => {
   let letter = String.fromCharCode(65 + Math.floor(rng() * 26))
   let zone = `${letter}${App.default_speed}`
 
-  while (App.sekrit_zones.has(zone)) {
+  while (App.sekrits[zone]) {
     letter = String.fromCharCode(65 + Math.floor(rng() * 26))
     zone = `${letter}${App.default_speed}`
   }

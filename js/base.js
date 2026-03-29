@@ -8,6 +8,8 @@ App.zone_usernames = []
 App.last_focus_time = 0
 App.zone_info_el = DOM.el(`#zone-info`)
 App.username_info_el = DOM.el(`#username-info`)
+App.zone_name_el = DOM.el(`#zone-name`)
+App.zone_dials_el = DOM.el(`#zone-dials`)
 App.sound_btn = DOM.el(`#sound-toggle`)
 App.overlay_el = DOM.el(`#modal-overlay`)
 App.modal_el = DOM.el(`#modal-content`)
@@ -188,11 +190,11 @@ App.setup_socket = () => {
       App.play_warp_drive()
 
       if (App.letter_dial_el) {
-        App.letter_dial_el.value = /^[A-Z][1-9]$/i.test(App.zone) ? App.zone.charAt(0) : `0`
+        App.letter_dial_el.value = Shared.is_public_zone(App.zone) ? App.zone.charAt(0) : `0`
       }
 
       if (App.speed_dial_el) {
-        App.speed_dial_el.value = /^[A-Z][1-9]$/i.test(App.zone) ? App.zone.charAt(1) : `0`
+        App.speed_dial_el.value = Shared.is_public_zone(App.zone) ? App.zone.charAt(1) : `0`
       }
 
       let theme = App.get_theme(App.zone)
@@ -1312,7 +1314,7 @@ App.clear_updates = () => {
 App.update_url = () => {
   let url = new URL(window.location)
 
-  if (/^[A-Z][1-9]$/i.test(App.zone)) {
+  if (Shared.is_public_zone(App.zone)) {
     url.searchParams.set(`zone`, App.zone)
   }
   else {
