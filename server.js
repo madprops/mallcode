@@ -14,6 +14,8 @@ App.actions = require(`./actions.js`)
 App.zone_states = {}
 App.next_client_id = 1
 App.words = new Set()
+App.sekrits = {}
+App.sekrit_zones = new Set()
 App.default_speed = 3
 App.block_seconds = 60
 App.spam_limit = 10
@@ -52,6 +54,36 @@ App.get_words = () => {
   catch (err) {
     console.error(`Error loading words.txt:`, err)
   }
+}
+
+App.get_sekrits = () => {
+  try {
+    let file = path.join(__dirname, `sekrit.json`)
+
+    if (fs.existsSync(file)) {
+      let data = JSON.parse(fs.readFileSync(file, `utf8`))
+
+      data.forEach(s => {
+        if (s.word && s.zone) {
+          App.sekrits[s.word.toUpperCase()] = s.zone.toUpperCase()
+          App.sekrit_zones.add(s.zone.toUpperCase())
+        }
+      })
+
+      console.log(`Loaded ${Object.keys(App.sekrits).length} sekrits.`)
+    }
+  }
+  catch (err) {
+    console.error(`Error loading sekrit.json:`, err)
+  }
+}
+
+App.is_public_zone = (zone) => {
+  if (typeof zone !== `string`) {
+    return false
+  }
+
+  return /^[A-Z][1-9]$/i.test(zone) && !App.sekrit_zones.has(zone.toUpperCase())
 }
 
 App.word_match = (word) => {
@@ -257,6 +289,14 @@ App.resolve_word = (zone) => {
 App.help_text = `https://www.youtube.com/watch?v=spdfnqS3bDg`
 
 App.process_word = (zone, word, ws) => {
+  if (App.sekrits[word]) {
+    if (ws && (ws.readyState === WebSocket.OPEN) && (ws.zone !== App.sekrits[word])) {
+      App.go_to_zone(ws, App.sekrits[word])
+    }
+
+    return
+  }
+
   if ([`HELP`, `SOS`].includes(word)) {
     if (ws && (ws.readyState === WebSocket.OPEN)) {
       App.send_message(ws, App.help_text, true)
@@ -280,8 +320,22 @@ App.process_word = (zone, word, ws) => {
   }
 }
 
-App.go_to_zone = (ws) => {
+App.go_to_zone = (ws, zone) => {
+  let old_zone = ws.zone
+  App.force_release(ws, old_zone)
+  ws.zone = zone
   ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username, version: App.version}))
+
+  if (old_zone !== ws.zone) {
+    if (old_zone) {
+      App.broadcast_zone_update(old_zone, ws.username, `leave`)
+    }
+
+    App.broadcast_zone_update(ws.zone, ws.username, `join`)
+    App.broadcast_zone_words(ws.zone, ws)
+  }
+
+  App.update_zone_activity(ws.zone)
 }
 
 App.setup_sockets = () => {
@@ -371,9 +425,7 @@ App.setup_sockets = () => {
       App.broadcast_zone_update(ws.zone, ws.username, `leave`)
     })
 
-    App.broadcast_zone_update(ws.zone, ws.username, `join`)
-    App.broadcast_zone_words(ws.zone, ws)
-    App.go_to_zone(ws)
+    App.go_to_zone(ws, ws.zone)
   })
 }
 
@@ -389,7 +441,7 @@ App.prepare_ws = (ws, req) => {
   let req_url = new URL(req.url, `http://localhost`)
   let req_zone = req_url.searchParams.get(`zone`)
 
-  if (req_zone && /^[A-Z][1-9]$/i.test(req_zone)) {
+  if (req_zone && App.is_public_zone(req_zone)) {
     ws.zone = req_zone.toUpperCase()
   }
   else {
@@ -402,18 +454,11 @@ App.prepare_ws = (ws, req) => {
 
 App.on_restore_zone = (ws, data) => {
   if (data.zone) {
-    let old_zone = ws.zone
-    App.force_release(ws, old_zone)
-    ws.zone = data.zone
-    App.go_to_zone(ws)
-
-    if (old_zone !== ws.zone) {
-      App.broadcast_zone_update(old_zone, ws.username, `leave`)
-      App.broadcast_zone_update(ws.zone, ws.username, `join`)
-      App.broadcast_zone_words(ws.zone, ws)
+    if (!App.is_public_zone(data.zone)) {
+      return
     }
 
-    App.update_zone_activity(ws.zone)
+    App.go_to_zone(ws, data.zone)
   }
 }
 
@@ -421,8 +466,10 @@ App.on_get_zones = (ws, data) => {
   let zones_info = {}
 
   for (let z in App.zone_data) {
-    zones_info[z] = {
-      last_activity: App.zone_data[z].last_activity,
+    if (App.is_public_zone(z)) {
+      zones_info[z] = {
+        last_activity: App.zone_data[z].last_activity,
+      }
     }
   }
 
@@ -583,7 +630,14 @@ App.default_zone = () => {
   let hash = App.shared.get_string_hash(date_str)
   let rng = App.shared.create_seeded_random(hash)
   let letter = String.fromCharCode(65 + Math.floor(rng() * 26))
-  return `${letter}${App.default_speed}`
+  let zone = `${letter}${App.default_speed}`
+
+  while (App.sekrit_zones.has(zone)) {
+    letter = String.fromCharCode(65 + Math.floor(rng() * 26))
+    zone = `${letter}${App.default_speed}`
+  }
+
+  return zone
 }
 
 App.force_release = (ws, zone) => {
@@ -628,6 +682,7 @@ App.block_message = (ws, seconds) => {
 
 App.get_version()
 App.get_words()
+App.get_sekrits()
 App.get_zone_data()
 App.setup_sockets()
 App.setup_server()
