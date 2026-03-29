@@ -235,7 +235,7 @@ App.resolve_letter = (zone) => {
   App.actions.check_code(z_state.last_active_ws, zone, z_state.current_sequence)
   let letter = App.shared.morse_code[z_state.current_sequence] || ``
 
-  if (letter !== `@`) {
+  if (letter !== ``) {
     z_state.letters.push(letter)
   }
 
@@ -243,7 +243,7 @@ App.resolve_letter = (zone) => {
     App.send_letter({letter, zone})
   }
   else {
-    App.send_sequence({zone})
+    App.send_sequence({sequence: ``, zone})
   }
 
   z_state.current_sequence = ``
@@ -480,7 +480,14 @@ App.on_up = (ws, data, z_state) => {
   z_state.is_pressed = false
 
   if (z_state.press_start_time) {
-    let duration = now - z_state.press_start_time
+    let server_duration = now - z_state.press_start_time
+    let duration = server_duration
+
+    if ((typeof data.duration === `number`) && (data.duration > 0)) {
+      let max_allowed = z_state.settings.max_press + 500
+      duration = Math.max(10, Math.min(data.duration, max_allowed))
+    }
+
     let max_seq_length = 15
 
     if (z_state.current_sequence.length < max_seq_length) {
