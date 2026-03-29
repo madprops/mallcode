@@ -59,7 +59,7 @@ App.get_words = () => {
 App.get_sekrits = () => {
   // Create sekrits.json
   // And fill it with private zones like
-  // [{"word": "fit", "zone": "wormhall"}]
+  // [{"word": "glue", "zone": "wormhall"}]
   // Now whenever a user types "fit" they will be teleported
   // to "wormhall" - that is the only way to get there
 
