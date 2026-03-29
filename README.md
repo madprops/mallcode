@@ -70,4 +70,12 @@ This means you could use this as a semi-secure interface to access or trigger th
 
 ---
 
+Mall Code can post automatically to `Bluesky`:
+
+![](posts.png)
+
+To
+
+---
+
 Invest in Mall Code to put a network enabled morse code communication system in all living rooms and airplanes.

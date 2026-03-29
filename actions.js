@@ -13,6 +13,11 @@ const Actions = {
 
 Actions.lock_delay = 10
 
+Actions.post_args = {
+  lock: 60,
+  exclamation: true,
+}
+
 Actions.execute_command = (command) => {
   exec(command, (error, stdout, stderr) => {
     if (error) {
@@ -178,16 +183,40 @@ Actions.register_global_code = (action, args) => {
 Actions.register_all = () => {
   let file_path = path.join(__dirname, `action_funcs.js`)
 
-  if (fs.existsSync(file_path)) {
-    try {
-      let code = fs.readFileSync(file_path, `utf-8`)
-      eval(code) // eslint-disable-line no-eval
-    }
-    catch (error) {
-      console.error(`Error evaluating action_funcs.js:`, error)
-    }
+  if (!fs.existsSync(file_path)) {
+    return
+  }
+
+  try {
+    let code = fs.readFileSync(file_path, `utf-8`)
+    eval(code) // eslint-disable-line no-eval
+  }
+  catch (error) {
+    console.error(`Error evaluating action_funcs.js:`, error)
   }
 }
 
+Actions.do_post(ws, zone, value) {
+  Actions.execute_command(`notify-send "${value}"`)
+}
+
+Actions.setup_post = () => {
+  let file_path = path.join(__dirname, `post_words.txt`)
+
+  if (!fs.existsSync(file_path)) {
+    return
+  }
+
+  let words = fs.readFileSync(file_path, `utf8`)
+  Actions.post_words = words.split(`\n`).filter(word => word)
+
+  for (let word of Actions.post_words) {
+    Actions.register_word(`any`, word, (ws, zone, value) => {
+      Actions.do_post(ws, zone, value)
+    }, post_args)
+  }
+}
+
+Actions.setup_post()
 Actions.register_all()
 module.exports = Actions
