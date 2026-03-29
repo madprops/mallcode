@@ -209,6 +209,7 @@ App.send_sequence = (args = {}) => {
     sequence: ``,
     username: ``,
     zone: ``,
+    resolve: false
   }
 
   if (!args.username) {
@@ -216,7 +217,7 @@ App.send_sequence = (args = {}) => {
   }
 
   App.shared.def_args(def_args, args)
-  let msg_seq = JSON.stringify({type: `SEQUENCE`, sequence: args.sequence, username: args.username})
+  let msg_seq = JSON.stringify({type: `SEQUENCE`, sequence: args.sequence, username: args.username, resolve: args.resolve})
 
   App.wss.clients.forEach((c) => {
     if ((c.readyState === WebSocket.OPEN) && (c.zone === args.zone)) {
@@ -239,12 +240,7 @@ App.resolve_letter = (zone) => {
     z_state.letters.push(letter)
   }
 
-  if (letter) {
-    App.send_letter({letter, zone})
-  }
-  else {
-    App.send_sequence({sequence: ``, zone})
-  }
+  App.send_sequence({sequence: z_state.current_sequence, zone: zone, resolve: true})
 
   z_state.current_sequence = ``
   z_state.control_start_time = Date.now()
@@ -262,7 +258,7 @@ App.resolve_word = (zone) => {
 
   let word = z_state.letters.join(``)
   App.actions.check_word(z_state.last_active_ws, zone, word)
-  let msg = JSON.stringify({type: `WORD`, word, letters: z_state.letters, username: z_state.last_active_ws ? z_state.last_active_ws.username : ``})
+  let msg = JSON.stringify({type: `WORD_END`, username: z_state.last_active_ws ? z_state.last_active_ws.username : ``})
   z_state.letters = []
 
   App.wss.clients.forEach((c) => {

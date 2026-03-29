@@ -42,6 +42,7 @@ App.ls_storage = `mallcode_v1`
 App.font_string = `noto_font, system-ui, sans-serif`
 App.words = []
 App.seq = 1
+App.current_letters = []
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
@@ -107,27 +108,36 @@ App.setup_socket = () => {
       App.handle_release(null, false)
     }
     else if (data.type === `SEQUENCE`) {
-      App.current_sequence = data.sequence
-      App.update_sequence_display()
+      if (data.resolve) {
+        let letter = Shared.morse_code[data.sequence] || ``
+
+        if (letter) {
+          App.spawn_sprite(letter, `letter`)
+          App.current_letters.push(letter)
+        }
+
+        App.current_sequence = ``
+        App.update_sequence_display()
+      }
+      else {
+        App.current_sequence = data.sequence
+        App.update_sequence_display()
+      }
     }
-    else if (data.type === `LETTER`) {
-      App.spawn_sprite(data.letter, `letter`)
-      App.current_sequence = ``
-      App.update_sequence_display()
-    }
-    else if (data.type === `WORD`) {
+    else if (data.type === `WORD_END`) {
+      let word = App.current_letters.join(``)
       let found = false
 
-      if (data.letters.length === 1) {
+      if (App.current_letters.length === 1) {
         for (let i = App.sprites.length - 1; i >= 0; i--) {
           let s = App.sprites[i]
 
-          if ((s.userData.type === `letter`) && (s.userData.text === data.word)) {
+          if ((s.userData.type === `letter`) && (s.userData.text === word)) {
             s.userData.type = `word`
             s.userData.decay_rate = 0.25
             s.userData.growth = 2
             let old_map = s.material.map
-            s.material.map = App.create_text_texture(data.word, false, false, true)
+            s.material.map = App.create_text_texture(word, false, false, true)
             old_map.dispose()
             found = true
             break
@@ -135,9 +145,11 @@ App.setup_socket = () => {
         }
       }
 
-      if (!found) {
-        App.spawn_sprite(data.word, `word`)
+      if (!found && (word.length > 0)) {
+        App.spawn_sprite(word, `word`)
       }
+
+      App.current_letters = []
     }
     else if (data.type === `ZONE`) {
       if (data.version) {
@@ -155,6 +167,7 @@ App.setup_socket = () => {
       }
 
       App.current_sequence = ``
+      App.current_letters = []
       App.update_sequence_display()
 
       App.zone = data.zone
