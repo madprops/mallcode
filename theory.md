@@ -30,7 +30,7 @@ And it gives cleanly produced words more weight and meaning.
 
 Connecting this to a social media system, like `Bluesky`, allows users to broadcast messages that could have meaning to other users.
 
-Not all words are broadcasted, to avoid allowing users from sending problematic words, instead some words are manually whitelisted by adding them to a list.
+Not all words are broadcasted, to avoid allowing users from sending problematic words, instead some words are manually whitelisted by adding them to a text file.
 
 ![](img/posts_2.png)
 
@@ -39,6 +39,8 @@ The posts have 2 components to consider, the code word, and the zone.
 It can be a call to gather at that specific zone for a meeting.
 
 Or it could be a codeword only members of an organized community can understand.
+
+Or it can just be random, maybe funny, meaningless manifestation of life.
 
 ---
 
