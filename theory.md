@@ -36,7 +36,7 @@ Not all words are broadcasted, to avoid allowing users from sending problematic 
 
 The posts have 2 components to consider, the code word, and the zone.
 
-It can be a call of action to gather at that specific zone for a meeting.
+It can be a call to gather at that specific zone for a meeting.
 
 Or it could be a codeword only members of an organized community can understand.
 
@@ -69,3 +69,11 @@ Special hardware can allow users to send morse code messages. For instance, a us
 ---
 
 Since time is involved, this can't be easily used for computer-to-computer communication. Computers can send messages to each other in big volumes, very quickly. But in this system they would be subjected to the same constraints humans have. So either computers would have to end behaving more human here, or there would be no computers, making it a human-mostly zone.
+
+---
+
+Streams and poll systems can use this as a way to gauge for support on certain things or events.
+
+For instance they could check the Bluesky posts to check for codewords that would be relevant in the moment.
+
+Streamers and organizations could start taking over some zones, or become associated to them.
