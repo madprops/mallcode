@@ -28,7 +28,7 @@ And it gives cleanly produced words more weight and meaning.
 
 ---
 
-Connecting this to a social media system, like Bluesky, allows users to broadcast messages that could have meaning to other users.
+Connecting this to a social media system, like `Bluesky`, allows users to broadcast messages that could have meaning to other users.
 
 Not all words are broadcasted, to avoid allowing users from sending problematic words, instead some words are manually whitelisted by adding them to a list.
 
@@ -74,7 +74,7 @@ Since time is involved, this can't be easily used for computer-to-computer commu
 
 Streams and poll systems can use this as a way to gauge for support on certain things or events.
 
-For instance they could check the Bluesky posts to check for codewords that would be relevant in the moment.
+For instance they could check the `Bluesky` posts to check for codewords that would be relevant in the moment.
 
 Streamers and organizations could start taking over some zones, or become associated with them.
 
