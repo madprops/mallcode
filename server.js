@@ -79,6 +79,10 @@ App.get_sekrits = () => {
           }
         }
       })
+
+      for (let zone in App.zone_states) {
+        App.zone_states[zone].settings = App.get_speed(zone)
+      }
     }
   }
   catch (err) {
@@ -196,18 +200,22 @@ App.broadcast_zone_words = (zone, client = null) => {
   }
 }
 
+App.get_speed = (zone) => {
+  let z_num = parseInt(zone.charAt(1))
+
+  if (App.sekrits[zone] && App.sekrits[zone].speed) {
+    z_num = App.sekrits[zone].speed
+  }
+  else if (isNaN(z_num)) {
+    z_num = App.default_speed
+  }
+
+  return App.shared.zone_settings[z_num] || App.shared.zone_settings[5]
+}
+
 App.get_zone_state = (zone) => {
   if (!App.zone_states[zone]) {
-    let z_num = parseInt(zone.charAt(1))
-
-    if (App.sekrits[zone] && App.sekrits[zone].speed) {
-      z_num = App.sekrits[zone].speed
-    }
-    else if (isNaN(z_num)) {
-      z_num = App.default_speed
-    }
-
-    let settings = App.shared.zone_settings[z_num] || App.shared.zone_settings[5]
+    let settings = App.get_speed(zone)
 
     App.zone_states[zone] = {
       current_sequence: ``,
