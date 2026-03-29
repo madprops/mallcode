@@ -14,7 +14,7 @@ Skilled users will type faster, with less errors. They could be found in the hig
 
 More skilled users can incorporate obscure characters apart from a-z to adorn their messages.
 
-So `Mall Code` allows to gauge cognitive abilities while simply engaging in communication.
+So `Mall Code` allows gauging cognitive abilities while simply engaging in communication.
 
 For instance you might want to sign your message with a nice name like:
 
