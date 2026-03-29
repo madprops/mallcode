@@ -208,12 +208,16 @@ Actions.setup_post = () => {
   }
 
   let words = fs.readFileSync(file_path, `utf8`)
-  Actions.post_words = words.split(`\n`).filter(word => word)
+
+  Actions.post_words = words.split(`\n`)
+    .filter(word => word).map(word => word.trim())
+
+  console.log(`Post Words: ${Actions.post_words.length}`)
 
   for (let word of Actions.post_words) {
     Actions.register_word(`any`, word, (ws, zone, value) => {
       Actions.do_post(ws, zone, value)
-    }, post_args)
+    }, Actions.post_args)
   }
 }
 
