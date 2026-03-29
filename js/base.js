@@ -178,7 +178,8 @@ App.setup_socket = () => {
       App.update_url()
       App.clear_updates()
       App.username = data.username
-      App.zone_settings = Shared.zone_settings[parseInt(App.zone.charAt(1))]
+      let z_num = parseInt(App.zone.charAt(1))
+      App.zone_settings = Shared.zone_settings[isNaN(z_num) ? 5 : z_num]
       App.max_press_duration = App.zone_settings.max_press
       App.input_throttle_ms = App.zone_settings.throttle
       App.unit_duration = App.zone_settings.unit_duration
@@ -187,11 +188,11 @@ App.setup_socket = () => {
       App.play_warp_drive()
 
       if (App.letter_dial_el) {
-        App.letter_dial_el.value = App.zone.charAt(0)
+        App.letter_dial_el.value = /^[A-Z][1-9]$/i.test(App.zone) ? App.zone.charAt(0) : `0`
       }
 
       if (App.speed_dial_el) {
-        App.speed_dial_el.value = App.zone.charAt(1)
+        App.speed_dial_el.value = /^[A-Z][1-9]$/i.test(App.zone) ? App.zone.charAt(1) : `0`
       }
 
       let theme = App.get_theme(App.zone)
@@ -926,6 +927,18 @@ App.setup_dials = () => {
   App.letter_dial_el = DOM.el(`#zone-dial-letter`)
   App.speed_dial_el = DOM.el(`#zone-dial-speed`)
 
+  let opt_l0 = DOM.create(`option`)
+  opt_l0.value = `0`
+  opt_l0.text = `0`
+  opt_l0.hidden = true
+  App.letter_dial_el.appendChild(opt_l0)
+
+  let opt_s0 = DOM.create(`option`)
+  opt_s0.value = `0`
+  opt_s0.text = `0`
+  opt_s0.hidden = true
+  App.speed_dial_el.appendChild(opt_s0)
+
   for (let i = 0; i < 26; i++) {
     let char = String.fromCharCode(65 + i)
     let opt = DOM.create(`option`)
@@ -1298,7 +1311,14 @@ App.clear_updates = () => {
 
 App.update_url = () => {
   let url = new URL(window.location)
-  url.searchParams.set(`zone`, App.zone)
+
+  if (/^[A-Z][1-9]$/i.test(App.zone)) {
+    url.searchParams.set(`zone`, App.zone)
+  }
+  else {
+    url.searchParams.delete(`zone`)
+  }
+
   window.history.replaceState({}, ``, url)
 }
 
