@@ -497,8 +497,8 @@ App.on_up = (ws, data, z_state) => {
       }
     }
 
-    let min_u = z_state.settings.forgiving ? 150 : (z_state.settings.unit_duration * 0.8)
-    let max_u = z_state.settings.forgiving ? 500 : (z_state.settings.unit_duration * 1.2)
+    let min_u = z_state.settings.forgiving ? 150 : z_state.settings.unit_duration * 0.8
+    let max_u = z_state.settings.forgiving ? 500 : z_state.settings.unit_duration * 1.2
     ws.unit_duration = Math.max(min_u, Math.min(max_u, ws.unit_duration))
     let msg_up = JSON.stringify({type: `UP`, username: ws.username})
 
