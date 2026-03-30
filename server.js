@@ -25,7 +25,7 @@ App.zone_data_changed = false
 App.save_data_interval = 2 * 1000
 App.max_words = 10
 App.enable_zone_words = true
-App.sekrit_delay = 5
+App.sekrit_delay = 60
 App.user_sekrits = {}
 App.max_connections_per_ip = 3
 
