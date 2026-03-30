@@ -20,6 +20,8 @@ For instance you might want to sign your message with a nice name like:
 
 ![](img/dee.png)
 
+![](img/mad.png)
+
 ---
 
 Being a harder and slower mode of communication filters out types of communication users might not desire at that point, like low effort hate, violence, confusion, hostility, or time-wasting messages.
