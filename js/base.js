@@ -1267,10 +1267,8 @@ App.build_zone_selector = (zones_info) => {
         App.speed_dial_el.value = zone.charAt(1)
         App.zone_dial_action()
       }
-      else {
-        if ((zone !== App.zone) && App.ws && (App.ws.readyState === WebSocket.OPEN)) {
-          App.ws.send(JSON.stringify({type: `RESTORE_ZONE`, zone: zone}))
-        }
+      else if ((zone !== App.zone) && App.ws && (App.ws.readyState === WebSocket.OPEN)) {
+        App.ws.send(JSON.stringify({type: `RESTORE_ZONE`, zone}))
       }
 
       clearInterval(App.zone_refresh_interval)
