@@ -86,6 +86,6 @@ This can be connected to an imaginarium to build structures in zones.
 
 For instance if a user is able to write `cemetery` in `K6`, then an AI system would build a cemetery 3D structre in that zone in some sort of walkable video game, maybe a `VR` experience.
 
-This allows users have a say into what exists or what is happening in certain zones, limited by their initiative, and being able to write the words in time.
+This allows users to have a say into what exists or what is happening in certain zones, limited by their initiative, and being able to write the words in time.
 
 A user might be able to tap `coke` in the zone, making them now eligible to receive a nice cold `coca cola` drink.
