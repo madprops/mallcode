@@ -1246,7 +1246,8 @@ App.on_sequence = (data) => {
     App.current_sequence = ``
     App.update_sequence_display()
   }
-  else {
+  else if (data.username !== App.username) {
+    // Only update the sequence string for remote users to prevent local rubber-banding
     App.current_sequence = data.sequence
     App.update_sequence_display()
   }
