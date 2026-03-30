@@ -1133,7 +1133,7 @@ App.build_zone_selector = (zones_info) => {
     html += `<div class="zone-map-sekrit-row">`
     let sorted_sekrits = Array.from(App.sekrit_zones).sort()
 
-    for (const zone of sorted_sekrits) {
+    for (let zone of sorted_sekrits) {
       let info = zones_info[zone] || {last_activity: 0}
       let colors = App.get_zone_colors(info.last_activity, now)
       let is_current = zone === App.zone

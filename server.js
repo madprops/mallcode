@@ -538,6 +538,12 @@ App.on_get_zones = (ws, data) => {
 
   let user_sekrits = App.user_sekrits[ws.username] ? Array.from(App.user_sekrits[ws.username]) : []
 
+  for (let z of user_sekrits) {
+    if (App.zone_data[z]) {
+      zones_info[z] = {last_activity: App.zone_data[z].last_activity}
+    }
+  }
+
   ws.send(JSON.stringify({type: `ZONES_INFO`, zones: zones_info, sekrits: user_sekrits}))
 }
 
