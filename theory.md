@@ -111,3 +111,13 @@ Same with names of people you might know.
 So I'd advice treating those with some sort of measure.
 
 Now consider what that means in an online multiplayer morse code system.
+
+---
+
+The unlockable sekrit zones make the game more exciting.
+
+Once a user inputs a sekrit word they unlock a special zone.
+
+These will remain unlocked and available at the zone map.
+
+![](img/zones.png)
