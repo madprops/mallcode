@@ -132,7 +132,7 @@ App.setup_socket = () => {
   }
 
   App.ws.onclose = () => {
-    App.on_ws_close(data)
+    App.on_ws_close()
   }
 
   App.ws.onerror = () => {
@@ -1374,7 +1374,7 @@ App.on_zones_info = (data) => {
   App.build_zone_selector(data.zones)
 }
 
-App.on_ws_close = (data) => {
+App.on_ws_close = () => {
   if (App.is_pressed) {
     App.handle_release(null, true)
   }
