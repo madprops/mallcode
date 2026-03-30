@@ -109,7 +109,18 @@ App.get_zone_data = () => {
 
   try {
     if (fs.existsSync(App.data_file)) {
-      App.zone_data = JSON.parse(fs.readFileSync(App.data_file, `utf8`))
+      let parsed = JSON.parse(fs.readFileSync(App.data_file, `utf8`))
+
+      if (parsed.zones) {
+        App.zone_data = parsed.zones
+
+        for (let user in parsed.sekrits) {
+          App.user_sekrits[user] = new Set(parsed.sekrits[user])
+        }
+      }
+      else {
+        App.zone_data = parsed
+      }
     }
   }
   catch (err) {
@@ -118,7 +129,18 @@ App.get_zone_data = () => {
 }
 
 App.save_zone_data = () => {
-  fs.writeFileSync(App.data_file, JSON.stringify(App.zone_data, null, 2), `utf8`)
+  let sekrits_to_save = {}
+
+  for (let user in App.user_sekrits) {
+    sekrits_to_save[user] = Array.from(App.user_sekrits[user])
+  }
+
+  let data_to_save = {
+    zones: App.zone_data,
+    sekrits: sekrits_to_save
+  }
+
+  fs.writeFileSync(App.data_file, JSON.stringify(data_to_save, null, 2), `utf8`)
 }
 
 App.update_zone_activity = (zone, activity = false) => {
@@ -318,6 +340,7 @@ App.process_word = (zone, word, ws) => {
       }
 
       App.user_sekrits[ws.username].add(sekrit.zone)
+      App.zone_data_changed = true
       App.go_to_zone(ws, sekrit.zone)
     }
 
