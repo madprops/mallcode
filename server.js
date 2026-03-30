@@ -137,7 +137,7 @@ App.save_zone_data = () => {
 
   let data_to_save = {
     zones: App.zone_data,
-    sekrits: sekrits_to_save
+    sekrits: sekrits_to_save,
   }
 
   fs.writeFileSync(App.data_file, JSON.stringify(data_to_save, null, 2), `utf8`)
