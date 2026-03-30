@@ -106,6 +106,8 @@ Our taps could be considered to be connected and felt by forces we can't see all
 
 Doing and `SOS` on a surface, without any tech, might trigger a vessel to appear in the sky.
 
+Same with names of people you might know.
+
 So I'd advice treating those with some sort of measure.
 
 Now consider what that means in an online multiplayer morse code system.
