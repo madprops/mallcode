@@ -54,9 +54,9 @@ For instance, it can be programmed so that certain words or sequences open up do
 
 There is already a system to register actions easily.
 
-It is a semi-secure interface since it's not really concealed, it just requires some morse code skill and knowing certian key words.
+It is a semi-secure interface since it's not really concealed, it just requires some morse code skill and knowing certain keywords.
 
-The key words can be zone dependent, so for instance opening doors can only work if you are in the K4 zone.
+The keywords can be zone dependent, so for instance opening doors can only work if you are in the K4 zone.
 
 It can be a way to provide an interface to fullfill wishes while having a certain friction, to not making it entirely easy to trigger actions, as a way to regulate actions.
 
