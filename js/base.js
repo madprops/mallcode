@@ -45,6 +45,7 @@ App.font_string = `noto_font, system-ui, sans-serif`
 App.words = []
 App.seq = 1
 App.current_letters = []
+App.sekrit_zones = new Set()
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
@@ -202,6 +203,7 @@ App.setup_socket = () => {
         DOM.hide(App.zone_name_el)
       }
       else {
+        App.sekrit_zones.add(App.zone)
         let theme = App.get_theme(App.zone)
         App.zone_name_el.textContent = App.zone
         App.zone_name_el.style.color = theme.particles
@@ -251,6 +253,12 @@ App.setup_socket = () => {
       App.update_words_display(data.words)
     }
     else if (data.type === `ZONES_INFO`) {
+      if (data.sekrits) {
+        for (let zone of data.sekrits) {
+          App.sekrit_zones.add(zone)
+        }
+      }
+
       App.build_zone_selector(data.zones)
     }
   }
@@ -1118,8 +1126,25 @@ App.get_zone_colors = (last_activity, current_time) => {
 }
 
 App.build_zone_selector = (zones_info) => {
-  let html = `<div class="zone-map-grid">`
+  let html = ``
   let now = Date.now()
+
+  if (App.sekrit_zones.size > 0) {
+    html += `<div class="zone-map-sekrit-row">`
+    let sorted_sekrits = Array.from(App.sekrit_zones).sort()
+
+    for (const zone of sorted_sekrits) {
+      let info = zones_info[zone] || {last_activity: 0}
+      let colors = App.get_zone_colors(info.last_activity, now)
+      let is_current = zone === App.zone
+      let cls = is_current ? `zone-map-btn zone-map-current` : `zone-map-btn`
+      html += `<button class="${cls}" data-zone="${zone}" style="color: ${colors.color}; background-color: ${colors.bg}; border-color: ${is_current ? `#00aaff` : colors.color}">${zone}</button>`
+    }
+
+    html += `</div>`
+  }
+
+  html += `<div class="zone-map-grid">`
 
   for (let i = 0; i < 26; i++) {
     let letter = String.fromCharCode(65 + i)

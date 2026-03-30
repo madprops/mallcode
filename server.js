@@ -536,7 +536,9 @@ App.on_get_zones = (ws, data) => {
     }
   }
 
-  ws.send(JSON.stringify({type: `ZONES_INFO`, zones: zones_info}))
+  let user_sekrits = App.user_sekrits[ws.username] ? Array.from(App.user_sekrits[ws.username]) : []
+
+  ws.send(JSON.stringify({type: `ZONES_INFO`, zones: zones_info, sekrits: user_sekrits}))
 }
 
 App.on_down = (ws, data, z_state) => {
