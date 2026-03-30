@@ -95,182 +95,44 @@ App.setup_socket = () => {
     }
 
     if (data.username && [`DOWN`, `UP`].includes(data.type)) {
-      App.current_user = data.username
-      App.username_info_el.textContent = data.username
-      App.username_debouncer.call()
+      App.on_up_or_down(data)
     }
 
     if (data.type === `DOWN`) {
-      App.remote_lock_time = performance.now()
-      App.last_typist_was_local = false
-      App.handle_press(null, false)
+      App.on_down(data)
     }
     else if (data.type === `UP`) {
-      App.remote_lock_time = performance.now()
-      App.last_typist_was_local = false
-      App.handle_release(null, false)
+      App.on_up(data)
     }
     else if (data.type === `SEQUENCE`) {
-      if ((data.username === App.username) && !data.resolve) {
+      let ok = App.on_sequence(data)
+
+      if (!ok) {
         return
-      }
-
-      if (data.resolve) {
-        let letter = Shared.morse_code[data.sequence] || ``
-
-        if (letter) {
-          App.spawn_sprite(letter, `letter`)
-          App.current_letters.push(letter)
-        }
-
-        App.current_sequence = ``
-        App.update_sequence_display()
-      }
-      else {
-        App.current_sequence = data.sequence
-        App.update_sequence_display()
       }
     }
     else if (data.type === `WORD_END`) {
-      let word = App.current_letters.join(``)
-      let found = false
-
-      if (App.current_letters.length === 1) {
-        for (let i = App.sprites.length - 1; i >= 0; i--) {
-          let s = App.sprites[i]
-
-          if ((s.userData.type === `letter`) && (s.userData.text === word)) {
-            s.userData.type = `word`
-            s.userData.decay_rate = 0.25
-            s.userData.growth = 2
-            let old_map = s.material.map
-            s.material.map = App.create_text_texture(word, false, false, true)
-            old_map.dispose()
-            found = true
-            break
-          }
-        }
-      }
-
-      if (!found && (word.length > 0)) {
-        App.spawn_sprite(word, `word`)
-      }
-
-      App.current_letters = []
+      App.on_word_end(data)
     }
     else if (data.type === `ZONE`) {
-      if (data.version) {
-        App.version = data.version
-      }
-
-      if (!App.started) {
-        App.start()
-      }
-
-      App.moving = false
-
-      if (App.is_pressed) {
-        App.handle_release(null, false)
-      }
-
-      App.current_sequence = ``
-      App.current_letters = []
-      App.update_sequence_display()
-
-      App.zone = data.zone
-      App.update_url()
-      App.clear_updates()
-      App.username = data.username
-      let z_num = parseInt(App.zone.charAt(1))
-      App.zone_settings = Shared.zone_settings[isNaN(z_num) ? 5 : z_num]
-      App.max_press_duration = App.zone_settings.max_press
-      App.input_throttle_ms = App.zone_settings.throttle
-      App.unit_duration = App.zone_settings.unit_duration
-      App.iambic_duration = App.zone_settings.iambic_duration
-      App.refresh_info()
-      App.play_warp_drive()
-
-      if (Shared.is_public_zone(App.zone)) {
-        if (App.letter_dial_el) {
-          App.letter_dial_el.value = App.zone.charAt(0)
-        }
-
-        if (App.speed_dial_el) {
-          App.speed_dial_el.value = App.zone.charAt(1)
-        }
-
-        DOM.show(App.zone_dials_el)
-        DOM.hide(App.zone_name_el)
-      }
-      else {
-        App.sekrit_zones.add(App.zone)
-        let theme = App.get_theme(App.zone)
-        App.zone_name_el.textContent = App.zone
-        App.zone_name_el.style.color = theme.particles
-        DOM.show(App.zone_name_el)
-        DOM.hide(App.zone_dials_el)
-      }
-
-      let theme = App.get_theme(App.zone)
-      App.particles_material.color.set(theme.particles)
-
-      if (App.particles_material.map) {
-        App.particles_material.map.dispose()
-      }
-
-      App.particles_material.map = App.create_particle_texture(theme)
-      App.particles_material.needsUpdate = true
+      App.on_zone(data)
     }
     else if (data.type === `MODAL`) {
       App.show_modal({text: data.text, pissed: data.pissed})
     }
     else if (data.type === `USERS`) {
-      App.online_count_zone = data.count_zone
-      App.online_count_global = data.count_global
-      App.zone_usernames = data.usernames
-
-      if (data.event && (data.username !== App.username)) {
-        if (data.event === `join`) {
-          App.show_update(`${data.username} joined`)
-        }
-        else if (data.event === `leave`) {
-          App.show_update(`${data.username} left`)
-        }
-
-        if (data.count_zone <= 10) {
-          if (data.event === `join`) {
-            App.play_zone_enter()
-          }
-          else if (data.event === `leave`) {
-            App.play_zone_leave()
-          }
-        }
-      }
-
-      App.refresh_info()
+      App.on_users(data)
     }
     else if (data.type === `WORDS`) {
       App.update_words_display(data.words)
     }
     else if (data.type === `ZONES_INFO`) {
-      if (data.sekrits) {
-        for (let zone of data.sekrits) {
-          App.sekrit_zones.add(zone)
-        }
-      }
-
-      App.build_zone_selector(data.zones)
+      App.on_zones_info(data)
     }
   }
 
   App.ws.onclose = () => {
-    if (App.is_pressed) {
-      App.handle_release(null, true)
-    }
-
-    setTimeout(() => {
-      App.setup_socket()
-    }, App.reconnect_delay)
+    App.on_ws_close(data)
   }
 
   App.ws.onerror = () => {
@@ -1366,6 +1228,160 @@ App.update_url = () => {
   }
 
   window.history.replaceState({}, ``, url)
+}
+
+App.on_sequence = (data) => {
+  if ((data.username === App.username) && !data.resolve && (data.sequence !== ``)) {
+    return false
+  }
+
+  if (data.resolve) {
+    let letter = Shared.morse_code[data.sequence] || ``
+
+    if (letter) {
+      App.spawn_sprite(letter, `letter`)
+      App.current_letters.push(letter)
+    }
+
+    App.current_sequence = ``
+    App.update_sequence_display()
+  }
+  else {
+    App.current_sequence = data.sequence
+    App.update_sequence_display()
+  }
+
+  return true
+}
+
+App.on_up_or_down = (data) => {
+  App.current_user = data.username
+  App.username_info_el.textContent = data.username
+  App.username_debouncer.call()
+}
+
+App.on_down = (data) => {
+  App.remote_lock_time = performance.now()
+  App.last_typist_was_local = false
+  App.handle_press(null, false)
+}
+
+App.on_up = (data) => {
+  App.remote_lock_time = performance.now()
+  App.last_typist_was_local = false
+  App.handle_release(null, false)
+}
+
+App.on_word_end = (data) => {
+  let word = App.current_letters.join(``)
+  let found = false
+
+  if (App.current_letters.length === 1) {
+    for (let i = App.sprites.length - 1; i >= 0; i--) {
+      let s = App.sprites[i]
+
+      if ((s.userData.type === `letter`) && (s.userData.text === word)) {
+        s.userData.type = `word`
+        s.userData.decay_rate = 0.25
+        s.userData.growth = 2
+        let old_map = s.material.map
+        s.material.map = App.create_text_texture(word, false, false, true)
+        old_map.dispose()
+        found = true
+        break
+      }
+    }
+  }
+
+  if (!found && (word.length > 0)) {
+    App.spawn_sprite(word, `word`)
+  }
+
+  App.current_letters = []
+}
+
+App.on_zone = (data) => {
+  if (data.version) {
+    App.version = data.version
+  }
+
+  if (!App.started) {
+    App.start()
+  }
+
+  App.moving = false
+
+  if (App.is_pressed) {
+    App.handle_release(null, false)
+  }
+
+  App.current_sequence = ``
+  App.current_letters = []
+  App.update_sequence_display()
+
+  App.zone = data.zone
+  App.update_url()
+  App.clear_updates()
+  App.username = data.username
+  let z_num = parseInt(App.zone.charAt(1))
+  App.zone_settings = Shared.zone_settings[isNaN(z_num) ? 5 : z_num]
+  App.max_press_duration = App.zone_settings.max_press
+  App.input_throttle_ms = App.zone_settings.throttle
+  App.unit_duration = App.zone_settings.unit_duration
+  App.iambic_duration = App.zone_settings.iambic_duration
+  App.refresh_info()
+  App.play_warp_drive()
+
+  if (Shared.is_public_zone(App.zone)) {
+    if (App.letter_dial_el) {
+      App.letter_dial_el.value = App.zone.charAt(0)
+    }
+
+    if (App.speed_dial_el) {
+      App.speed_dial_el.value = App.zone.charAt(1)
+    }
+
+    DOM.show(App.zone_dials_el)
+    DOM.hide(App.zone_name_el)
+  }
+  else {
+    App.sekrit_zones.add(App.zone)
+    let theme = App.get_theme(App.zone)
+    App.zone_name_el.textContent = App.zone
+    App.zone_name_el.style.color = theme.particles
+    DOM.show(App.zone_name_el)
+    DOM.hide(App.zone_dials_el)
+  }
+
+  let theme = App.get_theme(App.zone)
+  App.particles_material.color.set(theme.particles)
+
+  if (App.particles_material.map) {
+    App.particles_material.map.dispose()
+  }
+
+  App.particles_material.map = App.create_particle_texture(theme)
+  App.particles_material.needsUpdate = true
+}
+
+App.on_zones_info = () => {
+  if (data.sekrits) {
+    for (let zone of data.sekrits) {
+      App.sekrit_zones.add(zone)
+    }
+  }
+
+  App.build_zone_selector(data.zones)
+}
+
+App.on_ws_close = (data) => {
+  if (App.is_pressed) {
+    App.handle_release(null, true)
+  }
+
+  setTimeout(() => {
+    App.setup_socket()
+  }, App.reconnect_delay)
 }
 
 App.init = async () => {
