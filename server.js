@@ -25,7 +25,7 @@ App.zone_data_changed = false
 App.save_data_interval = 2 * 1000
 App.max_words = 10
 App.enable_zone_words = true
-App.sekrit_delay = 60
+App.sekrit_delay = 5
 App.user_sekrits = {}
 App.max_connections_per_ip = 3
 
@@ -77,13 +77,6 @@ App.get_sekrits = () => {
       })
     }
 
-    // Update settings for all active zones even if file was deleted
-    // so removed sekrits revert to default speeds
-    for (let zone in App.zone_states) {
-      App.zone_states[zone].settings = App.get_speed(zone)
-    }
-
-    // Clean up unlocked zones for users if they were removed from the JSON
     for (let user in App.user_sekrits) {
       for (let user_zone of App.user_sekrits[user]) {
         if (!App.sekrits[user_zone]) {
@@ -93,7 +86,22 @@ App.get_sekrits = () => {
       }
     }
 
-    // Eject clients who are currently inside a removed private zone
+    for (let zone in App.zone_data) {
+      if (!App.is_public_zone(zone) && !App.sekrits[zone]) {
+        delete App.zone_data[zone]
+        App.zone_data_changed = true
+      }
+    }
+
+    for (let zone in App.zone_states) {
+      if (!App.is_public_zone(zone) && !App.sekrits[zone]) {
+        delete App.zone_states[zone]
+      }
+      else {
+        App.zone_states[zone].settings = App.get_speed(zone)
+      }
+    }
+
     App.wss.clients.forEach(c => {
       if ((c.readyState === WebSocket.OPEN) && !App.is_public_zone(c.zone) && !App.sekrits[c.zone]) {
         App.go_to_zone(c, App.default_zone())
