@@ -18,8 +18,6 @@ So `Mall Code` allows gauging cognitive abilities while simply engaging in commu
 
 For instance you might want to sign your message with a nice name like:
 
-![](img/dee.png)
-
 ![](img/mad.png)
 
 ---
