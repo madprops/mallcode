@@ -27,6 +27,7 @@ App.max_words = 10
 App.enable_zone_words = true
 App.sekrit_delay = 60
 App.user_sekrits = {}
+App.max_connections_per_ip = 3
 
 App.get_version = () => {
   try {
@@ -244,6 +245,7 @@ App.get_zone_state = (zone) => {
       current_sequence: ``,
       letters: [],
       press_start_time: 0,
+      last_up_time: 0,
       letter_timeout: null,
       word_timeout: null,
       last_active_ws: null,
@@ -392,7 +394,12 @@ App.go_to_zone = (ws, zone) => {
 
 App.setup_sockets = () => {
   App.wss.on(`connection`, (ws, req) => {
-    App.prepare_ws(ws, req)
+    let is_allowed = App.prepare_ws(ws, req)
+
+    if (!is_allowed) {
+      ws.close(1008, `Too many connections`)
+      return
+    }
 
     ws.on(`pong`, () => {
       ws.is_alive = true
@@ -473,6 +480,14 @@ App.setup_sockets = () => {
     })
 
     ws.on(`close`, () => {
+      if (App.active_ips && App.active_ips[ws.ip]) {
+        App.active_ips[ws.ip] -= 1
+
+        if (App.active_ips[ws.ip] <= 0) {
+          delete App.active_ips[ws.ip]
+        }
+      }
+
       App.force_release(ws, ws.zone)
       App.broadcast_zone_update(ws.zone, ws.username, `leave`)
     })
@@ -482,12 +497,27 @@ App.setup_sockets = () => {
 }
 
 App.prepare_ws = (ws, req) => {
+  ws.ip = req.headers[`x-forwarded-for`] || req.socket.remoteAddress
+
+  if (!App.active_ips) {
+    App.active_ips = {}
+  }
+
+  if (!App.active_ips[ws.ip]) {
+    App.active_ips[ws.ip] = 0
+  }
+
+  if (App.active_ips[ws.ip] >= App.max_connections_per_ip) {
+    return false
+  }
+
+  App.active_ips[ws.ip] += 1
+
   let cookies = req.headers.cookie || ``
   let date_join_match = cookies.match(/(?:^|;\s*)date_join=([^;]+)/)
   ws.date_join = date_join_match ? parseInt(date_join_match[1], 10) : Date.now()
   ws.is_alive = true
   ws.id = App.next_client_id++
-  ws.ip = req.headers[`x-forwarded-for`] || req.socket.remoteAddress
   ws.username = App.shared.random_word(3, ws.date_join || ws.ip, true)
 
   let req_url = new URL(req.url, `http://localhost`)
@@ -510,6 +540,7 @@ App.prepare_ws = (ws, req) => {
 
   ws.unit_duration = null
   ws.penalty_expires = App.blocked_ips[ws.ip] || 0
+  return true
 }
 
 App.on_restore_zone = (ws, data) => {
@@ -552,12 +583,20 @@ App.on_down = (ws, data, z_state) => {
     return
   }
 
+  let now = Date.now()
   z_state.is_pressed = true
-  z_state.press_start_time = Date.now()
+  z_state.press_start_time = now
   clearTimeout(z_state.letter_timeout)
   clearTimeout(z_state.word_timeout)
 
-  ws.unit_duration = App.shared.process_gap(data.gap, ws.unit_duration, z_state.current_sequence.length, z_state.settings)
+  let gap = 0
+
+  if (z_state.last_up_time) {
+    let server_gap = now - z_state.last_up_time
+    gap = App.shared.validate_timing(data.gap, server_gap, 150)
+  }
+
+  ws.unit_duration = App.shared.process_gap(gap, ws.unit_duration, z_state.current_sequence.length, z_state.settings)
   let msg_down = JSON.stringify({type: `DOWN`, username: ws.username})
 
   App.wss.clients.forEach((client) => {
@@ -578,14 +617,11 @@ App.on_up = (ws, data, z_state) => {
 
   let now = Date.now()
   z_state.is_pressed = false
+  z_state.last_up_time = now
 
   if (z_state.press_start_time) {
     let server_duration = now - z_state.press_start_time
-    let duration = server_duration
-
-    if ((typeof data.duration === `number`) && (data.duration > 0)) {
-      duration = data.duration
-    }
+    let duration = App.shared.validate_timing(data.duration, server_duration, 150)
 
     let res = App.shared.process_duration(duration, ws.unit_duration, z_state.current_sequence, z_state.settings)
     ws.unit_duration = res.unit_duration
@@ -731,6 +767,7 @@ App.force_release = (ws, zone) => {
     z_state.current_sequence = ``
     z_state.letters = []
     z_state.press_start_time = 0
+    z_state.last_up_time = 0
     clearTimeout(z_state.letter_timeout)
     clearTimeout(z_state.word_timeout)
     z_state.last_active_ws = null

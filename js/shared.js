@@ -287,6 +287,20 @@ Shared.process_duration = (duration, unit_duration, sequence, settings) => {
   return {unit_duration, sequence}
 }
 
+Shared.validate_timing = (client_time, server_time, max_latency = 150) => {
+  if ((typeof client_time !== `number`) || (client_time <= 0)) {
+    return server_time
+  }
+
+  let diff = Math.abs(client_time - server_time)
+
+  if (diff <= max_latency) {
+    return client_time
+  }
+
+  return server_time
+}
+
 Shared.is_public_zone = (zone) => {
   return /^[A-Z][1-9]$/i.test(zone)
 }
