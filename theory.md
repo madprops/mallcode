@@ -82,10 +82,30 @@ Streamers and organizations could start taking over some zones, or become associ
 
 ---
 
-This can be connected to an imaginarium to build structures in zones.
+This can be connected to an `imaginarium` to build structures in zones.
 
 For instance if a user is able to write `cemetery` in `K6`, then an AI system would build a cemetery 3D structre in that zone in some sort of walkable video game, maybe a `VR` experience.
 
 This allows users to have a say into what exists or what is happening in certain zones, limited by their initiative, and being able to write the words in time.
 
 A user might be able to tap `coke` in the zone, making them now eligible to receive a nice cold `coca cola` drink.
+
+---
+
+Can be used for security purposes. Each zone meaning a certain room or event.
+
+Participants use the beeps as pings or signals. And the words would have meaning:
+
+For instance typing "hot" in M9 might mean something is happening there.
+
+---
+
+Our taps could be considered to be connected and felt by forces we can't see all the time.
+
+`Morse Code` itself, being an old tech by now, could have found its way into systems that are actively listening.
+
+Doing and `SOS` on a surface, without any tech, might trigger a vessel to appear in the sky.
+
+So I'd advice treating those with some sort of measure.
+
+Now consider what that means in an online multiplayer morse code system.
