@@ -992,7 +992,7 @@ App.build_zone_selector = (zones_info) => {
   let now = Date.now()
 
   if (App.sekrit_zones.size > 0) {
-    html += `<div class="zone-map-sekrit-row">`
+    html += `<div class="zone-map-sekrit-row flex-row-center">`
     let sorted_sekrits = Array.from(App.sekrit_zones).sort()
 
     for (let zone of sorted_sekrits) {
