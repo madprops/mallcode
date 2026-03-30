@@ -59,18 +59,12 @@ App.get_words = () => {
 }
 
 App.get_sekrits = () => {
-  // Create sekrits.json
-  // And fill it with private zones like
-  // [{"word": "glue", "zone": "wormhall"}]
-  // Now whenever a user types "glue" they will be teleported
-  // to "wormhall" - that is the only way to get there
-
   try {
     let file = path.join(__dirname, `sekrit.json`)
+    App.sekrits = {}
 
     if (fs.existsSync(file)) {
       let data = JSON.parse(fs.readFileSync(file, `utf8`))
-      App.sekrits = {}
 
       data.forEach(s => {
         if (s.word && s.zone) {
@@ -81,11 +75,30 @@ App.get_sekrits = () => {
           }
         }
       })
+    }
 
-      for (let zone in App.zone_states) {
-        App.zone_states[zone].settings = App.get_speed(zone)
+    // Update settings for all active zones even if file was deleted
+    // so removed sekrits revert to default speeds
+    for (let zone in App.zone_states) {
+      App.zone_states[zone].settings = App.get_speed(zone)
+    }
+
+    // Clean up unlocked zones for users if they were removed from the JSON
+    for (let user in App.user_sekrits) {
+      for (let user_zone of App.user_sekrits[user]) {
+        if (!App.sekrits[user_zone]) {
+          App.user_sekrits[user].delete(user_zone)
+          App.zone_data_changed = true
+        }
       }
     }
+
+    // Eject clients who are currently inside a removed private zone
+    App.wss.clients.forEach(c => {
+      if ((c.readyState === WebSocket.OPEN) && !App.is_public_zone(c.zone) && !App.sekrits[c.zone]) {
+        App.go_to_zone(c, App.default_zone())
+      }
+    })
   }
   catch (err) {
     console.error(`Error loading sekrit.json:`, err)

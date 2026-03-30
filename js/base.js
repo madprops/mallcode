@@ -1366,6 +1366,8 @@ App.on_zone = (data) => {
 
 App.on_zones_info = (data) => {
   if (data.sekrits) {
+    App.sekrit_zones.clear()
+
     for (let zone of data.sekrits) {
       App.sekrit_zones.add(zone)
     }
