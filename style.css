@@ -209,6 +209,8 @@ body, html {
 
 .zone-map-sekrit-row {
     gap: 10px;
+    max-width: 500px;
+    flex-wrap: wrap-reverse;
 }
 
 .hidden {
