@@ -1364,7 +1364,7 @@ App.on_zone = (data) => {
   App.particles_material.needsUpdate = true
 }
 
-App.on_zones_info = () => {
+App.on_zones_info = (data) => {
   if (data.sekrits) {
     for (let zone of data.sekrits) {
       App.sekrit_zones.add(zone)
@@ -1382,6 +1382,32 @@ App.on_ws_close = (data) => {
   setTimeout(() => {
     App.setup_socket()
   }, App.reconnect_delay)
+}
+
+App.on_users = (data) => {
+  App.online_count_zone = data.count_zone
+  App.online_count_global = data.count_global
+  App.zone_usernames = data.usernames
+
+  if (data.event && (data.username !== App.username)) {
+    if (data.event === `join`) {
+      App.show_update(`${data.username} joined`)
+    }
+    else if (data.event === `leave`) {
+      App.show_update(`${data.username} left`)
+    }
+
+    if (data.count_zone <= 10) {
+      if (data.event === `join`) {
+        App.play_zone_enter()
+      }
+      else if (data.event === `leave`) {
+        App.play_zone_leave()
+      }
+    }
+  }
+
+  App.refresh_info()
 }
 
 App.init = async () => {

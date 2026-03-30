@@ -287,8 +287,8 @@ Shared.process_duration = (duration, unit_duration, sequence, settings) => {
   return {unit_duration, sequence}
 }
 
-Shared.validate_timing = (client_time, server_time, max_latency = 150) => {
-  if ((typeof client_time !== `number`) || (client_time <= 0)) {
+Shared.validate_timing = (client_time, server_time, max_latency = 1500) => {
+  if (typeof client_time !== `number` || client_time <= 0) {
     return server_time
   }
 
