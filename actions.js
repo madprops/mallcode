@@ -201,6 +201,10 @@ Actions.register_all = () => {
 }
 
 Actions.do_post = (ws, zone, value) => {
+  if (ws.sekrit) {
+    return
+  }
+
   Actions.execute_command(`./post.js "${ws.username}" "${zone}" "${value}"`)
 }
 

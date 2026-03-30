@@ -26,6 +26,7 @@ App.save_data_interval = 2 * 1000
 App.max_words = 10
 App.enable_zone_words = true
 App.sekrit_delay = 60
+App.user_sekrits = {}
 
 App.get_version = () => {
   try {
@@ -312,6 +313,11 @@ App.process_word = (zone, word, ws) => {
 
   if (sekrit) {
     if (ws && (ws.readyState === WebSocket.OPEN) && (ws.zone !== sekrit.zone)) {
+      if (!App.user_sekrits[ws.username]) {
+        App.user_sekrits[ws.username] = new Set()
+      }
+
+      App.user_sekrits[ws.username].add(sekrit.zone)
       App.go_to_zone(ws, sekrit.zone)
     }
 
@@ -341,10 +347,15 @@ App.process_word = (zone, word, ws) => {
   }
 }
 
+App.set_zone = (ws, zone) => {
+  ws.zone = zone
+  ws.sekrit = App.sekrits[zone]
+}
+
 App.go_to_zone = (ws, zone) => {
   let old_zone = ws.zone
   App.force_release(ws, old_zone)
-  ws.zone = zone
+  App.set_zone(ws, zone)
   ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username, version: App.version}))
 
   if (old_zone) {
@@ -459,11 +470,19 @@ App.prepare_ws = (ws, req) => {
   let req_url = new URL(req.url, `http://localhost`)
   let req_zone = req_url.searchParams.get(`zone`)
 
-  if (req_zone && App.is_public_zone(req_zone)) {
-    ws.zone = req_zone.toUpperCase()
+  if (req_zone) {
+    let upper_zone = req_zone.toUpperCase()
+    let is_authorized = App.user_sekrits[ws.username] && App.user_sekrits[ws.username].has(upper_zone)
+
+    if (App.is_public_zone(upper_zone) || is_authorized) {
+      App.set_zone(ws, upper_zone)
+    }
+    else {
+      App.set_zone(ws, App.default_zone())
+    }
   }
   else {
-    ws.zone = App.default_zone()
+    App.set_zone(ws, App.default_zone())
   }
 
   ws.unit_duration = null
@@ -472,11 +491,14 @@ App.prepare_ws = (ws, req) => {
 
 App.on_restore_zone = (ws, data) => {
   if (data.zone) {
-    if (!App.is_public_zone(data.zone)) {
+    let upper_zone = data.zone.toUpperCase()
+    let is_authorized = App.user_sekrits[ws.username] && App.user_sekrits[ws.username].has(upper_zone)
+
+    if (!App.is_public_zone(upper_zone) && (upper_zone !== ws.zone) && !is_authorized) {
       return
     }
 
-    App.go_to_zone(ws, data.zone)
+    App.go_to_zone(ws, upper_zone)
   }
 }
 
