@@ -211,6 +211,7 @@ body, html {
     gap: 10px;
     max-width: 500px;
     flex-wrap: wrap-reverse;
+    padding-bottom: 10px;
 }
 
 .hidden {

@@ -1231,8 +1231,8 @@ App.update_url = () => {
 }
 
 App.on_sequence = (data) => {
-  if ((data.username === App.username) && !data.resolve && (data.sequence !== ``)) {
-    return false
+  if (data.unit_duration) {
+    App.unit_duration = data.unit_duration
   }
 
   if (data.resolve) {

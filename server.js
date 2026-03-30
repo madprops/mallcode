@@ -270,6 +270,7 @@ App.send_sequence = (args = {}) => {
     username: ``,
     zone: ``,
     resolve: false,
+    unit_duration: null,
   }
 
   if (!args.username) {
@@ -277,7 +278,7 @@ App.send_sequence = (args = {}) => {
   }
 
   App.shared.def_args(def_args, args)
-  let msg_seq = JSON.stringify({type: `SEQUENCE`, sequence: args.sequence, username: args.username, resolve: args.resolve})
+  let msg_seq = JSON.stringify({type: `SEQUENCE`, sequence: args.sequence, username: args.username, resolve: args.resolve, unit_duration: args.unit_duration})
 
   App.wss.clients.forEach((c) => {
     if ((c.readyState === WebSocket.OPEN) && (c.zone === args.zone)) {
@@ -593,7 +594,7 @@ App.on_down = (ws, data, z_state) => {
 
   if (z_state.last_up_time) {
     let server_gap = now - z_state.last_up_time
-    gap = App.shared.validate_timing(data.gap, server_gap, 150)
+    gap = App.shared.validate_timing(data.gap, server_gap, 500)
   }
 
   ws.unit_duration = App.shared.process_gap(gap, ws.unit_duration, z_state.current_sequence.length, z_state.settings)
@@ -621,7 +622,7 @@ App.on_up = (ws, data, z_state) => {
 
   if (z_state.press_start_time) {
     let server_duration = now - z_state.press_start_time
-    let duration = App.shared.validate_timing(data.duration, server_duration, 150)
+    let duration = App.shared.validate_timing(data.duration, server_duration, 500)
 
     let res = App.shared.process_duration(duration, ws.unit_duration, z_state.current_sequence, z_state.settings)
     ws.unit_duration = res.unit_duration
@@ -635,7 +636,7 @@ App.on_up = (ws, data, z_state) => {
       }
     })
 
-    App.send_sequence({sequence: z_state.current_sequence, username: ws.username, zone: ws.zone})
+    App.send_sequence({sequence: z_state.current_sequence, username: ws.username, zone: ws.zone, unit_duration: ws.unit_duration})
     let letter_delay = (ws.unit_duration * z_state.settings.letter_mult) + 250
     z_state.letter_timeout = setTimeout(() => App.resolve_letter(ws.zone), letter_delay)
   }
