@@ -118,8 +118,22 @@ The unlockable zones make the system more exciting.
 
 Once a user inputs a secret word they unlock a special zone.
 
-These will remain unlocked and available at the zone map.
+These will remain unlocked and available at the `Zone Map`.
 
 It provides discoverability and the creation of small communities.
 
 ![](img/zones.png)
+
+---
+
+The skill ceiling is high.
+
+Fast morse code typers could be found in the high speed zones (7, 8, 9)
+
+Players who are learning or practicing could start on slower speed zones.
+
+This allows users to engage in zones with people of their current skill level.
+
+Or observe high speed users talk among each other while rarely interacting.
+
+This also allows high speed users to go to slower zones to help people sharpen their skill.
