@@ -145,15 +145,11 @@ body, html {
 }
 
 #zone-map {
-    width: 54px;
+    width: 28px;
     height: 28px;
     cursor: pointer;
-    border-radius: 3px;
+    border-radius: 50%;
     transition: transform 0.1s ease-in-out;
-}
-
-#zone-map:hover {
-    transform: scale(1.15);
 }
 
 #zone-map-grid {
