@@ -23,20 +23,20 @@ App.get_settings = () => {
     {
       comment: `Enable or disable effects`,
       name: `animation`,
-      value: true,
+      value: App.animation,
       type: `boolean`,
     },
     {
       comment: `Dot dash sequence type`,
       name: `sequence`,
-      value: `above`,
+      value: App.sequence,
       type: `string`,
       options: [`base`, `above`, `below`],
     },
     {
       comment: `Volume level of the beeps`,
       name: `volume`,
-      value: `max`,
+      value: App.volume,
       type: `string`,
       options: [`max`, `mid`, `mute`],
     },
