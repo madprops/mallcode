@@ -40,6 +40,12 @@ App.get_settings = () => {
       type: `string`,
       options: [`max`, `mid`, `mute`],
     },
+    {
+      comment: `Background color of the canvas`,
+      name: `bg_color`,
+      value: App.bg_color,
+      type: `string`,
+    },
   ]
 }
 
@@ -163,6 +169,7 @@ App.check_save_settings = () => {
   App.refresh_sequence()
   App.refresh_effects_icon()
   App.refresh_sound_icon()
+  App.refresh_bg_color()
   App.save_storage()
   App.msg_settings.close()
 }

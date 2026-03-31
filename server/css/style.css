@@ -84,7 +84,7 @@ body, html {
 .dial {
   appearance: none;
   -webkit-appearance: none;
-  background: rgba(10, 10, 15, 0.8);
+  background: var(--bg_color);
   color: #fff;
   border: 1px solid #555;
   padding: 2px 32px 2px 8px;
@@ -142,6 +142,18 @@ body, html {
     font-size: 20px;
     pointer-events: none;
     z-index: 10;
+}
+
+#zone-map {
+    width: 54px;
+    height: 28px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: transform 0.1s ease-in-out;
+}
+
+#zone-map:hover {
+    transform: scale(1.15);
 }
 
 #zone-map-grid {

@@ -49,6 +49,7 @@ App.sekrit_zones = new Set()
 App.repo = `github.com/madprops/mallcode`
 App.join_sound = true
 App.leave_sound = true
+App.bg_color = `#000000`
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
@@ -253,7 +254,8 @@ App.setup_canvas = () => {
   App.renderer.setSize(window.innerWidth, window.innerHeight)
   App.renderer.setPixelRatio(window.devicePixelRatio)
   App.scene = new THREE.Scene()
-  App.scene.fog = new THREE.FogExp2(0x020208, 0.0015)
+  App.scene.background = new THREE.Color(App.bg_color)
+  App.scene.fog = new THREE.FogExp2(App.bg_color, 0.0015)
   App.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000)
   App.camera.position.z = 40
   App.timer = new THREE.Timer()
@@ -780,6 +782,7 @@ App.animate = () => {
     }
   }
 
+  App.animate_zone_map()
   App.renderer.render(App.scene, App.camera)
 }
 
@@ -806,6 +809,49 @@ App.get_theme = (zone) => {
     particles: `hsl(${Math.round(particle_hue)}, ${Shared.random_int({min: 80, max: 100, rand: random})}%, ${Shared.random_int({min: 55, max: 75, rand: random})}%)`,
     shape,
   }
+}
+
+App.setup_zone_map_canvas = () => {
+  App.zone_map_canvas = DOM.el(`#zone-map`)
+  if (!App.zone_map_canvas) return
+  App.zone_map_ctx = App.zone_map_canvas.getContext(`2d`)
+  App.zone_map_canvas.width = 64
+  App.zone_map_canvas.height = 48
+}
+
+App.animate_zone_map = () => {
+  if (!App.zone_map_ctx) {
+    return
+  }
+
+  let w = App.zone_map_canvas.width
+  let h = App.zone_map_canvas.height
+  App.zone_map_ctx.fillStyle = App.bg_color
+  App.zone_map_ctx.fillRect(0, 0, w, h)
+
+  if (!App.zone) {
+    return
+  }
+
+  let theme = App.get_theme(App.zone)
+  let time = App.animation ? performance.now() * 0.003 : 1
+  let pulse1 = (Math.sin(time) + 1) / 2
+  let pulse2 = (Math.cos(time * 0.8) + 1) / 2
+
+  App.zone_map_ctx.fillStyle = theme.particles
+  App.zone_map_ctx.globalAlpha = 0.5 + pulse1 * 0.5
+  App.zone_map_ctx.beginPath()
+  App.zone_map_ctx.arc(w / 2, h / 2, 6 + pulse2 * 8, 0, Math.PI * 2)
+  App.zone_map_ctx.fill()
+
+  App.zone_map_ctx.strokeStyle = theme.word
+  App.zone_map_ctx.globalAlpha = 0.3 + pulse2 * 0.7
+  App.zone_map_ctx.lineWidth = 3
+  App.zone_map_ctx.beginPath()
+  App.zone_map_ctx.arc(w / 2, h / 2, 14 + pulse1 * 6, 0, Math.PI * 2)
+  App.zone_map_ctx.stroke()
+
+  App.zone_map_ctx.globalAlpha = 1.0
 }
 
 App.setup_dials = () => {
@@ -936,6 +982,10 @@ App.load_storage = async () => {
           App.max_unfocused_beeps = App.storage.max_unfocused_beeps
         }
 
+        if (App.storage.bg_color !== undefined) {
+          App.bg_color = App.storage.bg_color
+        }
+
         resolve()
       }
 
@@ -964,6 +1014,7 @@ App.save_storage = () => {
   App.storage.max_unfocused_beeps = App.max_unfocused_beeps
   App.storage.join_sound = App.join_sound
   App.storage.leave_sound = App.leave_sound
+  App.storage.bg_color = App.bg_color
 
   let tx = App.db.transaction(`store`, `readwrite`)
   let store = tx.objectStore(`store`)
@@ -1023,6 +1074,26 @@ App.cycle_seq = () => {
 
 App.refresh_sequence = () => {
   App.sequence_el.textContent = Shared.capitalize(App.sequence)
+}
+
+App.refresh_bg_color = () => {
+  if (App.canvas) {
+    App.canvas.style.backgroundColor = App.bg_color
+  }
+  if (App.scene) {
+    try {
+      App.scene.background = new THREE.Color(App.bg_color)
+    }
+    catch (err) {}
+  }
+  if (App.scene && App.scene.fog) {
+    try {
+      App.scene.fog.color.set(App.bg_color)
+    }
+    catch (err) {}
+  }
+
+  document.documentElement.style.setProperty(`--bg_color`, App.bg_color)
 }
 
 App.show_update = (msg) => {
@@ -1302,6 +1373,7 @@ App.init = async () => {
   App.setup_msg_message()
   App.setup_about()
   App.setup_zone_map()
+  App.setup_zone_map_canvas()
   App.setup_settings()
   App.setup_dials()
 
@@ -1316,4 +1388,5 @@ App.init = async () => {
   App.hide_cover()
   App.refresh_effects_icon()
   App.refresh_sequence()
+  App.refresh_bg_color()
 }
