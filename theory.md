@@ -130,7 +130,7 @@ The skill ceiling is high.
 
 Fast morse code typers could be found in the high speed zones (7, 8, 9).
 
-Players who are learning or practicing could start on slower speed zones.
+Users who are learning or practicing could start on slower speed zones.
 
 This allows users to engage in zones with people of their current skill level.
 
