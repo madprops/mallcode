@@ -9,22 +9,22 @@ module.exports = (App) => {
   // Checks connections every x ms to unban and reduce levels
   App.anti_spam_check_delay = 1200
 
-  App.handler.start_anti_spam = (data) => {
-    App.handler.anti_spam_users = {}
-    App.handler.anti_spam_timeout()
+  App.start_anti_spam = () => {
+    App.anti_spam_users = {}
+    App.anti_spam_timeout()
   }
 
   // Starts a timeout to check spam on sockets
-  App.handler.anti_spam_timeout = () => {
+  App.anti_spam_timeout = () => {
     setTimeout(() => {
-      App.handler.anti_spam_timeout_action()
+      App.anti_spam_timeout_action()
     }, App.anti_spam_check_delay)
   }
 
   // What to do on each anti spam iteration
-  App.handler.anti_spam_timeout_action = () => {
-    for (let key in App.handler.anti_spam_users) {
-      let user = App.handler.anti_spam_users[key]
+  App.anti_spam_timeout_action = () => {
+    for (let key in App.anti_spam_users) {
+      let user = App.anti_spam_users[key]
 
       if (user.banned) {
         if (Date.now() > user.banned_until) {
@@ -38,45 +38,46 @@ module.exports = (App) => {
       }
     }
 
-    App.handler.anti_spam_timeout()
+    App.anti_spam_timeout()
   }
 
   // Add spam points and check if user is banned
-  App.handler.add_spam = (socket, amount = 1) => {
-    if (!App.handler.anti_spam_users[socket.hue.ip_address]) {
-      App.handler.anti_spam_users[socket.hue.ip_address] = {
+  App.add_spam = (ws, amount = 1) => {
+    if (!App.anti_spam_users[ws.ip]) {
+      App.anti_spam_users[ws.ip] = {
         level: 0,
         banned: false,
         banned_until: 0,
       }
     }
 
-    let user = App.handler.anti_spam_users[socket.hue.ip_address]
+    let user = App.anti_spam_users[ws.ip]
 
     if (user.banned) {
-      App.handler.anti_spam_kick(socket)
+      App.anti_spam_kick(ws)
       return `already_banned`
     }
 
     user.level += amount
 
     if (user.level >= App.anti_spam_max_limit) {
-      App.handler.anti_spam_ban(socket)
+      App.anti_spam_ban(ws)
+      return `already_banned`
     }
 
     return `ok`
   }
 
   // Kick a user
-  App.handler.anti_spam_kick = (socket) => {
-    socket.hue.kicked = true
-    socket.hue.info1 = `the anti-spam system`
-    App.handler.get_out(socket)
+  App.anti_spam_kick = (ws) => {
+    App.force_release(ws, ws.zone)
+    App.block_message(ws, App.anti_spam_ban_duration * 60)
+    ws.close(1008, `Spam detected`)
   }
 
   // Ban a user from connecting
-  App.handler.anti_spam_ban = (socket, minutes = App.anti_spam_ban_duration) => {
-    let user = App.handler.anti_spam_users[socket.hue.ip_address]
+  App.anti_spam_ban = (ws, minutes = App.anti_spam_ban_duration) => {
+    let user = App.anti_spam_users[ws.ip]
 
     if (!user) {
       return
@@ -84,13 +85,14 @@ module.exports = (App) => {
 
     user.banned = true
     user.banned_until = Date.now() + (minutes * 1000 * 60)
-    App.logger.log_error(`IP banned: ${socket.hue.ip_address}`)
-    App.handler.anti_spam_kick(socket)
+    App.blocked_ips[ws.ip] = user.banned_until
+    console.log(`IP banned for spam: ${ws.ip}`)
+    App.anti_spam_kick(ws)
   }
 
   // Get anti spam level
-  App.handler.get_spam_level = (socket) => {
-    let user = App.handler.anti_spam_users[socket.hue.ip_address]
+  App.get_spam_level = (ws) => {
+    let user = App.anti_spam_users[ws.ip]
 
     if (user) {
       return user.level

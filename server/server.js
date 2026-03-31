@@ -10,6 +10,7 @@ App.server = http.createServer(App.app)
 App.wss = new WebSocket.Server({server: App.server})
 App.shared = require(`./js/shared.js`)
 App.actions = require(`./actions.js`)
+require(`./spam.js`)(App)
 
 App.zone_states = {}
 App.next_client_id = 1
@@ -437,6 +438,12 @@ App.setup_sockets = () => {
     })
 
     ws.on(`message`, (message) => {
+      let spam_res = App.add_spam(ws, 1)
+
+      if (spam_res === `already_banned`) {
+        return
+      }
+
       let data
 
       try {
@@ -852,4 +859,5 @@ App.get_sekrits()
 App.get_zone_data()
 App.setup_sockets()
 App.setup_server()
+App.start_anti_spam()
 App.start_server()
