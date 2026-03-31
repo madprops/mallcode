@@ -137,3 +137,13 @@ This allows users to engage in zones with people of their current skill level.
 Learners can observe high speed users talk among each other while rarely interacting.
 
 This also allows high speed users to go to slower zones to help people sharpen their skill.
+
+---
+
+`Morse Code` is heavily based on sound.
+
+Witnessing other skilled users, listening to how they form the words, can help users solidify their morse code skills.
+
+Each user has a semi-unique name, color, and sound. It gives them some personality.
+
+So on group conversations, it's easier to know who's currently talking.
