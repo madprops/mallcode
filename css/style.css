@@ -367,14 +367,20 @@ a.clean-link:hover {
     color: #00ffcc !important;
 }
 
+#settings-container {
+    width: 480px;
+}
+
 #settings-editor {
     font-family: monospace;
     min-height: 200px;
-    border: 1px solid #ccc;
+    border: 1px solid #424242;
     padding: 10px;
-    background: #272822;
+    background: #23262c;
     color: #f8f8f2;
     outline: none;
     white-space: pre-wrap;
     word-wrap: break-word;
+    text-align: left;
+    cursor: text;
 }
