@@ -1,4 +1,6 @@
 App.zone_refresh_delay = 10
+App.max_zone_map_updates = 12
+App.zone_map_updates = 0
 
 App.update_zone_map_styles = () => {
   let c = DOM.el(`#zone-map-container`)
@@ -91,6 +93,11 @@ App.setup_zone_map = () => {
   DOM.ev(grid_el, `touchmove`, move_drag, {passive: false})
 
   App.zone_refresh_interval = setInterval(() => {
+    if (App.zone_map_updates >= App.max_zone_map_updates) {
+      App.msg_zone_map.close()
+      return
+    }
+
     App.show_zone_map()
   }, App.zone_refresh_delay * 1000)
 
@@ -179,10 +186,12 @@ App.build_zone_selector = (zones_info) => {
   App.zones_info = zones_info
 
   if (App.msg_zone_map.is_open()) {
+    App.zone_map_updates += 1
     App.update_zone_map_styles()
     return
   }
 
+  App.zone_map_updates = 0
   let html = ``
   let now = Date.now()
   let grid = DOM.el(`#zone-map-grid`)
