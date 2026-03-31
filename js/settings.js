@@ -3,6 +3,9 @@ App.settings = [
     comment: `Max beeps when the tab is unfocused`,
     name: `max_unfocused_beeps`,
     value: App.max_unfocused_beeps,
+    type: `number`,
+    min: 0,
+    max: 9999,
   },
 ]
 
@@ -13,7 +16,7 @@ App.setup_settings = () => {
 
       for (let setting of App.settings) {
         text_value += `# ${setting.comment}\n`
-        text_value += `${setting.name} = ${setting.value}`
+        text_value += `${setting.name} = ${setting.value}\n`
       }
 
       let text = DOM.el(`#settings-textarea`)
@@ -36,22 +39,50 @@ App.show_settings = () => {
 App.check_save_settings = () => {
   let textarea = DOM.el(`#settings-textarea`)
   let content = textarea.value
-  let match = /max_unfocused_beeps\s*=\s*(\d+)/.exec(content)
+  let parsed_toml = {}
 
-  if (match && match[1]) {
-    let value = parseInt(match[1], 10)
+  try {
+    parsed_toml = toml.parse(content)
+  }
+  catch (error) {
+    alert(`Invalid TOML format. Please check your syntax.`)
+    return
+  }
 
-    if (!isNaN(value) && (value >= 0) && (value <= 9999)) {
-      App.max_unfocused_beeps = value
-      App.storage.max_unfocused_beeps = value
-      App.save_storage()
-      App.msg_settings.close()
+  for (let setting of App.settings) {
+    let setting_value = parsed_toml[setting.name]
+
+    if (setting_value === undefined) {
+      alert(`Missing '${setting.name}' setting.`)
+      return
     }
-    else {
-      alert(`'max_unfocused_beeps' must be a number between 0 and 9999.`)
+
+    if (typeof setting_value !== setting.type) {
+      alert(`'${setting.name}' must be of type ${setting.type}.`)
+      return
+    }
+
+    if (setting.type === `number`) {
+
+      if ((setting.min !== undefined) && (setting_value < setting.min)) {
+        alert(`'${setting.name}' must be at least ${setting.min}.`)
+        return
+      }
+
+      if ((setting.max !== undefined) && (setting_value > setting.max)) {
+        alert(`'${setting.name}' must be at most ${setting.max}.`)
+        return
+      }
     }
   }
-  else {
-    alert(`Invalid format for 'max_unfocused_beeps'. Expected 'max_unfocused_beeps = 5'.`)
+
+  for (let setting of App.settings) {
+    let setting_value = parsed_toml[setting.name]
+    setting.value = setting_value
+    App[setting.name] = setting_value
+    App.storage[setting.name] = setting_value
   }
+
+  App.save_storage()
+  App.msg_settings.close()
 }
