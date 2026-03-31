@@ -907,7 +907,7 @@ App.load_storage = async () => {
         if (App.storage.volume !== undefined) {
           App.volume = App.storage.volume
 
-          if (![`max`, `mid`, `mute`].includes(App.volume)) {
+          if (!App.get_options(`volume`).includes(App.volume)) {
             App.volume = `max`
           }
         }
@@ -919,7 +919,7 @@ App.load_storage = async () => {
         if (App.storage.sequence !== undefined) {
           App.sequence = App.storage.sequence
 
-          if (![`base`, `above`, `below`].includes(App.sequence)) {
+          if (!App.get_options(`sequence`).includes(App.sequence)) {
             App.sequence = `above`
           }
         }

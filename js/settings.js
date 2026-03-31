@@ -43,6 +43,16 @@ App.get_settings = () => {
   ]
 }
 
+App.get_options = (name) => {
+  for (let setting of App.get_settings()) {
+    if (setting.name === name) {
+      return setting.options
+    }
+  }
+
+  return []
+}
+
 App.setup_settings = () => {
   App.msg_settings = Msg.factory({
     before_show: () => {
