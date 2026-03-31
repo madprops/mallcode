@@ -12,7 +12,6 @@ App.zone_name_el = DOM.el(`#zone-name`)
 App.zone_dials_el = DOM.el(`#zone-dials`)
 App.sound_btn = DOM.el(`#sound-toggle`)
 App.words_container_el = DOM.el(`#words-container`)
-App.sequence_el = DOM.el(`#seq-btn`)
 App.updates_el = DOM.el(`#updates`)
 App.protocol = window.location.protocol === `https:` ? `wss:` : `ws:`
 App.is_pressed = false
@@ -701,14 +700,6 @@ App.setup_events = () => {
     App.show_settings()
   })
 
-  DOM.ev(`#animate-toggle`, `click`, () => {
-    App.toggle_animation()
-  })
-
-  DOM.ev(App.sequence_el, `click`, () => {
-    App.cycle_seq()
-  })
-
   // Force a release if we regain focus and were stuck in a pressed state
   window.addEventListener(`focus`, () => {
     if (App.is_pressed) {
@@ -1050,17 +1041,6 @@ App.start = () => {
   App.started = true
 }
 
-App.refresh_effects_icon = () => {
-  let el = DOM.el(`#animate-toggle`)
-
-  if (App.animation) {
-    el.classList.remove(`disabled`)
-  }
-  else {
-    el.classList.add(`disabled`)
-  }
-}
-
 App.cycle_seq = () => {
   if (App.sequence === `base`) {
     App.sequence = `above`
@@ -1074,10 +1054,6 @@ App.cycle_seq = () => {
 
   App.refresh_sequence()
   App.save_storage()
-}
-
-App.refresh_sequence = () => {
-  App.sequence_el.textContent = Shared.capitalize(App.sequence)
 }
 
 App.refresh_bg_color = () => {
@@ -1363,20 +1339,6 @@ App.setup_msg_message = () => {
   App.msg_message.set(c)
 }
 
-App.toggle_animation = () => {
-  App.animation = !App.animation
-
-  if (App.storage) {
-    App.save_storage()
-  }
-
-  if (App.particle_mesh) {
-    App.particle_mesh.visible = App.animation
-  }
-
-  App.refresh_effects_icon()
-}
-
 App.init = async () => {
   await App.load_storage()
   App.create_debouncers()
@@ -1396,7 +1358,5 @@ App.init = async () => {
 
   App.setup_socket()
   App.hide_cover()
-  App.refresh_effects_icon()
-  App.refresh_sequence()
   App.refresh_bg_color()
 }

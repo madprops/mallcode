@@ -166,8 +166,6 @@ App.check_save_settings = () => {
     App.storage[setting.name] = setting_value
   }
 
-  App.refresh_sequence()
-  App.refresh_effects_icon()
   App.refresh_sound_icon()
   App.refresh_bg_color()
   App.save_storage()
