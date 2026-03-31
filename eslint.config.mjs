@@ -102,6 +102,7 @@ export default [
         module: "readonly",
         process: "readonly",
         Msg: "readonly",
+        toml: "readonly",
       }
     }
   }

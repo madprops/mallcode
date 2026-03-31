@@ -21,7 +21,7 @@ App.setup_settings = () => {
 
       let text = DOM.el(`#settings-textarea`)
       text.value = text_value
-    }
+    },
   })
 
   let template = DOM.el(`#settings-template`)
@@ -63,7 +63,6 @@ App.check_save_settings = () => {
     }
 
     if (setting.type === `number`) {
-
       if ((setting.min !== undefined) && (setting_value < setting.min)) {
         alert(`'${setting.name}' must be at least ${setting.min}.`)
         return
