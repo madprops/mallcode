@@ -1,7 +1,7 @@
 App.get_settings = () => {
   return [
     {
-      comment: `Max beeps when the tab is unfocused`,
+      comment: `Max beeps when unfocused`,
       name: `max_unfocused_beeps`,
       value: App.max_unfocused_beeps,
       type: `number`,
@@ -41,7 +41,7 @@ App.get_settings = () => {
       options: [`max`, `mid`, `mute`],
     },
     {
-      comment: `Background color of the canvas`,
+      comment: `The background color`,
       name: `bg_color`,
       value: App.bg_color,
       type: `string`,
