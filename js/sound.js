@@ -156,10 +156,10 @@ App.sound_enabled = () => {
 }
 
 App.refresh_sound_icon = () => {
-  if (App.volume === App.max_volume_level) {
+  if (App.volume === `max`) {
     App.sound_btn.textContent = `🔊`
   }
-  else if (App.volume === App.mid_volume_level) {
+  else if (App.volume === `mid`) {
     App.sound_btn.textContent = `🔉`
   }
   else {
@@ -182,7 +182,6 @@ App.setup_sound = () => {
     }
 
     if (App.storage) {
-      App.storage.volume_level = App.volume
       App.save_storage()
     }
 

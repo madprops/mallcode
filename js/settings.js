@@ -1,52 +1,55 @@
-App.settings = [
-  {
-    comment: `Max beeps when the tab is unfocused`,
-    name: `max_unfocused_beeps`,
-    value: App.max_unfocused_beeps,
-    type: `number`,
-    min: 0,
-    max: 9999,
-  },
-  {
-    comment: `Sound effect for join events`,
-    name: `join_sound`,
-    value: App.join_sound,
-    type: `boolean`,
-  },
-  {
-    comment: `Sound effect for leave events`,
-    name: `leave_sound`,
-    value: App.leave_sound,
-    type: `boolean`,
-  },
-  {
-    comment: `Enable or disable effects`,
-    name: `animation`,
-    value: true,
-    type: `boolean`,
-  },
-  {
-    comment: `Dot dash sequence type`,
-    name: `sequence`,
-    value: `above`,
-    type: `string`,
-    options: [`base`, `above`, `below`],
-  },
-  {
-    comment: `Volume level of the beeps`,
-    name: `volume`,
-    value: `max`,
-    type: `string`,
-    options: [`max`, `mid`, `mute`],
-  },
-]
+App.get_settings = () => {
+  return [
+    {
+      comment: `Max beeps when the tab is unfocused`,
+      name: `max_unfocused_beeps`,
+      value: App.max_unfocused_beeps,
+      type: `number`,
+      min: 0,
+      max: 9999,
+    },
+    {
+      comment: `Sound effect for join events`,
+      name: `join_sound`,
+      value: App.join_sound,
+      type: `boolean`,
+    },
+    {
+      comment: `Sound effect for leave events`,
+      name: `leave_sound`,
+      value: App.leave_sound,
+      type: `boolean`,
+    },
+    {
+      comment: `Enable or disable effects`,
+      name: `animation`,
+      value: true,
+      type: `boolean`,
+    },
+    {
+      comment: `Dot dash sequence type`,
+      name: `sequence`,
+      value: `above`,
+      type: `string`,
+      options: [`base`, `above`, `below`],
+    },
+    {
+      comment: `Volume level of the beeps`,
+      name: `volume`,
+      value: `max`,
+      type: `string`,
+      options: [`max`, `mid`, `mute`],
+    },
+  ]
+}
 
 App.setup_settings = () => {
   App.msg_settings = Msg.factory({
     before_show: () => {
       let text_value = ``
+      let settings = App.get_settings()
 
-      for (let setting of App.settings) {
+      for (let setting of settings) {
         text_value += `\n# ${setting.comment}\n`
 
         if (setting.options) {
@@ -100,7 +103,9 @@ App.check_save_settings = () => {
     return
   }
 
-  for (let setting of App.settings) {
+  let settings = App.get_settings()
+
+  for (let setting of settings) {
     let setting_value = parsed_toml[setting.name]
 
     if (setting_value === undefined) {
@@ -138,15 +143,16 @@ App.check_save_settings = () => {
     }
   }
 
-  for (let setting of App.settings) {
+  for (let setting of settings) {
     let setting_value = parsed_toml[setting.name]
     setting.value = setting_value
     App[setting.name] = setting_value
     App.storage[setting.name] = setting_value
   }
 
-  App.save_storage()
   App.refresh_sequence()
   App.refresh_effects_icon()
+  App.refresh_sound_icon()
+  App.save_storage()
   App.msg_settings.close()
 }

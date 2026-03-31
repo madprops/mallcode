@@ -924,6 +924,9 @@ App.load_storage = async () => {
           }
         }
 
+        App.join_sound = Boolean(App.storage.join_sound)
+        App.leave_sound = Boolean(App.storage.leave_sound)
+
         if (App.storage.max_unfocused_beeps !== undefined) {
           App.max_unfocused_beeps = App.storage.max_unfocused_beeps
         }
@@ -949,6 +952,13 @@ App.save_storage = () => {
   if (!App.db || !App.storage) {
     return
   }
+
+  App.storage.volume = App.volume
+  App.storage.animation = App.animation
+  App.storage.sequence = App.sequence
+  App.storage.max_unfocused_beeps = App.max_unfocused_beeps
+  App.storage.join_sound = App.join_sound
+  App.storage.leave_sound = App.leave_sound
 
   let tx = App.db.transaction(`store`, `readwrite`)
   let store = tx.objectStore(`store`)
@@ -1003,7 +1013,6 @@ App.cycle_seq = () => {
   }
 
   App.refresh_sequence()
-  App.storage.sequence = App.sequence
   App.save_storage()
 }
 
@@ -1272,7 +1281,6 @@ App.toggle_animation = () => {
   App.animation = !App.animation
 
   if (App.storage) {
-    App.storage.animation = App.animation
     App.save_storage()
   }
 
