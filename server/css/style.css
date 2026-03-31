@@ -145,7 +145,7 @@ body, html {
 }
 
 #zone-map {
-    width: 28px;
+    width: 32px;
     height: 28px;
     cursor: pointer;
     border-radius: 50%;
