@@ -32,6 +32,13 @@ App.settings = [
     type: `string`,
     options: [`base`, `above`, `below`],
   },
+  {
+    comment: `Volume level of the beeps`,
+    name: `volume`,
+    value: `max`,
+    type: `string`,
+    options: [`max`, `mid`, `mute`],
+  },
 ]
 
 App.setup_settings = () => {
@@ -41,6 +48,10 @@ App.setup_settings = () => {
 
       for (let setting of App.settings) {
         text_value += `\n# ${setting.comment}\n`
+
+        if (setting.options) {
+          text_value += `# ${setting.options.join(`, `)}\n`
+        }
 
         if (setting.type === `string`) {
           text_value += `${setting.name} = "${setting.value}"\n`

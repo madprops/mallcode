@@ -381,4 +381,6 @@ a.clean-link:hover {
     word-wrap: break-word;
     text-align: left;
     cursor: text;
+    overflow: auto;
+    max-height: 300px;
 }

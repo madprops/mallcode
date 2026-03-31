@@ -1,7 +1,8 @@
 App.audio_context = window.AudioContext || window.webkitAudioContext
 App.max_volume_level = 0.5
 App.mid_volume_level = 0.25
-App.volume_level = App.max_volume_level
+App.mute_volume_level = 0
+App.volume = `max`
 App.audio_started = false
 
 App.init_audio = () => {
@@ -151,14 +152,14 @@ App.play_zone_leave = () => {
 }
 
 App.sound_enabled = () => {
-  return App.volume_level > 0
+  return App.volume > 0
 }
 
 App.refresh_sound_icon = () => {
-  if (App.volume_level === App.max_volume_level) {
+  if (App.volume === App.max_volume_level) {
     App.sound_btn.textContent = `🔊`
   }
-  else if (App.volume_level === App.mid_volume_level) {
+  else if (App.volume === App.mid_volume_level) {
     App.sound_btn.textContent = `🔉`
   }
   else {
@@ -170,18 +171,18 @@ App.setup_sound = () => {
   App.refresh_sound_icon()
 
   App.sound_btn.addEventListener(`click`, () => {
-    if (App.volume_level === App.max_volume_level) {
-      App.volume_level = App.mid_volume_level
+    if (App.volume === App.max_volume_level) {
+      App.volume = `mix`
     }
-    else if (App.volume_level === App.mid_volume_level) {
-      App.volume_level = 0
+    else if (App.volume === App.mid_volume_level) {
+      App.volume = `mute`
     }
     else {
-      App.volume_level = App.max_volume_level
+      App.volume = `max`
     }
 
     if (App.storage) {
-      App.storage.volume_level = App.volume_level
+      App.storage.volume_level = App.volume
       App.save_storage()
     }
 
@@ -212,7 +213,7 @@ App.play_beep = (seed = `normal`) => {
     App.unfocused_beep_count += 1
   }
 
-  if (App.volume_level === 0) {
+  if (App.volume === `mute`) {
     return
   }
 
@@ -249,12 +250,24 @@ App.play_beep = (seed = `normal`) => {
 
   App.active_osc.frequency.setValueAtTime(start_freq, start_time)
   App.gain_node.gain.setValueAtTime(0, start_time)
-  App.gain_node.gain.linearRampToValueAtTime(App.volume_level, start_time + attack)
+  App.gain_node.gain.linearRampToValueAtTime(App.get_volume(), start_time + attack)
   App.active_osc.connect(filter)
   filter.connect(App.gain_node)
   App.gain_node.connect(App.audio_ctx.destination)
   App.active_osc.start(start_time)
   App.stop_beep_debouncer.call()
+}
+
+App.get_volume = () => {
+  if (App.volume === `max`) {
+    return App.max_volume_level
+  }
+
+  if (App.volume === `mix`) {
+    return App.mid_volume_level
+  }
+
+  return App.mute_volume_level
 }
 
 App.stop_beep = () => {
