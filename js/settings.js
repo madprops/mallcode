@@ -29,7 +29,7 @@ App.settings = [
     comment: `Dot dash sequence type`,
     name: `sequence`,
     value: `above`,
-    type: `option_string`,
+    type: `string`,
     options: [`base`, `above`, `below`],
   },
 ]
@@ -41,7 +41,13 @@ App.setup_settings = () => {
 
       for (let setting of App.settings) {
         text_value += `\n# ${setting.comment}\n`
-        text_value += `${setting.name} = ${setting.value}\n`
+
+        if (setting.type === `string`) {
+          text_value += `${setting.name} = "${setting.value}"\n`
+        }
+        else {
+          text_value += `${setting.name} = ${setting.value}\n`
+        }
       }
 
       if (App.settings_editor) {
@@ -78,6 +84,7 @@ App.check_save_settings = () => {
     parsed_toml = toml.parse(content)
   }
   catch (error) {
+    console.error(error)
     alert(`Invalid TOML format. Please check your syntax.`)
     return
   }
@@ -112,7 +119,7 @@ App.check_save_settings = () => {
         return
       }
     }
-    else if (setting.type === `option_string`) {
+    else if (setting.options) {
       if (!setting.options.includes(setting_value)) {
         alert(`'${setting.name}' must be one of ${setting.options.join(`, `)}.`)
         return
