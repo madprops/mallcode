@@ -40,7 +40,7 @@ It can be a call to gather at that specific zone for a meeting.
 
 Or it could be a codeword only members of an organized community can understand.
 
-Or it can just be random, maybe funny, meaningless manifestation of life.
+Or it can just be random, maybe funny, meaningless manifestations of life.
 
 ---
 
@@ -50,7 +50,7 @@ Banning this system would be absurd since it's banning one of the slowest and ha
 
 It can be used as an interface to access or create things.
 
-For instance, it can be programmed so that certain words or sequences open up doors, unlock computers, play messages, or any other action available.
+For instance, it can be programmed so that certain words or sequences open doors, unlock computers, play messages, or any other action available.
 
 There is already a system to register actions easily.
 
@@ -70,7 +70,7 @@ Special hardware can allow users to send morse code messages. For instance, a us
 
 ---
 
-Since time is involved, this can't be easily used for computer-to-computer communication. Computers can send messages to each other in big volumes, very quickly. But in this system they would be subjected to the same constraints humans have. So either computers would have to end behaving more human here, or there would be no computers, making it a human-mostly zone.
+Since time is involved, this can't be easily used for computer-to-computer communication. Computers can send messages to each other in big volumes, very quickly. But in this system they would be subjected to the same constraints humans have. So either computers would have to end behaving more human here, or there would be no computers, making it a human-mostly network.
 
 ---
 
@@ -84,7 +84,7 @@ Streamers and organizations could start taking over some zones, or become associ
 
 This can be connected to an `imaginarium` to build structures in zones.
 
-For instance if a user is able to write `cemetery` in `K6`, then an AI system would build a cemetery 3D structre in that zone in some sort of walkable video game, maybe a `VR` experience.
+For instance if a user is able to write `cemetery` in `K6`, then an AI system would build a cemetery 3D structure in that zone in some sort of walkable video game, maybe a `VR` experience.
 
 This allows users to have a say into what exists or what is happening in certain zones, limited by their initiative, and being able to write the words in time.
 
