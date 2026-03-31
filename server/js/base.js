@@ -813,7 +813,11 @@ App.get_theme = (zone) => {
 
 App.setup_zone_map_canvas = () => {
   App.zone_map_canvas = DOM.el(`#zone-map`)
-  if (!App.zone_map_canvas) return
+
+  if (!App.zone_map_canvas) {
+    return
+  }
+
   App.zone_map_ctx = App.zone_map_canvas.getContext(`2d`)
   App.zone_map_canvas.width = 48
   App.zone_map_canvas.height = 48
@@ -1080,12 +1084,14 @@ App.refresh_bg_color = () => {
   if (App.canvas) {
     App.canvas.style.backgroundColor = App.bg_color
   }
+
   if (App.scene) {
     try {
       App.scene.background = new THREE.Color(App.bg_color)
     }
     catch (err) {}
   }
+
   if (App.scene && App.scene.fog) {
     try {
       App.scene.fog.color.set(App.bg_color)
