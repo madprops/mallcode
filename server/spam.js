@@ -1,6 +1,6 @@
 module.exports = (App) => {
   // The bigger the number the more the anti-spam system tolerates
-  App.anti_spam_max_limit = 100
+  App.anti_spam_max_limit = 20
 
   // How much time in minutes a user is banned from the system after being detected
   // as a spammer by the automatic spam detection system
