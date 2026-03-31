@@ -120,8 +120,8 @@ App.setup_socket = () => {
     else if (data.type === `ZONE`) {
       App.on_zone(data)
     }
-    else if (data.type === `MODAL`) {
-      App.show_modal({text: data.text, pissed: data.pissed})
+    else if (data.type === `MESSAGE`) {
+      App.show_message({text: data.text, pissed: data.pissed})
     }
     else if (data.type === `USERS`) {
       App.on_users(data)
@@ -162,7 +162,7 @@ App.urlize = (text, clean = false) => {
   return text.replace(/(https?:\/\/[^\s]+)/g, `<a class="${cls}" href="$1" target="_blank">${label}</a>`)
 }
 
-App.show_modal = (args = {}) => {
+App.show_message = (args = {}) => {
   let def_args = {
     text: ``,
     html: ``,

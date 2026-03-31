@@ -33,23 +33,13 @@ body, html {
     display: block;
 }
 
-#Msg-content-message {
-    padding: 0 !important;
-}
-
 #message-container {
-    background: linear-gradient(135deg, #111118, #1a1a2e);
     color: #00ffcc;
-    padding: 20px 20px;
     overflow-y: auto;
     position: relative;
     font-size: 18px;
     font-weight: bold;
-    text-shadow: 0 0 5px rgba(0, 255, 204, 0.5);
     text-align: center;
-    border: 2px solid #00ffcc;
-    box-shadow: 0 0 20px rgba(0, 255, 204, 0.2), inset 0 0 15px rgba(0, 255, 204, 0.1);
-    animation: subtlePulse 3s infinite alternate ease-in-out;
 }
 
 .pissed {
@@ -372,6 +362,7 @@ a.clean-link:hover {
 .Msg-content {
     background: linear-gradient(135deg, #111118, #1a1a2e) !important;
     color: #00ffcc !important;
+    border: 1px solid #00ffcc !important;
 }
 
 #settings-container {

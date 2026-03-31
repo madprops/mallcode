@@ -810,7 +810,7 @@ App.force_release = (ws, zone) => {
 
 App.send_message = (ws, text, pissed = false) => {
   ws.send(JSON.stringify({
-    type: `MODAL`,
+    type: `MESSAGE`,
     text,
     pissed,
   }))
