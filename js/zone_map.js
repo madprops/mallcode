@@ -1,5 +1,26 @@
 App.zone_refresh_delay = 10
 
+App.update_zone_map_styles = () => {
+  let c = DOM.el(`#zone-map-container`)
+
+  if (!c) {
+    return
+  }
+
+  let current_time = Date.now()
+  let btns = DOM.els(`.zone-map-btn`, c)
+
+  for (let btn of btns) {
+    let zone = btn.dataset.zone
+    let style = App.get_zone_styling(zone, current_time)
+
+    btn.className = style.cls
+    btn.style.color = style.color
+    btn.style.backgroundColor = style.bg
+    btn.style.borderColor = style.border
+  }
+}
+
 App.setup_zone_map = () => {
   App.msg_zone_map = Msg.factory()
   let template = DOM.el(`#zone-map-template`)
@@ -65,18 +86,7 @@ App.setup_zone_map = () => {
   DOM.ev(grid_el, `touchmove`, move_drag, {passive: false})
 
   App.zone_refresh_interval = setInterval(() => {
-    let current_time = Date.now()
-    let btns = DOM.els(`.zone-map-btn`, c)
-
-    for (let btn of btns) {
-      let zone = btn.dataset.zone
-      let style = App.get_zone_styling(zone, current_time)
-
-      btn.className = style.cls
-      btn.style.color = style.color
-      btn.style.backgroundColor = style.bg
-      btn.style.borderColor = style.border
-    }
+    App.show_zone_map()
   }, App.zone_refresh_delay * 1000)
 
   DOM.ev(c, `click`, (e) => {
@@ -114,10 +124,6 @@ App.setup_zone_map = () => {
       active_btn.scrollIntoView({behavior: `instant`, block: `center`, inline: `center`})
     }
   }, 10)
-
-  if (App.zone_refresh_interval) {
-    clearInterval(App.zone_refresh_interval)
-  }
 }
 
 App.show_zone_map = () => {
@@ -147,31 +153,34 @@ App.get_zone_styling = (zone, current_time) => {
   let colors = App.get_zone_colors(info.last_activity, current_time)
   let is_current = zone === App.zone
   let is_populated = info.user_count > 0
-
   let cls = `zone-map-btn`
-  let border = colors.color
 
   if (is_current) {
     cls += ` zone-map-current`
-    border = `#00aaff`
   }
   else if (is_populated) {
     cls += ` zone-map-populated`
-    border = `#ffaa00`
   }
 
-  return {color: colors.color, bg: colors.bg, border: border, cls: cls}
+  return {color: colors.color, bg: colors.bg, cls}
 }
 
 App.get_zone_btn_html = (zone, current_time) => {
   let style = App.get_zone_styling(zone, current_time)
-  return `<button class="${style.cls}" data-zone="${zone}" style="color: ${style.color}; background-color: ${style.bg}; border-color: ${style.border}">${zone}</button>`
+  return `<button class="${style.cls}" data-zone="${zone}" style="color: ${style.color}; background-color: ${style.bg};">${zone}</button>`
 }
 
 App.build_zone_selector = (zones_info) => {
+  App.zones_info = zones_info
+
+  if (App.msg_zone_map.is_open()) {
+    App.update_zone_map_styles()
+    return
+  }
+
   let html = ``
   let now = Date.now()
-  App.zones_info = zones_info
+  let grid = DOM.el(`#zone-map-grid`)
 
   if (App.sekrit_zones.size > 0) {
     let sorted_sekrits = Array.from(App.sekrit_zones).sort()
@@ -193,6 +202,6 @@ App.build_zone_selector = (zones_info) => {
     }
   }
 
-  DOM.el(`#zone-map-grid`).innerHTML = html
+  grid.innerHTML = html
   App.msg_zone_map.show()
 }

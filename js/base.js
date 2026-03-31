@@ -256,7 +256,7 @@ App.setup_canvas = () => {
   App.scene.fog = new THREE.FogExp2(0x020208, 0.0015)
   App.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000)
   App.camera.position.z = 40
-  App.clock = new THREE.Clock()
+  App.clock = new THREE.Timer()
   App.particles_geometry = new THREE.BufferGeometry()
   let particles_count = 3000
   let pos_array = new Float32Array(particles_count * 3)
@@ -303,7 +303,6 @@ App.create_text_texture = (text, is_word = false, is_sequence = false, force_wor
     let dash_width = dot_diameter * 2
     let dash_height = dot_diameter * 0.9
     let spacing = dot_diameter
-
     let total_width = 0
 
     if (text.length > 0) {
@@ -321,7 +320,6 @@ App.create_text_texture = (text, is_word = false, is_sequence = false, force_wor
 
     let current_x = (text_canvas.width - total_width) / 2
     let center_y = text_canvas.height / 2
-
     let dash_y_offset = 0
     let offset = dot_radius * 1.5
 

@@ -177,8 +177,7 @@ body, html {
 }
 
 .zone-map-populated {
-    border-color: #ffaa00 !important;
-    border-width: 2px !important;
+    border-color: #00ffe1 !important;
 }
 
 #zone-map-grid::-webkit-scrollbar {
