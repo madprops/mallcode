@@ -325,6 +325,13 @@ a.clean-link:hover {
 #updates {
     color: white;
     font-size: 18px;
+    max-height: 50vh;
+    overflow: auto;
+    scrollbar-width: none;
+}
+
+#updates::-webkit-scrollbar {
+    display: none;
 }
 
 #settings-container {
