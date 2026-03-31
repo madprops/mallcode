@@ -171,10 +171,10 @@ App.setup_sound = () => {
   App.refresh_sound_icon()
 
   App.sound_btn.addEventListener(`click`, () => {
-    if (App.volume === App.max_volume_level) {
-      App.volume = `max`
+    if (App.volume === `max`) {
+      App.volume = `mid`
     }
-    else if (App.volume === App.mid_volume_level) {
+    else if (App.volume === `mid`) {
       App.volume = `mute`
     }
     else {
@@ -262,7 +262,7 @@ App.get_volume = () => {
     return App.max_volume_level
   }
 
-  if (App.volume === `max`) {
+  if (App.volume === `mid`) {
     return App.mid_volume_level
   }
 
