@@ -18,7 +18,7 @@ So `Mall Code` allows gauging cognitive abilities while simply engaging in commu
 
 For instance you might want to sign your message with a nice name like:
 
-![](img/mad.png)
+![](server/img/mad.png)
 
 ---
 
@@ -32,7 +32,7 @@ Connecting this to a social media system, like `Bluesky`, allows users to broadc
 
 Not all words are broadcasted, to avoid allowing users from sending problematic words, instead some words are manually whitelisted by adding them to a text file.
 
-![](img/posts_2.png)
+![](server/img/posts_2.png)
 
 The posts have 2 components to consider, the code word, and the zone.
 
@@ -122,7 +122,7 @@ These will remain unlocked and available at the `Zone Map`.
 
 It provides discoverability and the creation of small communities.
 
-![](img/zones.png)
+![](server/img/zones.png)
 
 ---
 

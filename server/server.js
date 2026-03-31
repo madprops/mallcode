@@ -192,7 +192,7 @@ App.setup_server = () => {
   App.app.use(App.express.static(__dirname))
 
   App.app.get(`/`, (req, res) => {
-    res.sendFile(path.join(__dirname, `index.html`))
+    res.sendFile(path.join(__dirname, `./index.html`))
   })
 }
 

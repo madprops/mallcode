@@ -1,4 +1,4 @@
-![](img/image.jpg)
+![](server/img/image.jpg)
 
 This is a Morse Code MMO.
 
@@ -72,7 +72,7 @@ This means you could use this as a semi-secure interface to access or trigger th
 
 Mall Code can post automatically to `Bluesky`:
 
-![](img/posts.png)
+![](server/img/posts.png)
 
 To do this, simply create `post_words.txt` and add words to it.
 
