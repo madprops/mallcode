@@ -441,7 +441,6 @@ App.trigger_down = (is_local = true) => {
   }
 
   App.particle_mesh.material.size = 0.5
-  App.init_audio()
   clearTimeout(App.max_press_timeout)
 
   App.max_press_timeout = setTimeout(() => {
@@ -652,6 +651,10 @@ App.setup_events = () => {
   DOM.ev(App.canvas, `contextmenu`, (e) => {
     e.preventDefault()
     App.handle_press(e)
+  })
+
+  DOM.ev(document.documentElement, `click`, () => {
+    App.init_audio()
   })
 
   DOM.ev(App.canvas, `mousedown`, App.handle_press)
