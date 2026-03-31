@@ -31,8 +31,9 @@ App.setup_settings = () => {
         text_value += `${setting.name} = ${setting.value}\n`
       }
 
-      let text = DOM.el(`#settings-textarea`)
-      text.value = text_value.trim()
+      if (App.settings_editor) {
+        App.settings_editor.updateCode(text_value.trim())
+      }
     },
   })
 
@@ -40,6 +41,14 @@ App.setup_settings = () => {
   let clone = template.content.cloneNode(true)
   let c = DOM.el(`#settings-container`, clone)
   let btn = DOM.el(`#save-settings-btn`, clone)
+  let editor_el = DOM.el(`#settings-editor`, clone)
+
+  let highlight_fn = (editor) => {
+    let code = editor.textContent
+    editor.innerHTML = Prism.highlight(code, Prism.languages.toml, `toml`)
+  }
+
+  App.settings_editor = CodeJar(editor_el, highlight_fn)
   DOM.ev(btn, `click`, App.check_save_settings)
   App.msg_settings.set(c)
 }
@@ -49,8 +58,7 @@ App.show_settings = () => {
 }
 
 App.check_save_settings = () => {
-  let textarea = DOM.el(`#settings-textarea`)
-  let content = textarea.value
+  let content = App.settings_editor.toString()
   let parsed_toml = {}
 
   try {
