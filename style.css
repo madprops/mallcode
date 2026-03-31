@@ -291,7 +291,7 @@ a.clean-link:hover {
     position: absolute;
     bottom: var(--hud_top);
     right: var(--hud_side);
-    z-index: 100;
+    z-index: 10;
     color: white;
 }
 
