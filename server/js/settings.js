@@ -1,12 +1,11 @@
 App.get_settings = () => {
   return [
     {
-      comment: `Max beeps when unfocused`,
-      name: `max_unfocused_beeps`,
-      value: App.max_unfocused_beeps,
-      type: `number`,
-      min: 0,
-      max: 9999,
+      comment: `Volume level of the beeps`,
+      name: `volume`,
+      value: App.volume,
+      type: `string`,
+      options: [`max`, `mid`, `mute`],
     },
     {
       comment: `Sound effect for join events`,
@@ -21,6 +20,20 @@ App.get_settings = () => {
       type: `boolean`,
     },
     {
+      comment: `Max beeps when unfocused`,
+      name: `max_unfocused_beeps`,
+      value: App.max_unfocused_beeps,
+      type: `number`,
+      min: 0,
+      max: 9999,
+    },
+    {
+      comment: `The background color`,
+      name: `bg_color`,
+      value: App.bg_color,
+      type: `string`,
+    },
+    {
       comment: `Enable or disable effects`,
       name: `animation`,
       value: App.animation,
@@ -32,19 +45,6 @@ App.get_settings = () => {
       value: App.sequence,
       type: `string`,
       options: [`base`, `above`, `below`],
-    },
-    {
-      comment: `Volume level of the beeps`,
-      name: `volume`,
-      value: App.volume,
-      type: `string`,
-      options: [`max`, `mid`, `mute`],
-    },
-    {
-      comment: `The background color`,
-      name: `bg_color`,
-      value: App.bg_color,
-      type: `string`,
     },
   ]
 }
