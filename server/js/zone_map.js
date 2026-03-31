@@ -37,6 +37,7 @@ App.setup_zone_map = () => {
     },
     after_close: () => {
       clearInterval(App.zone_refresh_interval)
+      App.zone_map_updates = 0
     },
   })
 
