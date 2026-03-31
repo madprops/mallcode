@@ -1,13 +1,12 @@
 module.exports = (App) => {
-  // The bigger the number the more the anti-spam system tolerates
-  App.anti_spam_max_limit = 100
+  // Allows up to 300 messages in a rapid burst
+  App.anti_spam_max_limit = 300
 
-  // How much time in minutes a user is banned from the system after being detected
-  // as a spammer by the automatic spam detection system
-  App.anti_spam_ban_duration = 60
+  // 10 minutes is safer for false positives
+  App.anti_spam_ban_duration = 10
 
-  // Checks connections every x ms to unban and reduce levels
-  App.anti_spam_check_delay = 1200
+  // Checks connections every 1 second
+  App.anti_spam_check_delay = 1000
 
   App.start_anti_spam = () => {
     App.anti_spam_users = {}
@@ -34,7 +33,11 @@ module.exports = (App) => {
         }
       }
       else if (user.level > 0) {
-        user.level -= 1
+        user.level -= 70
+
+        if (user.level < 0) {
+          user.level = 0
+        }
       }
     }
 
