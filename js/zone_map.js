@@ -22,7 +22,12 @@ App.update_zone_map_styles = () => {
 }
 
 App.setup_zone_map = () => {
-  App.msg_zone_map = Msg.factory()
+  App.msg_zone_map = Msg.factory({
+    after_close: () => {
+      clearInterval(App.zone_refresh_interval)
+    },
+  })
+
   let template = DOM.el(`#zone-map-template`)
   let clone = template.content.cloneNode(true)
   let c = DOM.el(`#zone-map-container`, clone)

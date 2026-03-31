@@ -28,6 +28,7 @@ App.enable_zone_words = true
 App.sekrit_delay = 60
 App.user_sekrits = {}
 App.max_connections_per_ip = 3
+App.max_info_per_minute = 10
 
 App.get_version = () => {
   try {
@@ -570,6 +571,7 @@ App.prepare_ws = (ws, req) => {
 
   ws.unit_duration = null
   ws.penalty_expires = App.blocked_ips[ws.ip] || 0
+  ws.get_zones_timestamps = []
   return true
 }
 
@@ -587,6 +589,14 @@ App.on_restore_zone = (ws, data) => {
 }
 
 App.on_get_zones = (ws, data) => {
+  let now = Date.now()
+  ws.get_zones_timestamps = ws.get_zones_timestamps.filter(t => (now - t) < 60000)
+
+  if (ws.get_zones_timestamps.length >= App.max_info_per_minute) {
+    return
+  }
+
+  ws.get_zones_timestamps.push(now)
   let zones_info = {}
 
   for (let z in App.zone_data) {
