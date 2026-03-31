@@ -172,7 +172,7 @@ App.setup_sound = () => {
 
   App.sound_btn.addEventListener(`click`, () => {
     if (App.volume === App.max_volume_level) {
-      App.volume = `mix`
+      App.volume = `max`
     }
     else if (App.volume === App.mid_volume_level) {
       App.volume = `mute`
@@ -262,7 +262,7 @@ App.get_volume = () => {
     return App.max_volume_level
   }
 
-  if (App.volume === `mix`) {
+  if (App.volume === `max`) {
     return App.mid_volume_level
   }
 
