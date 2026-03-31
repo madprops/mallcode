@@ -43,7 +43,7 @@ App.animation = true
 App.ls_storage = `mallcode_v1`
 App.font_string = `noto_font, system-ui, sans-serif`
 App.words = []
-App.seq = 1
+App.seq = 2
 App.current_letters = []
 App.sekrit_zones = new Set()
 
