@@ -22,12 +22,11 @@ App.setup_settings = () => {
   })
 
   let template = DOM.el(`#settings-template`)
-
-  if (template) {
-    let clone = template.content.cloneNode(true)
-    let c = DOM.el(`#settings-container`, clone)
-    App.msg_settings.set(c)
-  }
+  let clone = template.content.cloneNode(true)
+  let c = DOM.el(`#settings-container`, clone)
+  let btn = DOM.el(`#save-settings-btn`, clone)
+  DOM.ev(btn, `click`, App.check_save_settings)
+  App.msg_settings.set(c)
 }
 
 App.show_settings = () => {
@@ -46,11 +45,13 @@ App.check_save_settings = () => {
       App.max_unfocused_beeps = value
       App.storage.max_unfocused_beeps = value
       App.save_storage()
-      App.hide_modal()
-    } else {
+      App.msg_settings.close()
+    }
+    else {
       alert(`'max_unfocused_beeps' must be a number between 0 and 9999.`)
     }
-  } else {
+  }
+  else {
     alert(`Invalid format for 'max_unfocused_beeps'. Expected 'max_unfocused_beeps = 5'.`)
   }
 }

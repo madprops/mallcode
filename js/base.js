@@ -12,7 +12,6 @@ App.zone_name_el = DOM.el(`#zone-name`)
 App.zone_dials_el = DOM.el(`#zone-dials`)
 App.sound_btn = DOM.el(`#sound-toggle`)
 App.overlay_el = DOM.el(`#modal-overlay`)
-App.modal_el = DOM.el(`#modal-content`)
 App.words_container_el = DOM.el(`#words-container`)
 App.seq_el = DOM.el(`#seq-btn`)
 App.updates_el = DOM.el(`#updates`)
@@ -34,7 +33,6 @@ App.reconnect_delay = 5 * 1000
 App.beep_delay = 10
 App.stop_beep_delay = 1 * 1000
 App.updates_duration = 60 * 1000
-App.modal_open = false
 App.moving = false
 App.current_user = ``
 App.username = ``
@@ -176,9 +174,6 @@ App.show_modal = (args = {}) => {
     App.handle_release(null, true)
   }
 
-  DOM.show(App.overlay_el)
-  App.modal_open = true
-
   let content = ``
 
   if (args.text) {
@@ -203,11 +198,8 @@ App.show_modal = (args = {}) => {
     container.classList.remove(`pissed`)
     container.innerHTML = content
   }
-}
 
-App.hide_modal = () => {
-  DOM.hide(App.overlay_el)
-  App.modal_open = false
+  App.msg_message.show()
 }
 
 App.update_words_display = (words) => {
@@ -528,7 +520,7 @@ App.iambic_loop = () => {
 }
 
 App.handle_press = (e, is_local = true) => {
-  if (App.moving || App.modal_open) {
+  if (App.moving || App.modal_open()) {
     return
   }
 
@@ -604,7 +596,7 @@ App.handle_press = (e, is_local = true) => {
 }
 
 App.handle_release = (e, is_local = true) => {
-  if (App.moving || App.modal_open) {
+  if (App.moving || App.modal_open()) {
     return
   }
 
@@ -701,12 +693,6 @@ App.setup_events = () => {
 
   DOM.ev(`#settings`, `click`, () => {
     App.show_settings()
-  })
-
-  DOM.ev(`#modal-overlay`, `click`, (e) => {
-    if (e.target.id === `modal-overlay`) {
-      App.hide_modal()
-    }
   })
 
   DOM.ev(`#animate-toggle`, `click`, () => {
@@ -1276,9 +1262,23 @@ App.show_about = () => {
   App.msg_about.show()
 }
 
+App.modal_open = () => {
+  return App.msg_about.any_open()
+}
+
+App.setup_msg_message = () => {
+  App.msg_message = Msg.factory({id: `message`})
+  let template = DOM.el(`#message-template`)
+  let clone = template.content.cloneNode(true)
+  let c = DOM.el(`#message-container`, clone)
+  App.modal_el = c
+  App.msg_message.set(c)
+}
+
 App.init = async () => {
   await App.load_storage()
   App.create_debouncers()
+  App.setup_msg_message()
   App.setup_about()
   App.setup_zone_map()
   App.setup_settings()

@@ -33,26 +33,14 @@ body, html {
     display: block;
 }
 
-#modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(2, 2, 8, 0.85);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-    backdrop-filter: blur(4px);
+#Msg-content-message {
+    padding: 0 !important;
 }
 
-#modal-content {
+#message-container {
     background: linear-gradient(135deg, #111118, #1a1a2e);
     color: #00ffcc;
     padding: 20px 20px;
-    max-width: 70%;
-    max-height: 80%;
     overflow-y: auto;
     position: relative;
     font-size: 18px;
