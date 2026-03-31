@@ -1,5 +1,7 @@
 App.audio_context = window.AudioContext || window.webkitAudioContext
-App.volume_level = 0.5
+App.max_volume_level = 0.5
+App.mid_volume_level = 0.25
+App.volume_level = App.max_volume_level
 App.audio_started = false
 
 App.init_audio = () => {
@@ -153,10 +155,10 @@ App.sound_enabled = () => {
 }
 
 App.refresh_sound_icon = () => {
-  if (App.volume_level === 0.5) {
+  if (App.volume_level === App.max_volume_level) {
     App.sound_btn.textContent = `🔊`
   }
-  else if (App.volume_level === 0.25) {
+  else if (App.volume_level === App.mid_volume_level) {
     App.sound_btn.textContent = `🔉`
   }
   else {
@@ -168,14 +170,14 @@ App.setup_sound = () => {
   App.refresh_sound_icon()
 
   App.sound_btn.addEventListener(`click`, () => {
-    if (App.volume_level === 0.5) {
-      App.volume_level = 0.25
+    if (App.volume_level === App.max_volume_level) {
+      App.volume_level = App.mid_volume_level
     }
-    else if (App.volume_level === 0.25) {
+    else if (App.volume_level === App.mid_volume_level) {
       App.volume_level = 0
     }
     else {
-      App.volume_level = 0.5
+      App.volume_level = App.max_volume_level
     }
 
     if (App.storage) {

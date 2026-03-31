@@ -19,6 +19,19 @@ App.settings = [
     value: App.leave_sound,
     type: `boolean`,
   },
+  {
+    comment: `Enable or disable effects`,
+    name: `animation`,
+    value: true,
+    type: `boolean`,
+  },
+  {
+    comment: `Dot dash sequence type`,
+    name: `sequence`,
+    value: `above`,
+    type: `option_string`,
+    options: [`base`, `above`, `below`],
+  },
 ]
 
 App.setup_settings = () => {
@@ -99,6 +112,12 @@ App.check_save_settings = () => {
         return
       }
     }
+    else if (setting.type === `option_string`) {
+      if (!setting.options.includes(setting_value)) {
+        alert(`'${setting.name}' must be one of ${setting.options.join(`, `)}.`)
+        return
+      }
+    }
   }
 
   for (let setting of App.settings) {
@@ -109,5 +128,7 @@ App.check_save_settings = () => {
   }
 
   App.save_storage()
+  App.refresh_sequence()
+  App.refresh_effects_icon()
   App.msg_settings.close()
 }

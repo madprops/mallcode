@@ -305,6 +305,10 @@ Shared.is_public_zone = (zone) => {
   return /^[A-Z][1-9]$/i.test(zone)
 }
 
+Shared.capitalize = (s) => {
+  return s.charAt(0).toUpperCase() + s.slice(1)
+}
+
 if ((typeof module !== `undefined`) && module.exports) {
   module.exports = Shared
 }

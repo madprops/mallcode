@@ -12,7 +12,7 @@ App.zone_name_el = DOM.el(`#zone-name`)
 App.zone_dials_el = DOM.el(`#zone-dials`)
 App.sound_btn = DOM.el(`#sound-toggle`)
 App.words_container_el = DOM.el(`#words-container`)
-App.seq_el = DOM.el(`#seq-btn`)
+App.sequence_el = DOM.el(`#seq-btn`)
 App.updates_el = DOM.el(`#updates`)
 App.protocol = window.location.protocol === `https:` ? `wss:` : `ws:`
 App.is_pressed = false
@@ -43,7 +43,7 @@ App.animation = true
 App.ls_storage = `mallcode_v1`
 App.font_string = `noto_font, system-ui, sans-serif`
 App.words = []
-App.seq = 2
+App.sequence = `above`
 App.current_letters = []
 App.sekrit_zones = new Set()
 App.repo = `github.com/madprops/mallcode`
@@ -325,10 +325,10 @@ App.create_text_texture = (text, is_word = false, is_sequence = false, force_wor
     let dash_y_offset = 0
     let offset = dot_radius * 1.5
 
-    if (App.seq === 2) {
+    if (App.sequence === `above`) {
       dash_y_offset = -offset
     }
-    else if (App.seq === 3) {
+    else if (App.sequence === `below`) {
       dash_y_offset = offset
     }
 
@@ -700,21 +700,10 @@ App.setup_events = () => {
   })
 
   DOM.ev(`#animate-toggle`, `click`, () => {
-    App.animation = !App.animation
-
-    if (App.storage) {
-      App.storage.animation = App.animation
-      App.save_storage()
-    }
-
-    if (App.particle_mesh) {
-      App.particle_mesh.visible = App.animation
-    }
-
-    App.refresh_effects_icon()
+    App.toggle_animation()
   })
 
-  DOM.ev(App.seq_el, `click`, () => {
+  DOM.ev(App.sequence_el, `click`, () => {
     App.cycle_seq()
   })
 
@@ -916,15 +905,23 @@ App.load_storage = async () => {
         App.storage = get_req.result || {}
 
         if (App.storage.volume_level !== undefined) {
-          App.volume_level = App.storage.volume_level
+          App.volume_level = parseInt(App.storage.volume_level)
+
+          if (isNaN(App.volume_level)) {
+            App.volume_level = App.max_volume_level
+          }
         }
 
         if (App.storage.animation !== undefined) {
-          App.animation = App.storage.animation
+          App.animation = Boolean(App.storage.animation)
         }
 
         if (App.storage.sequence !== undefined) {
-          App.seq = App.storage.sequence
+          App.sequence = App.storage.sequence
+
+          if (![`base`, `above`, `below`].includes(App.sequence)) {
+            App.sequence = `above`
+          }
         }
 
         if (App.storage.max_unfocused_beeps !== undefined) {
@@ -995,31 +992,23 @@ App.refresh_effects_icon = () => {
 }
 
 App.cycle_seq = () => {
-  if (App.seq === 1) {
-    App.seq = 2
+  if (App.sequence === `base`) {
+    App.sequence = `above`
   }
-  else if (App.seq === 2) {
-    App.seq = 3
+  else if (App.sequence === `above`) {
+    App.sequence = `below`
   }
-  else if (App.seq === 3) {
-    App.seq = 1
+  else if (App.sequence === `below`) {
+    App.sequence = `base`
   }
 
-  App.refresh_seq()
-  App.storage.sequence = App.seq
+  App.refresh_sequence()
+  App.storage.sequence = App.sequence
   App.save_storage()
 }
 
-App.refresh_seq = () => {
-  if (App.seq === 1) {
-    App.seq_el.textContent = `Base`
-  }
-  else if (App.seq === 2) {
-    App.seq_el.textContent = `Above`
-  }
-  else if (App.seq === 3) {
-    App.seq_el.textContent = `Below`
-  }
+App.refresh_sequence = () => {
+  App.sequence_el.textContent = Shared.capitalize(App.sequence)
 }
 
 App.show_update = (msg) => {
@@ -1279,6 +1268,21 @@ App.setup_msg_message = () => {
   App.msg_message.set(c)
 }
 
+App.toggle_animation = () => {
+  App.animation = !App.animation
+
+  if (App.storage) {
+    App.storage.animation = App.animation
+    App.save_storage()
+  }
+
+  if (App.particle_mesh) {
+    App.particle_mesh.visible = App.animation
+  }
+
+  App.refresh_effects_icon()
+}
+
 App.init = async () => {
   await App.load_storage()
   App.create_debouncers()
@@ -1298,5 +1302,5 @@ App.init = async () => {
   App.setup_socket()
   App.hide_cover()
   App.refresh_effects_icon()
-  App.refresh_seq()
+  App.refresh_sequence()
 }
