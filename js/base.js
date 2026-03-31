@@ -904,10 +904,10 @@ App.load_storage = async () => {
       get_req.onsuccess = () => {
         App.storage = get_req.result || {}
 
-        if (App.storage.volume_level !== undefined) {
-          App.volume = App.storage.volume_level
+        if (App.storage.volume !== undefined) {
+          App.volume = App.storage.volume
 
-          if ([`max`, `mid`, `mute`]) {
+          if (![`max`, `mid`, `mute`].includes(App.volume)) {
             App.volume = `max`
           }
         }
