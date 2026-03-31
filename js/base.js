@@ -39,6 +39,8 @@ App.moving = false
 App.current_user = ``
 App.username = ``
 App.focused = !document.hidden
+App.unfocused_beep_count = 0
+App.max_unfocused_beeps = 5
 App.version = `0.0.0`
 App.animation = true
 App.ls_storage = `mallcode_v1`
@@ -732,10 +734,14 @@ App.setup_events = () => {
   document.addEventListener(`visibilitychange`, () => {
     App.focused = !document.hidden
 
-    if (App.focused && App.audio_ctx) {
-      App.audio_ctx.resume()
+    if (App.focused) {
+      if (App.audio_ctx) {
+        App.audio_ctx.resume()
+      }
+
+      App.unfocused_beep_count = 0
     }
-    else if (!App.focused) {
+    else {
       App.stop_beep()
     }
   })

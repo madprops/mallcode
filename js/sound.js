@@ -198,8 +198,16 @@ App.play_beep = (seed = `normal`) => {
     App.stop_beep()
   }
 
-  if (!App.audio_started || !App.focused) {
+  if (!App.audio_started) {
     return
+  }
+
+  if (!App.focused) {
+    if (App.unfocused_beep_count >= App.max_unfocused_beeps) {
+      return
+    }
+
+    App.unfocused_beep_count += 1
   }
 
   if (App.volume_level === 0) {
