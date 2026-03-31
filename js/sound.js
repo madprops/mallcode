@@ -152,7 +152,7 @@ App.play_zone_leave = () => {
 }
 
 App.sound_enabled = () => {
-  return App.volume > 0
+  return App.volume !== `mute`
 }
 
 App.refresh_sound_icon = () => {
