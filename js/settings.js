@@ -7,6 +7,18 @@ App.settings = [
     min: 0,
     max: 9999,
   },
+  {
+    comment: `Sound effect for join events`,
+    name: `join_sound`,
+    value: App.join_sound,
+    type: `boolean`,
+  },
+  {
+    comment: `Sound effect for leave events`,
+    name: `leave_sound`,
+    value: App.leave_sound,
+    type: `boolean`,
+  },
 ]
 
 App.setup_settings = () => {
@@ -15,12 +27,12 @@ App.setup_settings = () => {
       let text_value = ``
 
       for (let setting of App.settings) {
-        text_value += `# ${setting.comment}\n`
+        text_value += `\n# ${setting.comment}\n`
         text_value += `${setting.name} = ${setting.value}\n`
       }
 
       let text = DOM.el(`#settings-textarea`)
-      text.value = text_value
+      text.value = text_value.trim()
     },
   })
 
@@ -70,6 +82,12 @@ App.check_save_settings = () => {
 
       if ((setting.max !== undefined) && (setting_value > setting.max)) {
         alert(`'${setting.name}' must be at most ${setting.max}.`)
+        return
+      }
+    }
+    else if (setting.type === `boolean`) {
+      if ((setting_value !== true) && (setting_value !== false)) {
+        alert(`'${setting.name}' must be a boolean.`)
         return
       }
     }

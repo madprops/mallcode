@@ -5,7 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Mall Code</title>
         <link rel="shortcut icon" href="img/favicon.png" type="image/x-icon">
-        <link rel="stylesheet" href="style.css">
+        <link href="css/tomorrow.css" rel="stylesheet">
+        <link rel="stylesheet" href="css/style.css">
     </head>
 
     <body>
@@ -72,7 +73,7 @@
 
         <template id="settings-template">
             <div id="settings-container">
-                <textarea id="settings-textarea" rows="10"></textarea>
+                <div id="settings-editor" class="language-toml"></div>
                 <button id="save-settings-btn" class="modal-btn">Save</button>
             </div>
         </template>
@@ -89,10 +90,12 @@
         </template>
 
         <canvas id="glcanvas"></canvas>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-        <script src="js/dom.js"></script>
-        <script src="js/msg.js"></script>
-        <script src="js/smol-toml.js"></script>
+        <script src="js/libs/three.js"></script>
+        <script src="js/libs/dom.js"></script>
+        <script src="js/libs/msg.js"></script>
+        <script src="js/libs/smol-toml.js"></script>
+        <script src="js/libs/codejar.js"></script>
+        <script src="js/libs/prism.js"></script>
         <script src="js/shared.js"></script>
         <script src="js/base.js"></script>
         <script src="js/zone_map.js"></script>

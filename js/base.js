@@ -47,6 +47,8 @@ App.seq = 2
 App.current_letters = []
 App.sekrit_zones = new Set()
 App.repo = `github.com/madprops/mallcode`
+App.join_sound = true
+App.leave_sound = true
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {

@@ -366,3 +366,15 @@ a.clean-link:hover {
     background: linear-gradient(135deg, #111118, #1a1a2e) !important;
     color: #00ffcc !important;
 }
+
+#settings-editor {
+    font-family: monospace;
+    min-height: 200px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    background: #272822;
+    color: #f8f8f2;
+    outline: none;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
