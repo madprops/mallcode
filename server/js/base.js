@@ -256,7 +256,7 @@ App.setup_canvas = () => {
   App.scene.fog = new THREE.FogExp2(0x020208, 0.0015)
   App.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000)
   App.camera.position.z = 40
-  App.clock = new THREE.Clock()
+  App.timer = new THREE.Timer()
   App.particles_geometry = new THREE.BufferGeometry()
   let particles_count = 3000
   let pos_array = new Float32Array(particles_count * 3)
@@ -733,11 +733,16 @@ App.setup_events = () => {
 
 App.animate = () => {
   requestAnimationFrame(App.animate)
-  let delta = App.clock.getDelta()
+  // Call update before getting delta
+  App.timer.update()
+  let delta = App.timer.getDelta()
 
   if (App.animation) {
     App.particle_mesh.rotation.y += 0.02 * delta
     App.particle_mesh.rotation.x += 0.01 * delta
+  }
+  else {
+    App.camera.position.z = 40
   }
 
   let target_z = App.is_pressed ? 35 : 40
