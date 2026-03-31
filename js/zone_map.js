@@ -64,25 +64,18 @@ App.setup_zone_map = () => {
   DOM.ev(grid_el, `touchcancel`, end_drag)
   DOM.ev(grid_el, `touchmove`, move_drag, {passive: false})
 
-  let btns = DOM.els(`.zone-map-btn`, c)
-
   App.zone_refresh_interval = setInterval(() => {
     let current_time = Date.now()
+    let btns = DOM.els(`.zone-map-btn`, c)
 
     for (let btn of btns) {
       let zone = btn.dataset.zone
-      let info = App.zones_info[zone] || {last_activity: 0}
-      let colors = App.get_zone_colors(info.last_activity, current_time)
-      btn.style.color = colors.color
-      btn.style.backgroundColor = colors.bg
-      let is_current = zone === App.zone
+      let style = App.get_zone_styling(zone, current_time)
 
-      if (is_current) {
-        btn.classList.add(`zone-map-current`)
-      }
-      else {
-        btn.classList.remove(`zone-map-current`)
-      }
+      btn.className = style.cls
+      btn.style.color = style.color
+      btn.style.backgroundColor = style.bg
+      btn.style.borderColor = style.border
     }
   }, App.zone_refresh_delay * 1000)
 
@@ -142,11 +135,37 @@ App.get_zone_colors = (last_activity, current_time) => {
     activity = Math.max(0, 1 - fraction_of_hour)
   }
 
-  let hue = Math.round(120 - activity * 120)
+  let hue = Math.round(120 - (activity * 120))
   let color = `hsl(${hue}, 100%, 60%)`
   let bg = `hsl(${hue}, 50%, 15%)`
 
   return {color, bg}
+}
+
+App.get_zone_styling = (zone, current_time) => {
+  let info = App.zones_info[zone] || {last_activity: 0, user_count: 0}
+  let colors = App.get_zone_colors(info.last_activity, current_time)
+  let is_current = zone === App.zone
+  let is_populated = info.user_count > 0
+
+  let cls = `zone-map-btn`
+  let border = colors.color
+
+  if (is_current) {
+    cls += ` zone-map-current`
+    border = `#00aaff`
+  }
+  else if (is_populated) {
+    cls += ` zone-map-populated`
+    border = `#ffaa00`
+  }
+
+  return {color: colors.color, bg: colors.bg, border: border, cls: cls}
+}
+
+App.get_zone_btn_html = (zone, current_time) => {
+  let style = App.get_zone_styling(zone, current_time)
+  return `<button class="${style.cls}" data-zone="${zone}" style="color: ${style.color}; background-color: ${style.bg}; border-color: ${style.border}">${zone}</button>`
 }
 
 App.build_zone_selector = (zones_info) => {
@@ -155,15 +174,10 @@ App.build_zone_selector = (zones_info) => {
   App.zones_info = zones_info
 
   if (App.sekrit_zones.size > 0) {
-    html += ``
     let sorted_sekrits = Array.from(App.sekrit_zones).sort()
 
     for (let zone of sorted_sekrits) {
-      let info = zones_info[zone] || {last_activity: 0}
-      let colors = App.get_zone_colors(info.last_activity, now)
-      let is_current = zone === App.zone
-      let cls = is_current ? `zone-map-btn zone-map-current` : `zone-map-btn`
-      html += `<button class="${cls}" data-zone="${zone}" style="color: ${colors.color}; background-color: ${colors.bg}; border-color: ${is_current ? `#00aaff` : colors.color}">${zone}</button>`
+      html += App.get_zone_btn_html(zone, now)
     }
   }
 
@@ -175,11 +189,7 @@ App.build_zone_selector = (zones_info) => {
 
     for (let speed = 1; speed <= 9; speed++) {
       let zone = `${letter}${speed}`
-      let info = zones_info[zone] || {last_activity: 0}
-      let colors = App.get_zone_colors(info.last_activity, now)
-      let is_current = zone === App.zone
-      let cls = is_current ? `zone-map-btn zone-map-current` : `zone-map-btn`
-      html += `<button class="${cls}" data-zone="${zone}" style="color: ${colors.color}; background-color: ${colors.bg}; border-color: ${is_current ? `#00aaff` : colors.color}">${zone}</button>`
+      html += App.get_zone_btn_html(zone, now)
     }
   }
 

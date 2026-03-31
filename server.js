@@ -593,6 +593,7 @@ App.on_get_zones = (ws, data) => {
     if (App.is_public_zone(z)) {
       zones_info[z] = {
         last_activity: App.zone_data[z].last_activity,
+        user_count: 0,
       }
     }
   }
@@ -601,9 +602,24 @@ App.on_get_zones = (ws, data) => {
 
   for (let z of user_sekrits) {
     if (App.zone_data[z]) {
-      zones_info[z] = {last_activity: App.zone_data[z].last_activity}
+      zones_info[z] = {
+        last_activity: App.zone_data[z].last_activity,
+        user_count: 0,
+      }
     }
   }
+
+  App.wss.clients.forEach((client) => {
+    if ((client.readyState === WebSocket.OPEN) && client.zone) {
+      if (App.is_public_zone(client.zone) || user_sekrits.includes(client.zone)) {
+        if (!zones_info[client.zone]) {
+          zones_info[client.zone] = {last_activity: 0, user_count: 0}
+        }
+
+        zones_info[client.zone].user_count += 1
+      }
+    }
+  })
 
   ws.send(JSON.stringify({type: `ZONES_INFO`, zones: zones_info, sekrits: user_sekrits}))
 }

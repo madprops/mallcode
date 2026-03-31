@@ -176,6 +176,11 @@ body, html {
     border-width: 2px !important;
 }
 
+.zone-map-populated {
+    border-color: #ffaa00 !important;
+    border-width: 2px !important;
+}
+
 #zone-map-grid::-webkit-scrollbar {
     display: none;
 }
