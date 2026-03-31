@@ -103,6 +103,8 @@ export default [
         process: "readonly",
         Msg: "readonly",
         toml: "readonly",
+        Prism: "readonly",
+        CodeJar: "readonly",
       }
     }
   }
