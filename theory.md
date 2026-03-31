@@ -110,14 +110,16 @@ Same with names of people you might know.
 
 So I'd advice treating those with some sort of measure.
 
-Now consider what that means in an online multiplayer morse code system.
+Now consider what that means in an online multi-user morse code system.
 
 ---
 
-The unlockable sekrit zones make the game more exciting.
+The unlockable zones make the system more exciting.
 
-Once a user inputs a sekrit word they unlock a special zone.
+Once a user inputs a secret word they unlock a special zone.
 
 These will remain unlocked and available at the zone map.
+
+It provides discoverability and the creation of small communities.
 
 ![](img/zones.png)
