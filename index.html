@@ -48,6 +48,7 @@
         <div id="words-container"></div>
 
         <div id="bottom-right" class="corner flex-row-center">
+            <div id="settings" class="hud-button hud-text glow">Settings</div>
             <div id="seq-btn" class="hud-button hud-text glow" title="What kind of sequence to display">Base</div>
             <div id="animate-toggle" class="hud-button hud-text glow" title="Change how many effects remain active">Animate</div>
             <div id="about" class="hud-button hud-text glow" title="About">About</div>
@@ -69,11 +70,32 @@
 			</div>
 		</template>
 
+        <template id="settings-template">
+            <div id="settings-container">
+                <textarea id="settings-textarea" rows="10"></textarea>
+                <button id="save-settings-btn" class="modal-btn">Save</button>
+            </div>
+        </template>
+
+        <template id="zone-map-template">
+            <div id="zone-map-container">
+                <div id="zone-map-sekrit-row" class="flex-row-center"></div>
+                <div id="zone-map-grid"></div>
+            </div>
+        </template>
+
+        <template id="about-template">
+            <div id="about-container"></div>
+        </template>
+
         <canvas id="glcanvas"></canvas>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
         <script src="js/dom.js"></script>
+        <script src="js/msg.js"></script>
         <script src="js/shared.js"></script>
         <script src="js/base.js"></script>
+        <script src="js/zone_map.js"></script>
+        <script src="js/settings.js"></script>
         <script src="js/sound.js"></script>
 
         <script>

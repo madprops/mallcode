@@ -49,6 +49,7 @@ App.words = []
 App.seq = 2
 App.current_letters = []
 App.sekrit_zones = new Set()
+App.repo = `github.com/madprops/mallcode`
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
@@ -695,7 +696,11 @@ App.setup_events = () => {
   })
 
   DOM.ev(`#about`, `click`, () => {
-    App.show_menu()
+    App.show_about()
+  })
+
+  DOM.ev(`#settings`, `click`, () => {
+    App.show_settings()
   })
 
   DOM.ev(`#modal-overlay`, `click`, (e) => {
@@ -899,24 +904,6 @@ App.hide_cover = () => {
   }, 1000)
 }
 
-App.show_menu = () => {
-  let text = `Mall Code v${App.version}
-This is a Morse Code MMO.
-234 Zones. A letter and a speed number.
-For example: A2, K4, V9, F3, T8.
-Lower numbers mean slower, more forgiving.
-Higher numbers mean closer to real speed.
-Each zone has its own theme.
-The zones remember the words.
-You might encounter other users.
-Each user has a personality.
-Iambic keys: z/x and left/right.
-Developed by Merkoba in 2026.
-github.com/madprops/mallcode`
-
-  App.show_modal({text})
-}
-
 App.load_storage = async () => {
   return new Promise((resolve) => {
     let request = window.indexedDB.open(App.ls_storage, 1)
@@ -950,6 +937,10 @@ App.load_storage = async () => {
           App.seq = App.storage.sequence
         }
 
+        if (App.storage.max_unfocused_beeps !== undefined) {
+          App.max_unfocused_beeps = App.storage.max_unfocused_beeps
+        }
+
         resolve()
       }
 
@@ -975,180 +966,6 @@ App.save_storage = () => {
   let tx = App.db.transaction(`store`, `readwrite`)
   let store = tx.objectStore(`store`)
   store.put(App.storage, `data`)
-}
-
-App.show_zone_map = () => {
-  if (App.ws && (App.ws.readyState === WebSocket.OPEN)) {
-    App.ws.send(JSON.stringify({type: `GET_ZONES`}))
-  }
-}
-
-App.get_zone_colors = (last_activity, current_time) => {
-  let activity = 0
-
-  if (last_activity > 0) {
-    let time_since_active = current_time - last_activity
-    let fraction_of_hour = time_since_active / 3600000
-    activity = Math.max(0, 1 - fraction_of_hour)
-  }
-
-  let hue = Math.round(120 - activity * 120)
-  let color = `hsl(${hue}, 100%, 60%)`
-  let bg = `hsl(${hue}, 50%, 15%)`
-
-  return {color, bg}
-}
-
-App.build_zone_selector = (zones_info) => {
-  let html = ``
-  let now = Date.now()
-
-  if (App.sekrit_zones.size > 0) {
-    html += `<div class="zone-map-sekrit-row flex-row-center">`
-    let sorted_sekrits = Array.from(App.sekrit_zones).sort()
-
-    for (let zone of sorted_sekrits) {
-      let info = zones_info[zone] || {last_activity: 0}
-      let colors = App.get_zone_colors(info.last_activity, now)
-      let is_current = zone === App.zone
-      let cls = is_current ? `zone-map-btn zone-map-current` : `zone-map-btn`
-      html += `<button class="${cls}" data-zone="${zone}" style="color: ${colors.color}; background-color: ${colors.bg}; border-color: ${is_current ? `#00aaff` : colors.color}">${zone}</button>`
-    }
-
-    html += `</div>`
-  }
-
-  html += `<div class="zone-map-grid">`
-
-  for (let i = 0; i < 26; i++) {
-    let letter = String.fromCharCode(65 + i)
-
-    for (let speed = 1; speed <= 9; speed++) {
-      let zone = `${letter}${speed}`
-      let info = zones_info[zone] || {last_activity: 0}
-      let colors = App.get_zone_colors(info.last_activity, now)
-      let is_current = zone === App.zone
-      let cls = is_current ? `zone-map-btn zone-map-current` : `zone-map-btn`
-      html += `<button class="${cls}" data-zone="${zone}" style="color: ${colors.color}; background-color: ${colors.bg}; border-color: ${is_current ? `#00aaff` : colors.color}">${zone}</button>`
-    }
-  }
-
-  html += `</div>`
-  App.show_modal({html})
-  let btns = DOM.els(`.zone-map-btn`, App.modal_el)
-
-  let grid_el = DOM.el(`.zone-map-grid`, App.modal_el)
-  let is_down = false
-  let start_y
-  let scroll_top
-  let has_dragged = false
-
-  let start_drag = (e) => {
-    is_down = true
-    has_dragged = false
-    start_y = e.pageY || (e.touches && e.touches[0].pageY)
-    scroll_top = grid_el.scrollTop
-    grid_el.style.cursor = `grabbing`
-    grid_el.style.userSelect = `none`
-  }
-
-  let end_drag = () => {
-    is_down = false
-    grid_el.style.cursor = `grab`
-    grid_el.style.userSelect = ``
-  }
-
-  let move_drag = (e) => {
-    if (!is_down) {
-      return
-    }
-
-    let page_y = e.pageY || (e.touches && e.touches[0].pageY)
-
-    if (page_y === undefined) {
-      return
-    }
-
-    let walk = page_y - start_y
-
-    if (Math.abs(walk) > 5) {
-      has_dragged = true
-
-      if (e.cancelable && (e.type === `touchmove`)) {
-        e.preventDefault()
-      }
-    }
-
-    grid_el.scrollTop = scroll_top - walk
-  }
-
-  grid_el.style.cursor = `grab`
-
-  DOM.ev(grid_el, `mousedown`, start_drag)
-  DOM.ev(grid_el, `mouseleave`, end_drag)
-  DOM.ev(grid_el, `mouseup`, end_drag)
-  DOM.ev(grid_el, `mousemove`, move_drag)
-
-  DOM.ev(grid_el, `touchstart`, start_drag, {passive: true})
-  DOM.ev(grid_el, `touchend`, end_drag)
-  DOM.ev(grid_el, `touchcancel`, end_drag)
-  DOM.ev(grid_el, `touchmove`, move_drag, {passive: false})
-
-  setTimeout(() => {
-    let active_btn = DOM.el(`[data-zone="${App.zone}"]`, App.modal_el)
-
-    if (active_btn) {
-      active_btn.scrollIntoView({behavior: `instant`, block: `center`, inline: `center`})
-    }
-  }, 10)
-
-  if (App.zone_refresh_interval) {
-    clearInterval(App.zone_refresh_interval)
-  }
-
-  App.zone_refresh_interval = setInterval(() => {
-    let current_time = Date.now()
-
-    for (let btn of btns) {
-      let zone = btn.dataset.zone
-      let info = zones_info[zone] || {last_activity: 0}
-      let colors = App.get_zone_colors(info.last_activity, current_time)
-      btn.style.color = colors.color
-      btn.style.backgroundColor = colors.bg
-      let is_current = zone === App.zone
-
-      if (is_current) {
-        btn.classList.add(`zone-map-current`)
-      }
-      else {
-        btn.classList.remove(`zone-map-current`)
-      }
-    }
-  }, 10 * 1000)
-
-  for (let btn of btns) {
-    DOM.ev(btn, `click`, (e) => {
-      if (has_dragged) {
-        e.preventDefault()
-        e.stopPropagation()
-        return
-      }
-
-      let zone = btn.dataset.zone
-
-      if (Shared.is_public_zone(zone)) {
-        App.letter_dial_el.value = zone.charAt(0)
-        App.speed_dial_el.value = zone.charAt(1)
-        App.zone_dial_action()
-      }
-      else if ((zone !== App.zone) && App.ws && (App.ws.readyState === WebSocket.OPEN)) {
-        App.ws.send(JSON.stringify({type: `RESTORE_ZONE`, zone}))
-      }
-
-      clearInterval(App.zone_refresh_interval)
-      App.hide_modal()
-    })
-  }
 }
 
 App.refresh_info = () => {
@@ -1425,9 +1242,46 @@ App.on_users = (data) => {
   App.refresh_info()
 }
 
+App.get_about_text = () => {
+  return `Mall Code v${App.version}
+  This is a Morse Code MMO.
+  234 Zones. A letter and a speed number.
+  For example: A2, K4, V9, F3, T8.
+  Lower numbers mean slower, more forgiving.
+  Higher numbers mean closer to real speed.
+  Each zone has its own theme.
+  The zones remember the words.
+  You might encounter other users.
+  Each user has a personality.
+  Iambic keys: z/x and left/right.
+  Developed by Merkoba in 2026.
+  ${App.repo}`
+}
+
+App.setup_about = () => {
+  App.msg_about = Msg.factory({
+    before_show: () => {
+      let c = DOM.el(`#about-container`)
+      c.textContent = App.get_about_text()
+    },
+  })
+
+  let template = DOM.el(`#about-template`)
+  let clone = template.content.cloneNode(true)
+  let c = DOM.el(`#about-container`, clone)
+  App.msg_about.set(c)
+}
+
+App.show_about = () => {
+  App.msg_about.show()
+}
+
 App.init = async () => {
   await App.load_storage()
   App.create_debouncers()
+  App.setup_about()
+  App.setup_zone_map()
+  App.setup_settings()
   App.setup_dials()
 
   let params = new URLSearchParams(window.location.search)
