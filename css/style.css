@@ -330,16 +330,6 @@ a.clean-link:hover {
     gap: 10px;
 }
 
-#settings-textarea {
-    color: white;
-    font-size: 17px;
-    font-family: monospace;
-    background-color: #1d222b;
-    width: 500px;
-    border: 1px solid rgb(52, 52, 52);
-    outline: none;
-}
-
 .modal-btn {
     background-color: #1d222b;
     font-size: 18px;
@@ -383,4 +373,5 @@ a.clean-link:hover {
     cursor: text;
     overflow: auto;
     max-height: 300px;
+    font-size: 18px;
 }
