@@ -32,7 +32,7 @@ App.max_info_per_minute = 10
 
 App.get_version = () => {
   try {
-    App.package = JSON.parse(fs.readFileSync(path.join(__dirname, `package.json`), `utf8`))
+    App.package = JSON.parse(fs.readFileSync(path.join(__dirname, `../package.json`), `utf8`))
     App.version = App.package.version || `0.0.0`
   }
   catch (err) {
