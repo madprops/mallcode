@@ -38,6 +38,7 @@ App.modal_open = false
 App.moving = false
 App.current_user = ``
 App.username = ``
+App.focused = !document.hidden
 App.version = `0.0.0`
 App.animation = true
 App.ls_storage = `mallcode_v1`
@@ -729,8 +730,13 @@ App.setup_events = () => {
 
   // Also ensure the AudioContext is actually running
   document.addEventListener(`visibilitychange`, () => {
-    if ((document.visibilityState === `visible`) && App.audio_ctx) {
+    App.focused = !document.hidden
+
+    if (App.focused && App.audio_ctx) {
       App.audio_ctx.resume()
+    }
+    else if (!App.focused) {
+      App.stop_beep()
     }
   })
 }

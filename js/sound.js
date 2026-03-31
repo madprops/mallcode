@@ -15,7 +15,7 @@ App.init_audio = () => {
 }
 
 App.play_warp_drive = () => {
-  if (!App.audio_started) {
+  if (!App.audio_started || !App.focused) {
     return
   }
 
@@ -60,7 +60,7 @@ App.play_warp_drive = () => {
 }
 
 App.play_zone_enter = () => {
-  if (!App.audio_started) {
+  if (!App.audio_started || !App.focused) {
     return
   }
 
@@ -104,7 +104,7 @@ App.play_zone_enter = () => {
 }
 
 App.play_zone_leave = () => {
-  if (!App.audio_started) {
+  if (!App.audio_started || !App.focused) {
     return
   }
 
@@ -198,7 +198,7 @@ App.play_beep = (seed = `normal`) => {
     App.stop_beep()
   }
 
-  if (!App.audio_started) {
+  if (!App.audio_started || !App.focused) {
     return
   }
 
