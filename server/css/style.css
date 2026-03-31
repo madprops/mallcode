@@ -369,6 +369,7 @@ a.clean-link:hover {
 
 #settings-container {
     width: 480px;
+    max-width: 100%;
 }
 
 #settings-editor {
@@ -379,11 +380,13 @@ a.clean-link:hover {
     background: #23262c;
     color: #f8f8f2;
     outline: none;
-    white-space: pre-wrap;
-    word-wrap: break-word;
+    white-space: pre;
+    word-wrap: normal;
     text-align: left;
     cursor: text;
     overflow: auto;
     max-height: 300px;
     font-size: 18px;
+    box-sizing: border-box;
+    width: 100%;
 }
