@@ -25,6 +25,16 @@ App.update_zone_map_styles = () => {
 
 App.setup_zone_map = () => {
   App.msg_zone_map = Msg.factory({
+    after_show: () => {
+      App.zone_refresh_interval = setInterval(() => {
+        if (App.zone_map_updates >= App.max_zone_map_updates) {
+          App.msg_zone_map.close()
+          return
+        }
+
+        App.show_zone_map()
+      }, App.zone_refresh_delay * 1000)
+    },
     after_close: () => {
       clearInterval(App.zone_refresh_interval)
     },
@@ -91,15 +101,6 @@ App.setup_zone_map = () => {
   DOM.ev(grid_el, `touchend`, end_drag)
   DOM.ev(grid_el, `touchcancel`, end_drag)
   DOM.ev(grid_el, `touchmove`, move_drag, {passive: false})
-
-  App.zone_refresh_interval = setInterval(() => {
-    if (App.zone_map_updates >= App.max_zone_map_updates) {
-      App.msg_zone_map.close()
-      return
-    }
-
-    App.show_zone_map()
-  }, App.zone_refresh_delay * 1000)
 
   DOM.ev(c, `click`, (e) => {
     if (!e.target.classList.contains(`zone-map-btn`)) {
