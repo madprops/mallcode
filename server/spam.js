@@ -1,4 +1,14 @@
 module.exports = (App) => {
+  // The bigger the number the more the anti-spam system tolerates
+  App.anti_spam_max_limit = 100
+
+  // How much time in minutes a user is banned from the system after being detected
+  // as a spammer by the automatic spam detection system
+  App.anti_spam_ban_duration = 60
+
+  // Checks connections every x ms to unban and reduce levels
+  App.anti_spam_check_delay = 1200
+
   App.handler.start_anti_spam = (data) => {
     App.handler.anti_spam_users = {}
     App.handler.anti_spam_timeout()
@@ -8,13 +18,14 @@ module.exports = (App) => {
   App.handler.anti_spam_timeout = () => {
     setTimeout(() => {
       App.handler.anti_spam_timeout_action()
-    }, App.sconfig.anti_spam_check_delay)
+    }, App.anti_spam_check_delay)
   }
 
   // What to do on each anti spam iteration
   App.handler.anti_spam_timeout_action = () => {
     for (let key in App.handler.anti_spam_users) {
       let user = App.handler.anti_spam_users[key]
+
       if (user.banned) {
         if (Date.now() > user.banned_until) {
           user.banned = false
@@ -49,7 +60,7 @@ module.exports = (App) => {
 
     user.level += amount
 
-    if (user.level >= App.sconfig.anti_spam_max_limit) {
+    if (user.level >= App.anti_spam_max_limit) {
       App.handler.anti_spam_ban(socket)
     }
 
@@ -64,7 +75,7 @@ module.exports = (App) => {
   }
 
   // Ban a user from connecting
-  App.handler.anti_spam_ban = (socket, minutes = App.sconfig.anti_spam_ban_duration) => {
+  App.handler.anti_spam_ban = (socket, minutes = App.anti_spam_ban_duration) => {
     let user = App.handler.anti_spam_users[socket.hue.ip_address]
 
     if (!user) {
