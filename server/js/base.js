@@ -1089,14 +1089,18 @@ App.refresh_bg_color = () => {
     try {
       App.scene.background = new THREE.Color(App.bg_color)
     }
-    catch (err) {}
+    catch (err) {
+      //
+    }
   }
 
   if (App.scene && App.scene.fog) {
     try {
       App.scene.fog.color.set(App.bg_color)
     }
-    catch (err) {}
+    catch (err) {
+      //
+    }
   }
 
   document.documentElement.style.setProperty(`--bg_color`, App.bg_color)
