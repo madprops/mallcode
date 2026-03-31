@@ -71,7 +71,7 @@ App.setup_zone_map = () => {
 
     for (let btn of btns) {
       let zone = btn.dataset.zone
-      let info = zones_info[zone] || {last_activity: 0}
+      let info = App.zones_info[zone] || {last_activity: 0}
       let colors = App.get_zone_colors(info.last_activity, current_time)
       btn.style.color = colors.color
       btn.style.backgroundColor = colors.bg
@@ -152,6 +152,7 @@ App.get_zone_colors = (last_activity, current_time) => {
 App.build_zone_selector = (zones_info) => {
   let html = ``
   let now = Date.now()
+  App.zones_info = zones_info
 
   if (App.sekrit_zones.size > 0) {
     html += ``

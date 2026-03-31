@@ -101,6 +101,7 @@ export default [
         THREE: "readonly",
         module: "readonly",
         process: "readonly",
+        Msg: "readonly",
       }
     }
   }
