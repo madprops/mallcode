@@ -401,6 +401,14 @@ App.set_zone = (ws, zone) => {
 
 App.go_to_zone = (ws, zone) => {
   let old_zone = ws.zone
+
+  // If the user is already in this zone, just acknowledge and return
+  if (old_zone === zone) {
+    ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username, version: App.version}))
+    App.broadcast_zone_words(ws.zone, ws)
+    return
+  }
+
   App.force_release(ws, old_zone)
   App.set_zone(ws, zone)
   ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username, version: App.version}))
@@ -514,7 +522,7 @@ App.setup_sockets = () => {
       App.broadcast_zone_update(ws.zone, ws.username, `leave`)
     })
 
-    App.go_to_zone(ws, ws.zone)
+    App.go_to_zone(ws, ws.target_zone)
   })
 }
 
@@ -550,14 +558,14 @@ App.prepare_ws = (ws, req) => {
     let is_authorized = App.user_sekrits[ws.username] && App.user_sekrits[ws.username].has(upper_zone)
 
     if (App.is_public_zone(upper_zone) || is_authorized) {
-      App.set_zone(ws, upper_zone)
+      ws.target_zone = upper_zone
     }
     else {
-      App.set_zone(ws, App.default_zone())
+      ws.target_zone = App.default_zone()
     }
   }
   else {
-    App.set_zone(ws, App.default_zone())
+    ws.target_zone = App.default_zone()
   }
 
   ws.unit_duration = null
