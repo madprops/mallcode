@@ -428,6 +428,11 @@ App.setup_sockets = () => {
   App.wss.on(`connection`, (ws, req) => {
     let is_allowed = App.prepare_ws(ws, req)
 
+    if (is_allowed === `banned`) {
+      ws.close(1008, `Banned`)
+      return
+    }
+
     if (!is_allowed) {
       ws.close(1008, `Too many connections`)
       return
@@ -472,10 +477,7 @@ App.setup_sockets = () => {
       let now = Date.now()
 
       if (App.blocked_ips[ws.ip] && (now < App.blocked_ips[ws.ip])) {
-        ws.penalty_expires = App.blocked_ips[ws.ip]
-      }
-
-      if (ws.penalty_expires && (now < ws.penalty_expires)) {
+        ws.close(1008, `Banned`)
         return
       }
 
@@ -537,6 +539,10 @@ App.setup_sockets = () => {
 App.prepare_ws = (ws, req) => {
   ws.ip = req.headers[`x-forwarded-for`] || req.socket.remoteAddress
 
+  if (App.blocked_ips[ws.ip] && (Date.now() < App.blocked_ips[ws.ip])) {
+    return `banned`
+  }
+
   if (!App.active_ips) {
     App.active_ips = {}
   }
@@ -577,7 +583,6 @@ App.prepare_ws = (ws, req) => {
   }
 
   ws.unit_duration = null
-  ws.penalty_expires = App.blocked_ips[ws.ip] || 0
   ws.get_zones_timestamps = []
   return true
 }
@@ -739,18 +744,16 @@ App.on_active_ws_same = (ws, data, z_state) => {
   }
 
   if ((now - z_state.control_start_time) > (App.spam_limit * 1000)) {
-    ws.penalty_expires = now + App.block_seconds * 1000
-    App.blocked_ips[ws.ip] = ws.penalty_expires
+    App.blocked_ips[ws.ip] = now + App.block_seconds * 1000
     App.force_release(ws, ws.zone)
-    App.block_message(ws, App.block_seconds)
+    ws.close(1008, `Spam detected`)
     return true
   }
 
   if ((now - z_state.takeover_time) > (App.transmission_limit * 1000)) {
-    ws.penalty_expires = now + App.soft_block_seconds * 1000
-    App.blocked_ips[ws.ip] = ws.penalty_expires
+    App.blocked_ips[ws.ip] = now + App.soft_block_seconds * 1000
     App.force_release(ws, ws.zone)
-    App.block_message(ws, App.soft_block_seconds)
+    ws.close(1008, `Spam detected`)
     return true
   }
 
@@ -847,10 +850,6 @@ App.send_message = (ws, text, pissed = false) => {
     text,
     pissed,
   }))
-}
-
-App.block_message = (ws, seconds) => {
-  App.send_message(ws, `You have been blocked for ${seconds} seconds`)
 }
 
 App.get_version()
