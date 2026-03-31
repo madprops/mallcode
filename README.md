@@ -82,6 +82,10 @@ Or copy the default list:
 
 ---
 
+There's an anti-spam system to stop abuse.
+
+---
+
 Invest in `Mall Code` to put a `network` enabled morse code `communication` system in all `living rooms` and `airplanes`.
 
 ---
