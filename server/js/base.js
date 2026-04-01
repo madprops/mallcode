@@ -473,6 +473,8 @@ App.trigger_down = (is_local = true) => {
   let now = performance.now()
 
   if (is_local) {
+    clearTimeout(App.letter_timeout)
+    clearTimeout(App.word_timeout)
     App.last_typist_was_local = true
     App.current_user = App.username
     App.username_info_el.textContent = App.username
@@ -530,6 +532,12 @@ App.trigger_up = (is_local = true) => {
     App.current_sequence = res.sequence
     App.update_sequence_display()
     App.echo_debouncer.call()
+
+    let letter_delay = (App.unit_duration * App.zone_settings.letter_mult) + 250
+
+    App.letter_timeout = setTimeout(() => {
+      App.resolve_local_letter()
+    }, letter_delay)
   }
 
   if ((is_local !== false) && App.ws && (App.ws.readyState === WebSocket.OPEN)) {
@@ -538,6 +546,60 @@ App.trigger_up = (is_local = true) => {
 
   App.stop_beep()
   App.particle_mesh.material.size = 0.15
+}
+
+App.resolve_local_letter = () => {
+  if (!App.current_sequence) {
+    return
+  }
+
+  let letter = Shared.morse_code[App.current_sequence] || ``
+
+  if (letter !== ``) {
+    App.spawn_sprite(letter, `letter`)
+    App.current_letters.push(letter)
+  }
+
+  App.current_sequence = ``
+  App.update_sequence_display()
+
+  let word_delay = (App.unit_duration * App.zone_settings.word_mult) + 250
+
+  App.word_timeout = setTimeout(() => {
+    App.resolve_local_word()
+  }, word_delay)
+}
+
+App.resolve_local_word = () => {
+  if (!App.current_letters.length) {
+    return
+  }
+
+  let word = App.current_letters.join(``)
+  let found = false
+
+  if (App.current_letters.length === 1) {
+    for (let i = App.sprites.length - 1; i >= 0; i--) {
+      let s = App.sprites[i]
+
+      if ((s.userData.type === `letter`) && (s.userData.text === word)) {
+        s.userData.type = `word`
+        s.userData.decay_rate = 0.25
+        s.userData.growth = 2
+        let old_map = s.material.map
+        s.material.map = App.create_text_texture(word, false, false, true)
+        old_map.dispose()
+        found = true
+        break
+      }
+    }
+  }
+
+  if (!found && (word.length > 0)) {
+    App.spawn_sprite(word, `word`)
+  }
+
+  App.current_letters = []
 }
 
 App.iambic_loop = () => {
@@ -1033,13 +1095,12 @@ App.update_url = () => {
 }
 
 App.on_sequence = (data) => {
-  if (data.username !== App.username) {
-    if (data.unit_duration) {
-      App.unit_duration = data.unit_duration
-    }
+  if (data.username === App.username) {
+    return true
+  }
 
-    App.current_sequence = data.sequence
-    App.update_sequence_display()
+  if (data.unit_duration) {
+    App.unit_duration = data.unit_duration
   }
 
   if (data.resolve) {
@@ -1051,6 +1112,10 @@ App.on_sequence = (data) => {
     }
 
     App.current_sequence = ``
+    App.update_sequence_display()
+  }
+  else {
+    App.current_sequence = data.sequence
     App.update_sequence_display()
   }
 
@@ -1069,6 +1134,8 @@ App.on_up_or_down = (data) => {
 App.on_down = (data) => {
   App.remote_lock_time = performance.now()
   App.last_typist_was_local = false
+  clearTimeout(App.letter_timeout)
+  clearTimeout(App.word_timeout)
   App.handle_press(null, false)
 }
 
@@ -1079,6 +1146,10 @@ App.on_up = (data) => {
 }
 
 App.on_word_end = (data) => {
+  if (data.username === App.username) {
+    return
+  }
+
   let word = App.current_letters.join(``)
   let found = false
 
