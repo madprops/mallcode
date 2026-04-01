@@ -31,7 +31,7 @@ App.sekrit_delay = 60
 App.user_sekrits = {}
 App.max_connections_per_ip = 3
 App.max_info_per_minute = 10
-App.anomaly_duration = 2 // in hours
+App.anomaly_hours = 2
 App.anomaly_speed = 7
 App.anomaly_chance = 1
 
@@ -374,20 +374,6 @@ App.resolve_word = (zone) => {
 App.help_text = `https://www.youtube.com/watch?v=spdfnqS3bDg`
 
 App.process_word = (zone, word, ws) => {
-  if ((word.length >= 3) && (Math.random() < App.anomaly_chance)) {
-    if (!App.sekrits[word] && !App.shared.is_public_zone(word)) {
-      let zone = App.shared.random_word(3, word)
-      zone = zone.toUpperCase(zone)
-
-      App.sekrits[word] = {
-        word: word,
-        zone,
-        speed: App.anomaly_speed,
-        expires: Date.now() + App.anomaly_duration * 60 * 60 * 1000,
-      }
-    }
-  }
-
   let sekrit = Object.values(App.sekrits).find(s => s.word === word)
 
   if (sekrit) {
@@ -427,6 +413,20 @@ App.process_word = (zone, word, ws) => {
     App.zone_data[zone].echo = echo
     App.zone_data_changed = true
     App.broadcast_zone_words(zone)
+
+    if (Math.random() < App.anomaly_chance) {
+      if (!App.sekrits[word] && !App.shared.is_public_zone(word)) {
+        let zone = App.shared.random_word(3, word)
+        let zone_name = zone.toUpperCase()
+
+        App.sekrits[word] = {
+          word: zone_name,
+          zone: zone_name,
+          speed: App.anomaly_speed,
+          expires: Date.now() + App.anomaly_hours * 60 * 60 * 1000,
+        }
+      }
+    }
   }
 }
 
