@@ -125,9 +125,8 @@ App.get_bg_color = (zone) => {
   if (App.background === `auto`) {
     return App.get_zone_color(zone)
   }
-  else {
-    return App.background
-  }
+
+  return App.background
 }
 
 App.get_user_color = (name = `nobody`) => {
