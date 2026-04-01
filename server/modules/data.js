@@ -1,5 +1,3 @@
-
-
 module.exports = (App) => {
   App.get_version = () => {
     try {
