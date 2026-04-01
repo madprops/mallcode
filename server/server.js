@@ -33,7 +33,7 @@ App.max_connections_per_ip = 3
 App.max_info_per_minute = 10
 App.anomaly_hours = 2
 App.anomaly_speed = 7
-App.anomaly_chance = 0.1
+App.anomaly_chance = 1
 
 App.get_version = () => {
   try {
@@ -408,9 +408,15 @@ App.process_word = (zone, word, ws) => {
       App.zone_data[zone].words.shift()
     }
 
-    let echo = App.get_markov_text(App.zone_data[zone].words)
-    echo = App.shared.ticker_text(echo).substring(0, 280).trim()
-    App.zone_data[zone].echo = echo
+    try {
+      let echo = App.get_markov_text(App.zone_data[zone].words)
+      echo = App.shared.ticker_text(echo).substring(0, 280).trim()
+      App.zone_data[zone].echo = echo
+    }
+    catch (err) {
+      App.zone_data[zone].echo = ``
+    }
+
     App.zone_data_changed = true
     App.broadcast_zone_words(zone)
 
@@ -425,6 +431,8 @@ App.process_word = (zone, word, ws) => {
           speed: App.anomaly_speed,
           expires: Date.now() + App.anomaly_hours * 60 * 60 * 1000,
         }
+
+        console.log(11111111, word)
       }
     }
   }
@@ -656,20 +664,39 @@ App.on_get_zones = (ws, data) => {
     }
   }
 
+  for (let key in App.sekrits) {
+    let sekrit = App.sekrits[key]
+
+    if (sekrit.expires) {
+      let z = sekrit.zone
+
+      if (!zones_info[z]) {
+        zones_info[z] = {
+          last_activity: App.zone_data[z] ? App.zone_data[z].last_activity : 0,
+          user_count: 0,
+        }
+      }
+    }
+  }
+
   let user_sekrits = App.user_sekrits[ws.username] ? Array.from(App.user_sekrits[ws.username]) : []
 
   for (let z of user_sekrits) {
     if (App.zone_data[z]) {
-      zones_info[z] = {
-        last_activity: App.zone_data[z].last_activity,
-        user_count: 0,
+      if (!zones_info[z]) {
+        zones_info[z] = {
+          last_activity: App.zone_data[z].last_activity,
+          user_count: 0,
+        }
       }
     }
   }
 
   App.wss.clients.forEach((client) => {
     if ((client.readyState === WebSocket.OPEN) && client.zone) {
-      if (App.is_public_zone(client.zone) || user_sekrits.includes(client.zone)) {
+      let is_anomaly = App.sekrits[client.zone] && App.sekrits[client.zone].expires
+
+      if (App.is_public_zone(client.zone) || user_sekrits.includes(client.zone) || is_anomaly) {
         if (!zones_info[client.zone]) {
           zones_info[client.zone] = {last_activity: 0, user_count: 0}
         }
@@ -925,16 +952,32 @@ App.setup_markov = () => {
 }
 
 App.get_markov_text = (words) => {
-  let random_word = words[Math.floor(Math.random() * words.length)]
-  let options = {filter: (result) => result.string.includes(random_word)}
+  let options = {
+    maxTries: 2000,
+    filter: result => {
+      let lower_string = result.string.toLowerCase()
+      let has_word = words.some(word => lower_string.includes(word))
+      // forces the generator to combine at least 2 sentences
+      let is_novel = result.refs.length > 1
+      return has_word && is_novel
+    }
+  }
 
   try {
     let result = App.text_generator.generate(options)
     return result.string
-  }
-  catch (e) {
-    let fallback_result = App.text_generator.generate()
-    return fallback_result.string
+  } catch (e) {
+
+    try {
+      let fallback_options = {
+        maxTries: 1000,
+        filter: result => result.refs.length > 1
+      }
+      let fallback_result = App.text_generator.generate(fallback_options)
+      return fallback_result.string
+    } catch (err) {
+      return `signal lost...`
+    }
   }
 }
 
