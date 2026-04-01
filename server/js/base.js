@@ -293,17 +293,13 @@ App.create_particle_texture = (theme) => {
 App.setup_canvas = () => {
   App.canvas = DOM.el(`#glcanvas`)
   App.renderer = new THREE.WebGLRenderer({canvas: App.canvas, antialias: true, alpha: true})
-  let gl = App.renderer.getContext()
-  App.max_render_size = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE)
+  App.renderer.setSize(window.innerWidth, window.innerHeight)
   App.renderer.setPixelRatio(window.devicePixelRatio)
   App.scene = new THREE.Scene()
   App.scene.background = new THREE.Color(App.bg_color)
   App.scene.fog = new THREE.FogExp2(App.bg_color, 0.0015)
   App.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000)
   App.camera.position.z = 40
-
-  App.resize()
-
   App.timer = new THREE.Timer()
   App.particles_geometry = new THREE.BufferGeometry()
   let particles_count = 3000
@@ -750,7 +746,9 @@ App.setup_events = () => {
   }, {passive: false})
 
   DOM.ev(window, `resize`, () => {
-    App.resize()
+    App.camera.aspect = window.innerWidth / window.innerHeight
+    App.camera.updateProjectionMatrix()
+    App.renderer.setSize(window.innerWidth, window.innerHeight)
   })
 
   DOM.ev(window, `focus`, () => {
@@ -1497,24 +1495,6 @@ App.setup_msg_message = () => {
   let c = DOM.el(`#message-container`, clone)
   App.modal_el = c
   App.msg_message.set(c)
-}
-
-App.resize = () => {
-  let width = window.innerWidth
-  let height = window.innerHeight
-  let pixel_ratio = window.devicePixelRatio
-  let buffer_w = width * pixel_ratio
-  let buffer_h = height * pixel_ratio
-
-  if (buffer_w > App.max_render_size || buffer_h > App.max_render_size) {
-    let scale = App.max_render_size / Math.max(buffer_w, buffer_h)
-    width = width * scale
-    height = height * scale
-  }
-
-  App.camera.aspect = window.innerWidth / window.innerHeight
-  App.camera.updateProjectionMatrix()
-  App.renderer.setSize(width, height, false)
 }
 
 App.start = () => {
