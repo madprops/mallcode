@@ -1301,6 +1301,12 @@ App.load_fonts = () => {
   document.fonts.load(`1em piss_font`)
 }
 
+App.refresh_animation = () => {
+  if (App.particle_mesh) {
+    App.particle_mesh.visible = App.animation
+  }
+}
+
 App.start = () => {
   App.setup_canvas()
   App.setup_events()

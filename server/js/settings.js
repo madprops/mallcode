@@ -170,6 +170,7 @@ App.check_save_settings = () => {
   App.refresh_background()
   App.get_theme(App.zone, true)
   App.refresh_sound_icon()
+  App.refresh_animation()
   App.save_storage()
   App.msg_settings.close()
 }
