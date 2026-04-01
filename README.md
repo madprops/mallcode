@@ -86,8 +86,25 @@ There's an anti-spam system to stop abuse.
 
 ---
 
+
 Invest in `Mall Code` to put a `network` enabled morse code `communication` system in all `living rooms` and `airplanes`.
 
 ---
 
 Read some [theories](theory.md).
+
+---
+
+## Installation
+
+`git clone this_repo`
+
+`npm install`
+
+Run `server/markov.js` to create the echo corpus.
+
+Start it with `run.sh`.
+
+Then make a proper `pm2` config for it.
+
+The main file is `server/server.js`.

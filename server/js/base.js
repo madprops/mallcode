@@ -8,6 +8,7 @@ App.zone_usernames = []
 App.last_focus_time = 0
 App.zone_info_el = DOM.el(`#zone-info`)
 App.username_info_el = DOM.el(`#username-info`)
+App.echoes_el = DOM.el(`#echoes`)
 App.zone_name_el = DOM.el(`#zone-name`)
 App.zone_dials_el = DOM.el(`#zone-dials`)
 App.sound_btn = DOM.el(`#sound-toggle`)
@@ -54,6 +55,17 @@ App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
     App.username_info_el.textContent = ``
   }, App.restore_username_delay)
+
+  App.echo_debouncer = Shared.create_debouncer(() => {
+    DOM.hide(App.username_info_el)
+
+    if (App.echo) {
+      DOM.show(App.echoes_el)
+    }
+    else {
+      DOM.hide(App.echoes_el)
+    }
+  }, 5000)
 
   App.zone_dial_debouncer = Shared.create_debouncer(() => {
     App.zone_dial_action()
@@ -127,7 +139,7 @@ App.setup_socket = () => {
       App.on_users(data)
     }
     else if (data.type === `WORDS`) {
-      App.update_words_display(data.words)
+      App.update_words_display(data.words, data.echo)
     }
     else if (data.type === `ZONES_INFO`) {
       App.on_zones_info(data)
@@ -203,9 +215,21 @@ App.show_message = (args = {}) => {
   App.msg_message.show()
 }
 
-App.update_words_display = (words) => {
+App.update_echo_display = (echo = ``) => {
+  App.echo = echo
+
+  let current_html = App.echoes_el.innerHTML
+  let new_html = App.echo ? `<span class="ticker-text">${App.clean_html(App.echo)}</span>` : ``
+
+  if (current_html !== new_html) {
+    App.echoes_el.innerHTML = new_html
+  }
+}
+
+App.update_words_display = (words, echo = ``) => {
   App.words = words
   App.words_container_el.innerHTML = words.map(w => `<div>${w}</div>`).join(``)
+  App.update_echo_display(echo)
 }
 
 App.create_particle_texture = (theme) => {
@@ -417,7 +441,10 @@ App.trigger_down = (is_local = true) => {
     App.last_typist_was_local = true
     App.current_user = App.username
     App.username_info_el.textContent = App.username
+    DOM.show(App.username_info_el)
+    DOM.hide(App.echoes_el)
     App.username_debouncer.call()
+    App.echo_debouncer.call()
   }
 
   let gap = 0
@@ -467,6 +494,7 @@ App.trigger_up = (is_local = true) => {
     App.unit_duration = res.unit_duration
     App.current_sequence = res.sequence
     App.update_sequence_display()
+    App.echo_debouncer.call()
   }
 
   if ((is_local !== false) && App.ws && (App.ws.readyState === WebSocket.OPEN)) {
@@ -1137,7 +1165,10 @@ App.on_sequence = (data) => {
 App.on_up_or_down = (data) => {
   App.current_user = data.username
   App.username_info_el.textContent = data.username
+  DOM.show(App.username_info_el)
+  DOM.hide(App.echoes_el)
   App.username_debouncer.call()
+  App.echo_debouncer.call()
 }
 
 App.on_down = (data) => {
@@ -1211,6 +1242,13 @@ App.on_zone = (data) => {
   App.iambic_duration = App.zone_settings.iambic_duration
   App.refresh_info()
   App.play_warp_drive()
+  App.update_echo_display(data.echo)
+  DOM.hide(App.username_info_el)
+  if (App.echo) {
+    DOM.show(App.echoes_el)
+  } else {
+    DOM.hide(App.echoes_el)
+  }
 
   if (Shared.is_public_zone(App.zone)) {
     if (App.letter_dial_el) {
