@@ -432,15 +432,14 @@ App.spawn_sprite = (text, type) => {
     sprite.userData = {
       text,
       type,
-      velocity: new THREE.Vector3
-      (
+      velocity: new THREE.Vector3(
         (Math.random() - 0.5) * 0.05,
         Math.random() * 0.05 + 0.02, 0.05,
       ),
       age: 0,
       life: 1.0,
       decay_rate: type === `word` ? 0.25 : 0.35,
-      growth: type === `word` ? 2 : 10
+      growth: type === `word` ? 2 : 10,
     },
 
     App.sprites.push(sprite)
