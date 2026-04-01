@@ -46,6 +46,9 @@ body, html {
     font-size: 18px;
     font-weight: bold;
     text-align: center;
+    min-height: 0;
+    max-height: 100%;
+    width: 100%;
 }
 
 .pissed {
@@ -188,6 +191,13 @@ body, html {
     font-size: 20px;
     pointer-events: none;
     z-index: 10;
+}
+
+#zone-map-container {
+    min-height: 0;
+    max-height: 100%;
+    width: 100%;
+    overflow: auto;
 }
 
 #zone-map-icon {
@@ -402,6 +412,15 @@ a.clean-link:hover {
     background: linear-gradient(135deg, #111118, #1a1a2e) !important;
     color: #00ffcc !important;
     border: 1px solid #00ffcc !important;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+.Msg-content-container {
+    display: flex !important;
+    flex-direction: column;
 }
 
 #settings-container {
