@@ -964,35 +964,30 @@ App.setup_markov = () => {
   App.text_generator.import(saved_corpus)
 }
 
-App.get_markov_text = (words) => {
-  let options = {
-    maxTries: 2000,
-    filter: result => {
-      let lower_string = result.string.toLowerCase()
-      let has_word = words.some(word => lower_string.includes(word))
-      // forces the generator to combine at least 2 sentences
-      let is_novel = result.refs.length > 1
-      return has_word && is_novel
-    },
+App.get_markov_text = () => {
+  let target_length = App.max_echo_length
+  let generated_text = ``
+
+  while (generated_text.length < target_length) {
+    let options = {maxTries: 1000, filter: result => result.refs.length > 1}
+
+    try {
+      let result = App.text_generator.generate(options)
+      generated_text += result.string + ` `
+    }
+    catch (e) {
+      generated_text += `signal lost... `
+      break
+    }
   }
 
-  try {
-    let result = App.text_generator.generate(options)
-    return result.string
+  let final_string = generated_text.trim()
+
+  if (final_string.length > target_length) {
+    final_string = final_string.substring(0, target_length).trim() + `...`
   }
-  catch (e) {
-    try {
-      let fallback_options = {
-        maxTries: 1000,
-        filter: result => result.refs.length > 1,
-      }
-      let fallback_result = App.text_generator.generate(fallback_options)
-      return fallback_result.string
-    }
-    catch (err) {
-      return `signal lost...`
-    }
-  }
+
+  return final_string
 }
 
 App.get_version()
