@@ -35,6 +35,7 @@ App.anomaly_hours = 2
 App.anomaly_speed = 7
 App.anomaly_chance = 1
 App.max_echo_length = 1024
+App.help_text = `https://www.youtube.com/watch?v=spdfnqS3bDg`
 
 App.get_version = () => {
   try {
@@ -384,8 +385,6 @@ App.resolve_word = (zone) => {
   App.process_word(zone, word, z_state.last_active_ws)
 }
 
-App.help_text = `https://www.youtube.com/watch?v=spdfnqS3bDg`
-
 App.get_anomaly_chance = () => {
   let base_chance = App.anomaly_chance / 100
   let max_comfortable_anomalies = 10
@@ -443,29 +442,24 @@ App.process_word = (zone, word, ws) => {
       App.zone_data[zone].words.shift()
     }
 
-    try {
-      let echo = App.get_markov_text(App.zone_data[zone].words)
-      echo = App.shared.ticker_text(echo).substring(0, App.max_echo_length).trim()
-      App.zone_data[zone].echo = echo
-    }
-    catch (err) {
-      App.zone_data[zone].echo = ``
-    }
-
+    App.get_zone_echo(zone)
     App.zone_data_changed = true
     App.broadcast_zone_words(zone)
+    App.check_anomaly(word)
+  }
+}
 
-    if (Math.random() < App.get_anomaly_chance()) {
-      if (!App.sekrits[word] && !App.shared.is_public_zone(word)) {
-        let zone_name = App.shared.random_word(3, word)
-        zone_name = zone_name.toUpperCase()
+App.check_anomaly = (word) => {
+  if (Math.random() < App.get_anomaly_chance()) {
+    if (!App.sekrits[word] && !App.shared.is_public_zone(word)) {
+      let zone_name = App.shared.random_word(3, word)
+      zone_name = zone_name.toUpperCase()
 
-        App.sekrits[zone_name] = {
-          word: zone_name,
-          zone: zone_name,
-          speed: App.anomaly_speed,
-          expires: Date.now() + App.anomaly_hours * 60 * 60 * 1000,
-        }
+      App.sekrits[zone_name] = {
+        word: zone_name,
+        zone: zone_name,
+        speed: App.anomaly_speed,
+        expires: Date.now() + App.anomaly_hours * 60 * 60 * 1000,
       }
     }
   }
@@ -1019,6 +1013,17 @@ App.get_markov_text = () => {
   }
 
   return final_string
+}
+
+App.get_zone_echo = (zone) => {
+  try {
+    let echo = App.get_markov_text()
+    echo = App.shared.ticker_text(echo).substring(0, App.max_echo_length).trim()
+    App.zone_data[zone].echo = echo
+  }
+  catch (err) {
+    App.zone_data[zone].echo = ``
+  }
 }
 
 App.get_version()
