@@ -393,9 +393,9 @@ App.process_word = (zone, word, ws) => {
       App.zone_data[zone].words.shift()
     }
 
-    let text = App.get_markov_text(App.zone_data[zone].words)
-    App.zone_data[zone].echo = App.shared.ticker_text(text)
-
+    let echo = App.get_markov_text(App.zone_data[zone].words)
+    echo = App.shared.ticker_text(echo).substring(0, 280).trim()
+    App.zone_data[zone].echo = echo
     App.zone_data_changed = true
     App.broadcast_zone_words(zone)
   }
