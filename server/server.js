@@ -36,8 +36,19 @@ App.anomaly_hours = 2
 App.anomaly_speed = 7
 App.anomaly_chance = 1
 App.max_anomalies = 6
-App.help_text = `https://www.youtube.com/watch?v=spdfnqS3bDg`
-App.test_text = `https://www.newgrounds.com/portal/view/803018`
+
+App.messages = [
+  {
+    words: [`HELP`, `SOS`],
+    text: `https://www.youtube.com/watch?v=spdfnqS3bDg`,
+    pissed: true,
+  },
+  {
+    words: [`TEST`],
+    text: `https://www.newgrounds.com/portal/view/803018`,
+    pissed: true,
+  },
+]
 
 App.get_version = () => {
   try {
@@ -425,17 +436,7 @@ App.process_word = (zone, word, ws) => {
     return
   }
 
-  if ([`HELP`, `SOS`].includes(word)) {
-    if (ws && (ws.readyState === WebSocket.OPEN)) {
-      App.send_message(ws, App.help_text, true)
-    }
-  }
-
-  if ([`TEST`].includes(word)) {
-    if (ws && (ws.readyState === WebSocket.OPEN)) {
-      App.send_message(ws, App.test_text, true)
-    }
-  }
+  App.check_messages(ws, word)
 
   if ((word.length >= 3) && App.word_match(word)) {
     if (!App.zone_data[zone]) {
@@ -1112,6 +1113,15 @@ App.setup_bundler = () => {
 
   fs.watch(libs_dir, handle_watch)
   fs.watch(js_dir, handle_watch)
+}
+
+App.check_messages = (ws, word) => {
+  for (let msg of App.messages) {
+    if (msg.words.includes(word)) {
+      App.send_message(ws, msg.text, msg.pissed)
+      break
+    }
+  }
 }
 
 App.get_version()
