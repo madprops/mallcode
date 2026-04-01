@@ -293,8 +293,8 @@ App.create_particle_texture = (theme) => {
 App.setup_canvas = () => {
   App.canvas = DOM.el(`#glcanvas`)
   App.renderer = new THREE.WebGLRenderer({canvas: App.canvas, antialias: true, alpha: true})
-  App.renderer.setSize(window.innerWidth, window.innerHeight)
   App.renderer.setPixelRatio(window.devicePixelRatio)
+  App.renderer.setSize(window.innerWidth, window.innerHeight)
   App.scene = new THREE.Scene()
   App.scene.background = new THREE.Color(App.bg_color)
   App.scene.fog = new THREE.FogExp2(App.bg_color, 0.0015)
@@ -871,8 +871,8 @@ App.get_theme = (zone, force = false) => {
 
   let seed = Shared.get_string_hash(zone)
   let random = Shared.create_seeded_random(seed)
-  let bg_color_val = App.get_color(App.bg_color)
-  let is_dark = App.colorlib.is_dark(bg_color_val)
+  let bg_val = App.get_color(App.bg_color)
+  let is_dark = App.colorlib.is_dark(bg_val)
   let base_hue = random() * 360
   let hue1 = base_hue
   let hue2 = (base_hue + 120 + random() * 40 - 20) % 360
@@ -911,13 +911,13 @@ App.get_theme = (zone, force = false) => {
     App.text_color = `black`
   }
 
-  App.text_color = App.get_color(App.text_color)
-  App.set_css_var(`text_color`, App.text_color)
+  let text_val = App.get_color(App.text_color)
+  App.set_css_var(`text_color`, text_val)
 
-  App.border_color = App.colorlib.get_lighter_or_darker(App.text_color, 0.6)
+  App.border_color = App.colorlib.get_lighter_or_darker(text_val, 0.6)
   App.set_css_var(`border_color`, App.border_color)
 
-  App.highlight_color = App.colorlib.get_lighter_or_darker(App.bg_color, 0.1)
+  App.highlight_color = App.colorlib.get_lighter_or_darker(bg_val, 0.1)
   App.set_css_var(`highlight_color`, App.highlight_color)
 
   App.theme_cache = theme
