@@ -179,7 +179,7 @@ App.urlize = (text, clean = false) => {
   if (clean) {
     label = label.replace(/[^a-zA-Z0-9]/g, ` `)
     label = label.replace(/\s+/g, ` `)
-    label = label.trim()
+    label = label.substring(0, 25).trim()
     cls = ` clean-link`
   }
 
@@ -212,18 +212,12 @@ App.show_message = (args = {}) => {
 
   if (args.pissed) {
     container.classList.add(`pissed`)
-    container.classList.add(`font-loading`)
-
-    document.fonts.load(`1em piss_font`).then(() => {
-      container.innerHTML = content
-      container.classList.remove(`font-loading`)
-    })
   }
   else {
     container.classList.remove(`pissed`)
-    container.innerHTML = content
   }
 
+  container.innerHTML = content
   App.msg_message.show()
 }
 
@@ -1324,6 +1318,10 @@ App.setup_msg_message = () => {
   App.msg_message.set(c)
 }
 
+App.load_fonts = () => {
+  document.fonts.load(`1em piss_font`)
+}
+
 App.start = () => {
   App.setup_canvas()
   App.setup_events()
@@ -1352,4 +1350,5 @@ App.init = async () => {
   App.setup_socket()
   App.hide_cover()
   App.refresh_bg_color()
+  App.load_fonts()
 }

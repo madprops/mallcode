@@ -52,10 +52,6 @@ body, html {
     font-family: "piss_font", sans-serif;
 }
 
-.font-loading {
-    visibility: hidden;
-}
-
 @keyframes subtlePulse {
     from {
         box-shadow: 0 0 15px rgba(0, 255, 204, 0.1), inset 0 0 10px rgba(0, 255, 204, 0.05);
