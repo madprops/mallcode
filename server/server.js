@@ -31,10 +31,11 @@ App.sekrit_delay = 60
 App.user_sekrits = {}
 App.max_connections_per_ip = 3
 App.max_info_per_minute = 20
+App.max_echo_length = 1024
 App.anomaly_hours = 2
 App.anomaly_speed = 7
 App.anomaly_chance = 1
-App.max_echo_length = 1024
+App.max_anomalies = 6
 App.help_text = `https://www.youtube.com/watch?v=spdfnqS3bDg`
 App.test_text = `https://www.newgrounds.com/portal/view/803018`
 
@@ -388,10 +389,9 @@ App.resolve_word = (zone) => {
 
 App.get_anomaly_chance = () => {
   let base_chance = App.anomaly_chance / 100
-  let max_comfortable_anomalies = 10
   let current_anomalies = Object.values(App.sekrits).filter(s => s.expires).length
 
-  if (current_anomalies >= max_comfortable_anomalies) {
+  if (current_anomalies >= App.max_anomalies) {
     return 0
   }
 

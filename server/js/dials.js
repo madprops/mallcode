@@ -1,5 +1,5 @@
 App.zone_dial_delay = 100
-App.zone_dial_delay_2 = 1000
+App.zone_dial_delay_2 = 600
 App.dial_visible = false
 
 App.setup_dials = () => {
