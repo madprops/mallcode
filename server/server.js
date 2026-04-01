@@ -10,8 +10,10 @@ App.server = http.createServer(App.app)
 App.wss = new WebSocket.Server({server: App.server})
 const Markov = require(`markov-strings`).default
 App.shared = require(`./js/main/shared.js`)
-App.actions = require(`./actions.js`)
-require(`./spam.js`)(App)
+App.actions = require(`./modules/actions.js`)
+require(`./modules/spam.js`)(App)
+require(`./modules/data.js`)(App)
+require(`./modules/zones.js`)(App)
 
 App.zone_states = {}
 App.next_client_id = 1
@@ -49,164 +51,8 @@ App.messages = [
   },
 ]
 
-App.get_version = () => {
-  try {
-    App.package = JSON.parse(fs.readFileSync(path.join(__dirname, `../package.json`), `utf8`))
-    App.version = App.package.version || `0.0.0`
-  }
-  catch (err) {
-    App.version = `0.0.0`
-  }
-}
-
-App.get_words = () => {
-  try {
-    let data = fs.readFileSync(path.join(__dirname, `words.txt`), `utf8`)
-
-    data.split(`\n`).forEach(line => {
-      let word = line.trim()
-
-      if (word) {
-        App.words.add(word)
-      }
-    })
-
-    console.log(`Loaded ${App.words.size} words.`)
-  }
-  catch (err) {
-    console.error(`Error loading words.txt:`, err)
-  }
-}
-
-App.get_sekrits = () => {
-  try {
-    let file = path.join(__dirname, `sekrit.json`)
-    let anomalies = {}
-
-    for (let z in App.sekrits) {
-      if (App.sekrits[z].expires) {
-        anomalies[z] = App.sekrits[z]
-      }
-    }
-
-    App.sekrits = {}
-
-    if (fs.existsSync(file)) {
-      let data = JSON.parse(fs.readFileSync(file, `utf8`))
-
-      data.forEach(s => {
-        if (s.word && s.zone) {
-          App.sekrits[s.zone.toUpperCase()] = {
-            word: s.word.toUpperCase(),
-            zone: s.zone.toUpperCase(),
-            speed: s.speed,
-          }
-        }
-      })
-    }
-
-    for (let z in anomalies) {
-      App.sekrits[z] = anomalies[z]
-    }
-
-    for (let user in App.user_sekrits) {
-      for (let user_zone of App.user_sekrits[user]) {
-        if (!App.sekrits[user_zone]) {
-          App.user_sekrits[user].delete(user_zone)
-          App.zone_data_changed = true
-        }
-      }
-    }
-
-    for (let zone in App.zone_data) {
-      if (!App.is_public_zone(zone) && !App.sekrits[zone]) {
-        delete App.zone_data[zone]
-        App.zone_data_changed = true
-      }
-    }
-
-    for (let zone in App.zone_states) {
-      if (!App.is_public_zone(zone) && !App.sekrits[zone]) {
-        delete App.zone_states[zone]
-      }
-      else {
-        App.zone_states[zone].settings = App.get_speed(zone)
-      }
-    }
-
-    App.wss.clients.forEach(c => {
-      if ((c.readyState === WebSocket.OPEN) && !App.is_public_zone(c.zone) && !App.sekrits[c.zone]) {
-        App.go_to_zone(c, App.default_zone())
-      }
-    })
-  }
-  catch (err) {
-    console.error(`Error loading sekrit.json:`, err)
-  }
-}
-
-App.is_public_zone = (zone) => {
-  if (typeof zone !== `string`) {
-    return false
-  }
-
-  return App.shared.is_public_zone(zone) && !App.sekrits[zone.toUpperCase()]
-}
-
 App.word_match = (word) => {
   return App.words.has(word.toLowerCase())
-}
-
-App.get_zone_data = () => {
-  App.zone_data = {}
-  App.data_file = path.join(__dirname, `data.json`)
-
-  try {
-    if (fs.existsSync(App.data_file)) {
-      let parsed = JSON.parse(fs.readFileSync(App.data_file, `utf8`))
-
-      if (parsed.zones) {
-        App.zone_data = parsed.zones
-
-        for (let user in parsed.sekrits) {
-          App.user_sekrits[user] = new Set(parsed.sekrits[user])
-        }
-      }
-      else {
-        App.zone_data = parsed
-      }
-    }
-  }
-  catch (err) {
-    console.error(`Error loading data.json:`, err)
-  }
-}
-
-App.save_zone_data = () => {
-  let sekrits_to_save = {}
-
-  for (let user in App.user_sekrits) {
-    sekrits_to_save[user] = Array.from(App.user_sekrits[user])
-  }
-
-  let data_to_save = {
-    zones: App.zone_data,
-    sekrits: sekrits_to_save,
-  }
-
-  fs.writeFileSync(App.data_file, JSON.stringify(data_to_save, null, 2), `utf8`)
-}
-
-App.update_zone_activity = (zone, activity = false) => {
-  if (!App.zone_data[zone]) {
-    App.zone_data[zone] = {words: [], last_activity: 0}
-  }
-
-  if (activity) {
-    App.zone_data[zone].last_activity = Date.now()
-  }
-
-  App.zone_data_changed = true
 }
 
 App.setup_server = () => {
@@ -288,41 +134,6 @@ App.broadcast_zone_words = (zone, client = null) => {
       }
     })
   }
-}
-
-App.get_speed = (zone) => {
-  let z_num = parseInt(zone.charAt(1))
-
-  if (App.sekrits[zone] && App.sekrits[zone].speed) {
-    z_num = App.sekrits[zone].speed
-  }
-  else if (isNaN(z_num)) {
-    z_num = App.default_speed
-  }
-
-  return App.shared.zone_settings[z_num] || App.shared.zone_settings[5]
-}
-
-App.get_zone_state = (zone) => {
-  if (!App.zone_states[zone]) {
-    let settings = App.get_speed(zone)
-
-    App.zone_states[zone] = {
-      current_sequence: ``,
-      letters: [],
-      press_start_time: 0,
-      last_up_time: 0,
-      letter_timeout: null,
-      word_timeout: null,
-      last_active_ws: null,
-      lock_expires: 0,
-      control_start_time: 0,
-      takeover_time: 0,
-      settings,
-    }
-  }
-
-  return App.zone_states[zone]
 }
 
 App.get_last_username = (zone) => {
@@ -470,36 +281,6 @@ App.check_anomaly = (word) => {
       }
     }
   }
-}
-
-App.set_zone = (ws, zone) => {
-  ws.zone = zone
-  ws.sekrit = App.sekrits[zone]
-}
-
-App.go_to_zone = (ws, zone) => {
-  let old_zone = ws.zone
-
-  // If the user is already in this zone, just acknowledge and return
-  if (old_zone === zone) {
-    let echo = App.zone_data[ws.zone] && App.zone_data[ws.zone].echo ? App.zone_data[ws.zone].echo : ``
-    ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username, version: App.version, echo}))
-    App.broadcast_zone_words(ws.zone, ws)
-    return
-  }
-
-  App.force_release(ws, old_zone)
-  App.set_zone(ws, zone)
-  let echo = App.zone_data[ws.zone] && App.zone_data[ws.zone].echo ? App.zone_data[ws.zone].echo : ``
-  ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username, version: App.version, echo}))
-
-  if (old_zone) {
-    App.broadcast_zone_update(old_zone, ws.username, `leave`)
-  }
-
-  App.broadcast_zone_update(ws.zone, ws.username, `join`)
-  App.broadcast_zone_words(ws.zone, ws)
-  App.update_zone_activity(ws.zone)
 }
 
 App.setup_sockets = () => {
@@ -868,33 +649,6 @@ App.on_active_ws_same = (ws, data, z_state) => {
   return false
 }
 
-App.check_expired_sekrits = () => {
-  let now = Date.now()
-
-  for (let zone in App.sekrits) {
-    let sekrit = App.sekrits[zone]
-
-    if (sekrit.expires && (now > sekrit.expires)) {
-      delete App.sekrits[zone]
-
-      if (App.zone_data[zone]) {
-        delete App.zone_data[zone]
-        App.zone_data_changed = true
-      }
-
-      if (App.zone_states[zone]) {
-        delete App.zone_states[zone]
-      }
-
-      App.wss.clients.forEach(c => {
-        if ((c.readyState === WebSocket.OPEN) && (c.zone === zone)) {
-          App.go_to_zone(c, App.random_zone())
-        }
-      })
-    }
-  }
-}
-
 App.start_server = () => {
   let port = process.env.PORT || 3773
 
@@ -941,31 +695,6 @@ App.start_server = () => {
       App.get_version()
     }
   })
-}
-
-App.default_zone = () => {
-  let date = new Date()
-  let day = String(date.getDate()).padStart(2, `0`)
-  let month = String(date.getMonth() + 1).padStart(2, `0`)
-  let year = date.getFullYear()
-  let date_str = `${day}/${month}/${year}`
-  let hash = App.shared.get_string_hash(date_str)
-  let rng = App.shared.create_seeded_random(hash)
-  let letter = String.fromCharCode(65 + Math.floor(rng() * 26))
-  let zone = `${letter}${App.default_speed}`
-
-  while (App.sekrits[zone]) {
-    letter = String.fromCharCode(65 + Math.floor(rng() * 26))
-    zone = `${letter}${App.default_speed}`
-  }
-
-  return zone
-}
-
-App.random_zone = () => {
-  let letter = App.shared.random_letter()
-  let speed = App.shared.random_speed()
-  return `${letter}${speed}`
 }
 
 App.force_release = (ws, zone) => {
