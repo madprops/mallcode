@@ -913,9 +913,8 @@ App.get_theme = (zone, force = false) => {
   }
 
   App.border_color = App.colorlib.get_lighter_or_darker(App.text_color, 0.6)
-  App.set_css_var(`border_color`, App.border_color)
-
   App.set_css_var(`text_color`, App.text_color)
+  App.set_css_var(`border_color`, App.border_color)
   App.theme_cache = theme
 
   if (App.particles_material) {
