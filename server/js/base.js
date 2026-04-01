@@ -52,7 +52,7 @@ App.leave_sound = true
 App.bg_color = `rgb(0, 0, 0)`
 App.text_color = `rgb(255, 255, 255)`
 App.echo_delay = 5 * 1000
-App.ticker_speed = 65
+App.ticker_speed = 66
 App.colorlib = ColorLib()
 App.theme_cache = null
 App.theme_needs_update = true
@@ -422,8 +422,25 @@ App.spawn_sprite = (text, type) => {
       sprite.scale.set(12, 3, 1)
     }
 
-    sprite.position.set((Math.random() - 0.5) * 20, (Math.random() - 0.5) * 10, type === `word` ? 20 : 0)
-    sprite.userData = {text, type, velocity: new THREE.Vector3((Math.random() - 0.5) * 0.05, Math.random() * 0.05 + 0.02, 0.05), life: 1.0, decay_rate: type === `word` ? 0.25 : 0.5, age: 0, growth: type === `word` ? 2 : 10}
+    sprite.position.set(
+      (Math.random() - 0.5) * 20,
+      (Math.random() - 0.5) * 10,
+      type === `word` ? 20 : 0,
+    )
+
+    sprite.userData = {
+      text,
+      type,
+      velocity: new THREE.Vector3
+      (
+        (Math.random() - 0.5) * 0.05,
+        Math.random() * 0.05 + 0.02, 0.05,
+      ),
+      age: 0,
+      life: 1.0,
+      decay_rate: type === `word` ? 0.25 : 0.35,
+      growth: type === `word` ? 2 : 10},
+
     App.sprites.push(sprite)
   }
 
@@ -868,11 +885,12 @@ App.get_theme = (zone) => {
     p_min = 55
     p_max = 75
   }
+
   else {
-    l_min = 20
-    l_max = 40
-    p_min = 25
-    p_max = 45
+    l_min = 10
+    l_max = 30
+    p_min = 15
+    p_max = 35
   }
 
   let shapes = [`circle`, `square`, `triangle`, `star`]
@@ -1270,6 +1288,7 @@ App.on_word_end = (data) => {
         s.userData.decay_rate = 0.25
         s.userData.growth = 2
         let old_map = s.material.map
+        console.log(4)
         s.material.map = App.create_text_texture(word, false, false, true)
         old_map.dispose()
         found = true
