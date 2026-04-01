@@ -51,7 +51,7 @@ App.leave_sound = true
 App.bg_color = `black`
 App.text_color = `white`
 App.echo_delay = 5 * 1000
-App.ticker_speed = 70
+App.ticker_speed = 69
 App.colorlib = ColorLib()
 App.theme_cache = null
 
@@ -1080,8 +1080,13 @@ App.update_url = () => {
 }
 
 App.on_sequence = (data) => {
-  if (data.unit_duration) {
-    App.unit_duration = data.unit_duration
+  if (data.username !== App.username) {
+    if (data.unit_duration) {
+      App.unit_duration = data.unit_duration
+    }
+
+    App.current_sequence = data.sequence
+    App.update_sequence_display()
   }
 
   if (data.resolve) {
@@ -1093,11 +1098,6 @@ App.on_sequence = (data) => {
     }
 
     App.current_sequence = ``
-    App.update_sequence_display()
-  }
-  else if (data.username !== App.username) {
-    // Only update the sequence string for remote users to prevent local rubber-banding
-    App.current_sequence = data.sequence
     App.update_sequence_display()
   }
 
