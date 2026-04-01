@@ -73,7 +73,6 @@ body, html {
     font-size: 18px;
     font-weight: bold;
     z-index: 10;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
 #zone-dials {
@@ -354,6 +353,20 @@ a.clean-link:hover {
 
 #updates::-webkit-scrollbar {
     display: none;
+}
+
+.modal-btn {
+    background-color: #1d222b;
+    font-size: 18px;
+    font-family: sans-serif;
+    color: white;
+    border: 1px solid rgb(52, 52, 52);
+    padding: 5px;
+    cursor: pointer;
+}
+
+.modal-btn:hover {
+    border: 1px solid rgb(81, 81, 81);
 }
 
 #about-container {
