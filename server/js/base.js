@@ -439,7 +439,8 @@ App.spawn_sprite = (text, type) => {
       age: 0,
       life: 1.0,
       decay_rate: type === `word` ? 0.25 : 0.35,
-      growth: type === `word` ? 2 : 10},
+      growth: type === `word` ? 2 : 10
+    },
 
     App.sprites.push(sprite)
   }
