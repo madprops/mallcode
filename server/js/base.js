@@ -8,7 +8,7 @@ App.zone_usernames = []
 App.last_focus_time = 0
 App.zone_info_el = DOM.el(`#zone-info`)
 App.username_info_el = DOM.el(`#username-info`)
-App.echoes_el = DOM.el(`#echoes`)
+App.echo_el = DOM.el(`#echo`)
 App.zone_name_el = DOM.el(`#zone-name`)
 App.zone_dials_el = DOM.el(`#zone-dials`)
 App.sound_btn = DOM.el(`#sound-toggle`)
@@ -60,10 +60,10 @@ App.create_debouncers = () => {
     DOM.hide(App.username_info_el)
 
     if (App.echo) {
-      DOM.show(App.echoes_el)
+      DOM.show(App.echo_el)
     }
     else {
-      DOM.hide(App.echoes_el)
+      DOM.hide(App.echo_el)
     }
   }, 5000)
 
@@ -218,11 +218,11 @@ App.show_message = (args = {}) => {
 App.update_echo_display = (echo = ``) => {
   App.echo = echo
 
-  let current_html = App.echoes_el.innerHTML
+  let current_html = App.echo_el.innerHTML
   let new_html = App.echo ? `<span class="ticker-text">${App.clean_html(App.echo)}</span>` : ``
 
   if (current_html !== new_html) {
-    App.echoes_el.innerHTML = new_html
+    App.echo_el.innerHTML = new_html
   }
 }
 
@@ -442,7 +442,7 @@ App.trigger_down = (is_local = true) => {
     App.current_user = App.username
     App.username_info_el.textContent = App.username
     DOM.show(App.username_info_el)
-    DOM.hide(App.echoes_el)
+    DOM.hide(App.echo_el)
     App.username_debouncer.call()
     App.echo_debouncer.call()
   }
@@ -1166,7 +1166,7 @@ App.on_up_or_down = (data) => {
   App.current_user = data.username
   App.username_info_el.textContent = data.username
   DOM.show(App.username_info_el)
-  DOM.hide(App.echoes_el)
+  DOM.hide(App.echo_el)
   App.username_debouncer.call()
   App.echo_debouncer.call()
 }
@@ -1245,9 +1245,9 @@ App.on_zone = (data) => {
   App.update_echo_display(data.echo)
   DOM.hide(App.username_info_el)
   if (App.echo) {
-    DOM.show(App.echoes_el)
+    DOM.show(App.echo_el)
   } else {
-    DOM.hide(App.echoes_el)
+    DOM.hide(App.echo_el)
   }
 
   if (Shared.is_public_zone(App.zone)) {
