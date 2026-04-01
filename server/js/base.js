@@ -293,13 +293,17 @@ App.create_particle_texture = (theme) => {
 App.setup_canvas = () => {
   App.canvas = DOM.el(`#glcanvas`)
   App.renderer = new THREE.WebGLRenderer({canvas: App.canvas, antialias: true, alpha: true})
-  App.renderer.setSize(window.innerWidth, window.innerHeight)
+  let gl = App.renderer.getContext()
+  App.max_render_size = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE)
   App.renderer.setPixelRatio(window.devicePixelRatio)
   App.scene = new THREE.Scene()
   App.scene.background = new THREE.Color(App.bg_color)
   App.scene.fog = new THREE.FogExp2(App.bg_color, 0.0015)
   App.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000)
   App.camera.position.z = 40
+
+  App.resize()
+
   App.timer = new THREE.Timer()
   App.particles_geometry = new THREE.BufferGeometry()
   let particles_count = 3000
@@ -746,9 +750,7 @@ App.setup_events = () => {
   }, {passive: false})
 
   DOM.ev(window, `resize`, () => {
-    App.camera.aspect = window.innerWidth / window.innerHeight
-    App.camera.updateProjectionMatrix()
-    App.renderer.setSize(window.innerWidth, window.innerHeight)
+    App.resize()
   })
 
   DOM.ev(window, `focus`, () => {
@@ -1203,29 +1205,6 @@ App.refresh_info = () => {
   }
 }
 
-App.start = () => {
-  App.setup_canvas()
-  App.setup_events()
-  App.setup_sound()
-  App.animate()
-  App.started = true
-}
-
-App.cycle_seq = () => {
-  if (App.sequence === `base`) {
-    App.sequence = `above`
-  }
-  else if (App.sequence === `above`) {
-    App.sequence = `below`
-  }
-  else if (App.sequence === `below`) {
-    App.sequence = `base`
-  }
-
-  App.refresh_sequence()
-  App.save_storage()
-}
-
 App.refresh_bg_color = () => {
   if (App.canvas) {
     App.canvas.style.backgroundColor = App.bg_color
@@ -1518,6 +1497,32 @@ App.setup_msg_message = () => {
   let c = DOM.el(`#message-container`, clone)
   App.modal_el = c
   App.msg_message.set(c)
+}
+
+App.resize = () => {
+  let width = window.innerWidth
+  let height = window.innerHeight
+  let pixel_ratio = window.devicePixelRatio
+  let buffer_w = width * pixel_ratio
+  let buffer_h = height * pixel_ratio
+
+  if (buffer_w > App.max_render_size || buffer_h > App.max_render_size) {
+    let scale = App.max_render_size / Math.max(buffer_w, buffer_h)
+    width = width * scale
+    height = height * scale
+  }
+
+  App.camera.aspect = window.innerWidth / window.innerHeight
+  App.camera.updateProjectionMatrix()
+  App.renderer.setSize(width, height, false)
+}
+
+App.start = () => {
+  App.setup_canvas()
+  App.setup_events()
+  App.setup_sound()
+  App.animate()
+  App.started = true
 }
 
 App.init = async () => {
