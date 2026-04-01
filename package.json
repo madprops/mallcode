@@ -1,6 +1,6 @@
 {
   "name": "mallcode",
-  "version": "7.2.0",
+  "version": "7.7.0",
   "description": "A multi-user morse code system",
   "main": "server.js",
   "scripts": {
