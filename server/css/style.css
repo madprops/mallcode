@@ -130,6 +130,12 @@ body, html {
     gap: 20px;
 }
 
+#sound-toggle {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
 #top-left {
     position: absolute;
     top: var(--hud_top);

@@ -167,45 +167,45 @@ App.refresh_sound_icon = () => {
   let color = App.text_color || `white`
   App.sound_ctx.fillStyle = color
   App.sound_ctx.strokeStyle = color
-  App.sound_ctx.lineWidth = 3
+  App.sound_ctx.lineWidth = 4
   App.sound_ctx.lineCap = `round`
   App.sound_ctx.lineJoin = `round`
 
   App.sound_ctx.beginPath()
-  App.sound_ctx.moveTo(12, 20)
-  App.sound_ctx.lineTo(12, 28)
-  App.sound_ctx.lineTo(18, 28)
-  App.sound_ctx.lineTo(26, 36)
-  App.sound_ctx.lineTo(26, 12)
-  App.sound_ctx.lineTo(18, 20)
+  App.sound_ctx.moveTo(2, 16)
+  App.sound_ctx.lineTo(2, 32)
+  App.sound_ctx.lineTo(12, 32)
+  App.sound_ctx.lineTo(24, 44)
+  App.sound_ctx.lineTo(24, 4)
+  App.sound_ctx.lineTo(12, 16)
   App.sound_ctx.closePath()
 
   if (App.volume === `max`) {
     App.sound_ctx.fill()
 
     App.sound_ctx.beginPath()
-    App.sound_ctx.arc(26, 24, 8, -Math.PI / 3, Math.PI / 3)
+    App.sound_ctx.arc(24, 24, 10, -Math.PI / 3, Math.PI / 3)
     App.sound_ctx.stroke()
 
     App.sound_ctx.beginPath()
-    App.sound_ctx.arc(26, 24, 14, -Math.PI / 3, Math.PI / 3)
+    App.sound_ctx.arc(24, 24, 20, -Math.PI / 3, Math.PI / 3)
     App.sound_ctx.stroke()
   }
   else if (App.volume === `mid`) {
     App.sound_ctx.fill()
 
     App.sound_ctx.beginPath()
-    App.sound_ctx.arc(26, 24, 8, -Math.PI / 3, Math.PI / 3)
+    App.sound_ctx.arc(24, 24, 10, -Math.PI / 3, Math.PI / 3)
     App.sound_ctx.stroke()
   }
   else {
     App.sound_ctx.stroke()
 
     App.sound_ctx.beginPath()
-    App.sound_ctx.moveTo(32, 20)
-    App.sound_ctx.lineTo(40, 28)
-    App.sound_ctx.moveTo(40, 20)
-    App.sound_ctx.lineTo(32, 28)
+    App.sound_ctx.moveTo(32, 18)
+    App.sound_ctx.lineTo(44, 30)
+    App.sound_ctx.moveTo(44, 18)
+    App.sound_ctx.lineTo(32, 30)
     App.sound_ctx.stroke()
   }
 }
