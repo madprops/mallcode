@@ -1122,7 +1122,11 @@ App.refresh_bg_color = () => {
     }
   }
 
-  document.documentElement.style.setProperty(`--bg_color`, App.bg_color)
+  App.set_css_var(`bg_color`, App.bg_color)
+}
+
+App.set_css_var = (name, value) => {
+  document.documentElement.style.setProperty(`--${name}`, value)
 }
 
 App.show_update = (msg) => {
@@ -1259,6 +1263,8 @@ App.on_zone = (data) => {
   App.play_warp_drive()
   App.update_echo_display(data.echo)
   DOM.hide(App.username_info_el)
+  let theme = App.get_theme(App.zone)
+
   if (App.echo) {
     DOM.show(App.echo_el)
   }
@@ -1280,20 +1286,19 @@ App.on_zone = (data) => {
   }
   else {
     App.sekrit_zones.add(App.zone)
-    let theme = App.get_theme(App.zone)
     App.zone_name_el.textContent = App.zone
     App.zone_name_el.style.color = theme.particles
     DOM.show(App.zone_name_el)
     DOM.hide(App.zone_dials_el)
   }
 
-  let theme = App.get_theme(App.zone)
   App.particles_material.color.set(theme.particles)
 
   if (App.particles_material.map) {
     App.particles_material.map.dispose()
   }
 
+  App.set_css_var(`zone_color`, theme.particles)
   App.particles_material.map = App.create_particle_texture(theme)
   App.particles_material.needsUpdate = true
 }
