@@ -51,6 +51,7 @@ App.join_sound = true
 App.leave_sound = true
 App.bg_color = `#000000`
 App.echo_delay = 5 * 1000
+App.ticker_speed = 60
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
@@ -229,10 +230,8 @@ App.update_echo_display = (echo = ``) => {
       let ticker = App.echo_el.querySelector(`.ticker-text`)
 
       if (ticker) {
-        // Calculate width, using a fallback estimation if the element is currently hidden (offsetWidth = 0)
         let width = ticker.offsetWidth || (App.echo.length * 10 + 100)
-        // Set a constant speed of 40 pixels per second
-        ticker.style.animationDuration = `${width / 40}s`
+        ticker.style.animationDuration = `${width / App.ticker_speed}s`
       }
     }
   }
