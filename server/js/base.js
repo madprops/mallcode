@@ -1351,6 +1351,7 @@ App.get_about_text = () => {
   Higher numbers mean closer to real speed.
   Each zone has its own theme.
   The zones remember the words.
+  There's also sekrit zones and anomalies.
   You might encounter other users.
   Each user has a personality.
   Iambic keys: z/x and left/right.
