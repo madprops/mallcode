@@ -237,7 +237,7 @@ App.setup_zone_map_icon = () => {
 }
 
 App.animate_zone_map_icon = () => {
-  if (!App.zone_map_ctx) {
+  if (!App.zone_map_ctx || !App.zone_map_icon_locked_color) {
     return
   }
 
@@ -258,7 +258,7 @@ App.animate_zone_map_icon = () => {
   let now = performance.now()
   let is_locked = App.is_pressed || ((now - App.remote_lock_time) < Shared.lock_time) || ((now - App.last_input_time) < Shared.lock_time)
 
-  App.zone_map_ctx.fillStyle = is_locked ? `#ca4e4e` : `#58a564`
+  App.zone_map_ctx.fillStyle = is_locked ? App.zone_map_icon_locked_color : App.zone_map_icon_unlocked_color
   App.zone_map_ctx.globalAlpha = 0.6 + pulse1 * 0.4
   App.zone_map_ctx.beginPath()
   App.zone_map_ctx.arc(w / 2, h / 2, 10 + pulse2 * 4, 0, Math.PI * 2)

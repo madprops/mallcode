@@ -69,9 +69,14 @@ App.get_theme = (zone, force = false) => {
 
   if (is_dark) {
     App.text_color = `white`
+    App.zone_map_icon_locked_color = `#ff8899`
+    App.zone_map_icon_unlocked_color = `#88ffaa`
   }
+
   else {
     App.text_color = `black`
+    App.zone_map_icon_locked_color = `#e05070`
+    App.zone_map_icon_unlocked_color = `#22aa55`
   }
 
   let text_val = App.get_color(App.text_color)
