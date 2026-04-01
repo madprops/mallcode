@@ -926,20 +926,34 @@ App.setup_markov = () => {
 
 App.get_markov_text = (words) => {
   let options = {
-    maxTries: 1000,
-    filter: result => words.some(word => result.string.includes(word))
+    maxTries: 2000,
+    filter: result => {
+      let lower_string = result.string.toLowerCase()
+      let has_word = words.some(word => lower_string.includes(word))
+
+      // forces the generator to combine at least 2 sentences
+      let is_novel = result.refs.length > 1
+
+      return has_word && is_novel
+    }
   }
 
   try {
     let result = App.text_generator.generate(options)
     return result.string
-  } catch (e) {
+  }
+  catch (e) {
     try {
-      let fallback_options = {maxTries: 100}
+      let fallback_options = {
+        maxTries: 1000,
+        filter: result => result.refs.length > 1
+      }
+
       let fallback_result = App.text_generator.generate(fallback_options)
       return fallback_result.string
-    } catch (err) {
-      return `signal lost...`
+    }
+    catch (err) {
+      return ``
     }
   }
 }
