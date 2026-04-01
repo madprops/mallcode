@@ -378,12 +378,15 @@ App.process_word = (zone, word, ws) => {
 
   if (sekrit) {
     if (ws && (ws.readyState === WebSocket.OPEN) && (ws.zone !== sekrit.zone)) {
-      if (!App.user_sekrits[ws.username]) {
-        App.user_sekrits[ws.username] = new Set()
+      if (!sekrit.expires) {
+        if (!App.user_sekrits[ws.username]) {
+          App.user_sekrits[ws.username] = new Set()
+        }
+
+        App.user_sekrits[ws.username].add(sekrit.zone)
+        App.zone_data_changed = true
       }
 
-      App.user_sekrits[ws.username].add(sekrit.zone)
-      App.zone_data_changed = true
       App.go_to_zone(ws, sekrit.zone)
     }
 
@@ -612,8 +615,9 @@ App.prepare_ws = (ws, req) => {
   if (req_zone) {
     let upper_zone = req_zone.toUpperCase()
     let is_authorized = App.user_sekrits[ws.username] && App.user_sekrits[ws.username].has(upper_zone)
+    let is_anomaly = App.sekrits[upper_zone] && App.sekrits[upper_zone].expires
 
-    if (App.is_public_zone(upper_zone) || is_authorized) {
+    if (App.is_public_zone(upper_zone) || is_authorized || is_anomaly) {
       ws.target_zone = upper_zone
     }
     else {
@@ -633,8 +637,9 @@ App.on_restore_zone = (ws, data) => {
   if (data.zone) {
     let upper_zone = data.zone.toUpperCase()
     let is_authorized = App.user_sekrits[ws.username] && App.user_sekrits[ws.username].has(upper_zone)
+    let is_anomaly = App.sekrits[upper_zone] && App.sekrits[upper_zone].expires
 
-    if (!App.is_public_zone(upper_zone) && (upper_zone !== ws.zone) && !is_authorized) {
+    if (!App.is_public_zone(upper_zone) && (upper_zone !== ws.zone) && !is_authorized && !is_anomaly) {
       return
     }
 

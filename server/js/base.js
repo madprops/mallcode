@@ -1139,7 +1139,7 @@ App.clear_updates = () => {
 App.update_url = () => {
   let url = new URL(window.location)
 
-  if (Shared.is_public_zone(App.zone)) {
+  if (App.zone) {
     url.searchParams.set(`zone`, App.zone)
   }
   else {
@@ -1403,7 +1403,7 @@ App.init = async () => {
   let params = new URLSearchParams(window.location.search)
   let p_zone = params.get(`zone`)
 
-  if (p_zone && /^[A-Z][1-9]$/i.test(p_zone)) {
+  if (p_zone) {
     App.zone = p_zone.toUpperCase()
   }
 
