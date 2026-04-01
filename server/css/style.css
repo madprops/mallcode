@@ -97,6 +97,7 @@ body, html {
   background-repeat: no-repeat;
   box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.05);
   transition: all 0.2s ease-in-out;
+  color: var(--text_color);
 }
 
 .dial option {
