@@ -8,7 +8,7 @@ const path = require(`path`)
 const fs = require(`fs`)
 App.server = http.createServer(App.app)
 App.wss = new WebSocket.Server({server: App.server})
-const Markov = require('markov-strings').default
+const Markov = require(`markov-strings`).default
 App.shared = require(`./js/shared.js`)
 App.actions = require(`./actions.js`)
 require(`./spam.js`)(App)

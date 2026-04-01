@@ -1246,7 +1246,8 @@ App.on_zone = (data) => {
   DOM.hide(App.username_info_el)
   if (App.echo) {
     DOM.show(App.echo_el)
-  } else {
+  }
+  else {
     DOM.hide(App.echo_el)
   }
 

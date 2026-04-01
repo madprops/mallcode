@@ -1,5 +1,5 @@
-let fs = require('fs')
-let Markov = require('markov-strings').default
+let fs = require(`fs`)
+let Markov = require(`markov-strings`).default
 
 function build_corpus(file_path) {
   let text = fs.readFileSync(file_path, `utf-8`)
