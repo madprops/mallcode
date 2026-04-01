@@ -219,20 +219,17 @@ body, html {
 }
 
 .zone-map-btn {
-    padding: 10px 5px;
+    padding: 8px 4px;
     font-size: 16px;
     font-family: monospace;
     font-weight: bold;
     cursor: pointer;
     border: 1px solid;
-    border-radius: 4px;
-    transition: transform 0.1s;
     min-width: 40px;
 }
 
 .zone-map-btn:hover {
-    transform: scale(1.1);
-    z-index: 2;
+    filter: brightness(1.2);
 }
 
 .zone-map-current {
@@ -257,6 +254,10 @@ body, html {
     max-width: 500px;
     flex-wrap: wrap-reverse;
     padding-bottom: 10px;
+}
+
+#zone-map-sekrit-row .zone-map-btn {
+    padding: 5px 10px;
 }
 
 .hidden {
