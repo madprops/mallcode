@@ -102,6 +102,13 @@ App.get_theme = (zone, force = false) => {
 App.get_zone_color = (zone_name) => {
   let letter = zone_name.charAt(0)
 
+  if (!Shared.is_public_zone(zone_name)) {
+    let seed = Shared.get_string_hash(zone_name)
+    let random = Shared.create_seeded_random(seed)
+    let keys = Object.keys(App.zone_colors)
+    letter = keys[Shared.random_int({min: 0, max: keys.length - 1, rand: random})]
+  }
+
   if (App.zone_colors[letter]) {
     return App.zone_colors[letter]
   }
