@@ -318,6 +318,9 @@ Shared.ticker_text = (text) => {
   // strip out dialogue hyphens
   formatted = formatted.replace(/- /g, ``)
 
+  // remove leading punctuation from segments
+  formatted = formatted.replace(/(^|\/\/)\s*[,.;:-]+/g, `$1 `)
+
   // remove trailing punctuation from segments
   formatted = formatted.replace(/[,.;:-]+(?=\s*(?:\/\/|$))/g, ``)
 
