@@ -33,7 +33,7 @@ App.max_connections_per_ip = 3
 App.max_info_per_minute = 10
 App.anomaly_hours = 2
 App.anomaly_speed = 7
-App.anomaly_chance = 0.1
+App.anomaly_chance = 1
 App.max_echo_length = 1024
 
 App.get_version = () => {
@@ -424,7 +424,7 @@ App.process_word = (zone, word, ws) => {
     App.zone_data_changed = true
     App.broadcast_zone_words(zone)
 
-    if (Math.random() < App.anomaly_chance) {
+    if (Math.random() < (App.anomaly_chance / 100)) {
       if (!App.sekrits[word] && !App.shared.is_public_zone(word)) {
         let zone_name = App.shared.random_word(3, word)
         zone_name = zone_name.toUpperCase()
