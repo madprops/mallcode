@@ -1,29 +1,29 @@
 module.exports = (App) => {
   App.setup_bundler = () => {
-    let libs_dir = path.join(__dirname, `./js/libs`)
-    let js_dir = path.join(__dirname, `./js/main`)
+    let libs_dir = App.i.path.join(__dirname, `./js/libs`)
+    let js_dir = App.i.path.join(__dirname, `./js/main`)
 
     App.top_libs = []
     App.top_main = [`shared`, `base`]
 
     App.get_js_files = (dir, top_files = []) => {
-      let files = fs.readdirSync(dir)
+      let files = App.i.fs.readdirSync(dir)
       let js_files = []
       let top_paths = []
 
       for (let i = 0; i < top_files.length; i++) {
         let expected_name = top_files[i] + `.js`
-        let full_path = path.join(dir, expected_name)
+        let full_path = App.i.path.join(dir, expected_name)
 
-        if (fs.existsSync(full_path)) {
+        if (App.i.fs.existsSync(full_path)) {
           top_paths.push(full_path)
         }
       }
 
       for (let i = 0; i < files.length; i++) {
         let file = files[i]
-        let full_path = path.join(dir, file)
-        let is_file = fs.statSync(full_path).isFile()
+        let full_path = App.i.path.join(dir, file)
+        let is_file = App.i.fs.statSync(full_path).isFile()
         let is_js = file.endsWith(`.js`)
         let is_bundle = file.endsWith(`.bundle.js`)
         let base_name = file.replace(/\.js$/, ``)
@@ -42,11 +42,11 @@ module.exports = (App) => {
         App.libs_files = App.get_js_files(libs_dir, App.top_libs)
         App.main_files = App.get_js_files(js_dir, App.top_main)
 
-        let libs_code = App.libs_files.map(f => fs.readFileSync(f, `utf8`)).join(`\n;\n`)
-        fs.writeFileSync(path.join(__dirname, `./js/libs.bundle.js`), libs_code, `utf8`)
+        let libs_code = App.libs_files.map(f => App.i.fs.readFileSync(f, `utf8`)).join(`\n;\n`)
+        App.i.fs.writeFileSync(App.i.path.join(__dirname, `./js/libs.bundle.js`), libs_code, `utf8`)
 
-        let main_code = App.main_files.map(f => fs.readFileSync(f, `utf8`)).join(`\n;\n`)
-        fs.writeFileSync(path.join(__dirname, `./js/main.bundle.js`), main_code, `utf8`)
+        let main_code = App.main_files.map(f => App.i.fs.readFileSync(f, `utf8`)).join(`\n;\n`)
+        App.i.fs.writeFileSync(App.i.path.join(__dirname, `./js/main.bundle.js`), main_code, `utf8`)
       }
       catch (err) {
         console.error(`Error bundling files:`, err)
@@ -70,7 +70,7 @@ module.exports = (App) => {
       }
     }
 
-    fs.watch(libs_dir, handle_watch)
-    fs.watch(js_dir, handle_watch)
+    App.i.fs.watch(libs_dir, handle_watch)
+    App.i.fs.watch(js_dir, handle_watch)
   }
 }

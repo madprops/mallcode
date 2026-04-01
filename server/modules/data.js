@@ -1,7 +1,9 @@
+
+
 module.exports = (App) => {
   App.get_version = () => {
     try {
-      App.package = JSON.parse(fs.readFileSync(path.join(__dirname, `../package.json`), `utf8`))
+      App.package = JSON.parse(App.i.fs.readFileSync(App.i.path.join(__dirname, `../package.json`), `utf8`))
       App.version = App.package.version || `0.0.0`
     }
     catch (err) {
@@ -11,7 +13,7 @@ module.exports = (App) => {
 
   App.get_words = () => {
     try {
-      let data = fs.readFileSync(path.join(__dirname, `words.txt`), `utf8`)
+      let data = App.i.fs.readFileSync(App.i.path.join(__dirname, `words.txt`), `utf8`)
 
       data.split(`\n`).forEach(line => {
         let word = line.trim()
@@ -30,7 +32,7 @@ module.exports = (App) => {
 
   App.get_sekrits = () => {
     try {
-      let file = path.join(__dirname, `sekrit.json`)
+      let file = App.i.path.join(__dirname, `sekrit.json`)
       let anomalies = {}
 
       for (let z in App.sekrits) {
@@ -41,8 +43,8 @@ module.exports = (App) => {
 
       App.sekrits = {}
 
-      if (fs.existsSync(file)) {
-        let data = JSON.parse(fs.readFileSync(file, `utf8`))
+      if (App.i.fs.existsSync(file)) {
+        let data = JSON.parse(App.i.fs.readFileSync(file, `utf8`))
 
         data.forEach(s => {
           if (s.word && s.zone) {
@@ -97,11 +99,11 @@ module.exports = (App) => {
 
   App.get_zone_data = () => {
     App.zone_data = {}
-    App.data_file = path.join(__dirname, `data.json`)
+    App.data_file = App.i.path.join(__dirname, `data.json`)
 
     try {
-      if (fs.existsSync(App.data_file)) {
-        let parsed = JSON.parse(fs.readFileSync(App.data_file, `utf8`))
+      if (App.i.fs.existsSync(App.data_file)) {
+        let parsed = JSON.parse(App.i.fs.readFileSync(App.data_file, `utf8`))
 
         if (parsed.zones) {
           App.zone_data = parsed.zones
@@ -132,6 +134,6 @@ module.exports = (App) => {
       sekrits: sekrits_to_save,
     }
 
-    fs.writeFileSync(App.data_file, JSON.stringify(data_to_save, null, 2), `utf8`)
+    App.i.fs.writeFileSync(App.data_file, JSON.stringify(data_to_save, null, 2), `utf8`)
   }
 }

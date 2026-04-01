@@ -1,16 +1,17 @@
 const App = {}
+App.i = {}
 
+App.i.path = require(`path`)
+App.i.fs = require(`fs`)
 App.express = require(`express`)
 App.app = App.express()
 const http = require(`http`)
 const WebSocket = require(`ws`)
-const path = require(`path`)
-const fs = require(`fs`)
 App.server = http.createServer(App.app)
 App.wss = new WebSocket.Server({server: App.server})
 const Markov = require(`markov-strings`).default
 App.shared = require(`./js/main/shared.js`)
-App.actions = require(`./modules/actions.js`)
+App.actions = require(`./actions.js`)
 require(`./modules/spam.js`)(App)
 require(`./modules/data.js`)(App)
 require(`./modules/zones.js`)(App)
@@ -79,7 +80,7 @@ App.setup_server = () => {
   App.app.use(App.express.static(__dirname))
 
   App.app.get(`/`, (req, res) => {
-    res.sendFile(path.join(__dirname, `./index.html`))
+    res.sendFile(App.i.path.join(__dirname, `./index.html`))
   })
 }
 
@@ -118,13 +119,13 @@ App.start_server = () => {
     }
   }, App.save_data_interval)
 
-  fs.watch(__dirname, (event, filename) => {
+  App.i.fs.watch(__dirname, (event, filename) => {
     if (filename === `sekrit.json`) {
       App.get_sekrits()
     }
   })
 
-  fs.watch(path.join(__dirname, `..`), (event, filename) => {
+  App.i.fs.watch(App.i.path.join(__dirname, `..`), (event, filename) => {
     if (filename === `package.json`) {
       App.get_version()
     }
