@@ -224,6 +224,17 @@ App.update_echo_display = (echo = ``) => {
 
   if (current_html !== new_html) {
     App.echo_el.innerHTML = new_html
+
+    if (App.echo) {
+      let ticker = App.echo_el.querySelector(`.ticker-text`)
+
+      if (ticker) {
+        // Calculate width, using a fallback estimation if the element is currently hidden (offsetWidth = 0)
+        let width = ticker.offsetWidth || (App.echo.length * 10 + 100)
+        // Set a constant speed of 40 pixels per second
+        ticker.style.animationDuration = `${width / 40}s`
+      }
+    }
   }
 }
 

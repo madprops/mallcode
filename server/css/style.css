@@ -131,7 +131,7 @@ body, html {
 
 .ticker-text {
     display: inline-block;
-    animation: ticker 15s linear infinite;
+    animation: ticker linear infinite;
     padding-left: 100px;
 }
 

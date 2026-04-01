@@ -425,14 +425,12 @@ App.process_word = (zone, word, ws) => {
         let zone_name = App.shared.random_word(3, word)
         zone_name = zone_name.toUpperCase()
 
-        App.sekrits[word] = {
+        App.sekrits[zone_name] = {
           word: zone_name,
           zone: zone_name,
           speed: App.anomaly_speed,
           expires: Date.now() + App.anomaly_hours * 60 * 60 * 1000,
         }
-
-        console.log(11111111, word)
       }
     }
   }
@@ -680,6 +678,15 @@ App.on_get_zones = (ws, data) => {
   }
 
   let user_sekrits = App.user_sekrits[ws.username] ? Array.from(App.user_sekrits[ws.username]) : []
+  let sekrits_to_send = [...user_sekrits]
+
+  for (let key in App.sekrits) {
+    let sekrit = App.sekrits[key]
+
+    if (sekrit.expires && !sekrits_to_send.includes(sekrit.zone)) {
+      sekrits_to_send.push(sekrit.zone)
+    }
+  }
 
   for (let z of user_sekrits) {
     if (App.zone_data[z]) {
@@ -706,7 +713,7 @@ App.on_get_zones = (ws, data) => {
     }
   })
 
-  ws.send(JSON.stringify({type: `ZONES_INFO`, zones: zones_info, sekrits: user_sekrits}))
+  ws.send(JSON.stringify({type: `ZONES_INFO`, zones: zones_info, sekrits: sekrits_to_send}))
 }
 
 App.on_down = (ws, data, z_state) => {
