@@ -101,7 +101,7 @@ Read some [theories](theory.md).
 
 `npm install`
 
-Run `server/markov.js` to create the echo corpus.
+Run `server/build_corpus.js` to create the echo corpus.
 
 Start it with `run.sh`.
 

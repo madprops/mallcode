@@ -60,6 +60,11 @@ App.word_match = (word) => {
   return App.words.has(word.toLowerCase())
 }
 
+App.get_last_username = (zone) => {
+  let z_state = App.zone_states[zone]
+  return z_state.last_active_ws ? z_state.last_active_ws.username : ``
+}
+
 App.setup_server = () => {
   App.app.use((req, res, next) => {
     let cookies = req.headers.cookie || ``
@@ -76,11 +81,6 @@ App.setup_server = () => {
   App.app.get(`/`, (req, res) => {
     res.sendFile(path.join(__dirname, `./index.html`))
   })
-}
-
-App.get_last_username = (zone) => {
-  let z_state = App.zone_states[zone]
-  return z_state.last_active_ws ? z_state.last_active_ws.username : ``
 }
 
 App.start_server = () => {
