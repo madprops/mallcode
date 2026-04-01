@@ -34,6 +34,7 @@ App.max_info_per_minute = 10
 App.anomaly_hours = 2
 App.anomaly_speed = 7
 App.anomaly_chance = 0.1
+App.max_echo_length = 1024
 
 App.get_version = () => {
   try {
@@ -413,7 +414,7 @@ App.process_word = (zone, word, ws) => {
 
     try {
       let echo = App.get_markov_text(App.zone_data[zone].words)
-      echo = App.shared.ticker_text(echo).substring(0, 280).trim()
+      echo = App.shared.ticker_text(echo).substring(0, App.max_echo_length).trim()
       App.zone_data[zone].echo = echo
     }
     catch (err) {
