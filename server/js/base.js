@@ -52,6 +52,7 @@ App.leave_sound = true
 App.bg_color = `#000000`
 App.echo_delay = 5 * 1000
 App.ticker_speed = 65
+App.colorlib = ColorLib()
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
@@ -827,20 +828,50 @@ App.get_user_color = (name = `nobody`) => {
   return `hsl(${Math.round(base_hue)}, ${Shared.random_int({min: 80, max: 100, rand: random})}%, ${Shared.random_int({min: 55, max: 75, rand: random})}%)`
 }
 
+App.get_color = (color_string) => {
+  if (color_string.startsWith(`#`) || color_string.startsWith(`rgb`)) {
+    return color_string
+  }
+
+  let temp_el = DOM.create(`div`)
+  temp_el.style.color = color_string
+  document.body.appendChild(temp_el)
+  let rgb = window.getComputedStyle(temp_el).color
+  document.body.removeChild(temp_el)
+  return rgb
+}
+
 App.get_theme = (zone) => {
   let seed = Shared.get_string_hash(zone)
   let random = Shared.create_seeded_random(seed)
+  let bg_color_val = App.get_color(App.bg_color)
+  let is_dark = App.colorlib.is_dark(bg_color_val)
   let base_hue = random() * 360
   let hue1 = base_hue
   let hue2 = (base_hue + 120 + random() * 40 - 20) % 360
   let particle_hue = random() * 360
+  let l_min, l_max, p_min, p_max
+
+  if (is_dark) {
+    l_min = 60
+    l_max = 80
+    p_min = 55
+    p_max = 75
+  }
+  else {
+    l_min = 20
+    l_max = 40
+    p_min = 25
+    p_max = 45
+  }
+
   let shapes = [`circle`, `square`, `triangle`, `star`]
   let shape = shapes[Shared.random_int({min: 0, max: shapes.length - 1, rand: random})]
 
   return {
-    letter: `hsl(${Math.round(hue1)}, ${Shared.random_int({min: 70, max: 100, rand: random})}%, ${Shared.random_int({min: 60, max: 80, rand: random})}%)`,
-    word: `hsl(${Math.round(hue2)}, ${Shared.random_int({min: 70, max: 100, rand: random})}%, ${Shared.random_int({min: 60, max: 80, rand: random})}%)`,
-    particles: `hsl(${Math.round(particle_hue)}, ${Shared.random_int({min: 80, max: 100, rand: random})}%, ${Shared.random_int({min: 55, max: 75, rand: random})}%)`,
+    letter: `hsl(${Math.round(hue1)}, ${Shared.random_int({min: 70, max: 100, rand: random})}%, ${Shared.random_int({min: l_min, max: l_max, rand: random})}%)`,
+    word: `hsl(${Math.round(hue2)}, ${Shared.random_int({min: 70, max: 100, rand: random})}%, ${Shared.random_int({min: l_min, max: l_max, rand: random})}%)`,
+    particles: `hsl(${Math.round(particle_hue)}, ${Shared.random_int({min: 80, max: 100, rand: random})}%, ${Shared.random_int({min: p_min, max: p_max, rand: random})}%)`,
     shape,
   }
 }

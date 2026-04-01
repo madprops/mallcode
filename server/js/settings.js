@@ -32,6 +32,7 @@ App.get_settings = () => {
       name: `bg_color`,
       value: App.bg_color,
       type: `string`,
+      color: true,
     },
     {
       comment: `Enable or disable effects`,
@@ -160,10 +161,15 @@ App.check_save_settings = () => {
   }
 
   for (let setting of settings) {
-    let setting_value = parsed_toml[setting.name]
-    setting.value = setting_value
-    App[setting.name] = setting_value
-    App.storage[setting.name] = setting_value
+    let value = parsed_toml[setting.name]
+
+    if (setting.color) {
+      value = App.get_color(value)
+    }
+
+    setting.value = value
+    App[setting.name] = value
+    App.storage[setting.name] = value
   }
 
   App.refresh_sound_icon()
