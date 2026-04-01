@@ -51,7 +51,7 @@ App.leave_sound = true
 App.bg_color = `black`
 App.text_color = `white`
 App.echo_delay = 5 * 1000
-App.ticker_speed = 66
+App.ticker_speed = 69
 App.colorlib = ColorLib()
 App.theme_cache = null
 
