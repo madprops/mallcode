@@ -309,6 +309,21 @@ Shared.capitalize = (s) => {
   return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
+Shared.ticker_text = (text) => {
+  let formatted = text.toLowerCase()
+
+  // turn newlines into a stylized separator for the ticker
+  formatted = formatted.replace(/[\r\n]+/g, ` // `)
+
+  // strip out dialogue hyphens
+  formatted = formatted.replace(/- /g, ``)
+
+  // clean up any accidental double spaces
+  formatted = formatted.replace(/\s+/g, ` `)
+
+  return formatted.trim()
+}
+
 if ((typeof module !== `undefined`) && module.exports) {
   module.exports = Shared
 }

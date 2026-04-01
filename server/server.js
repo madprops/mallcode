@@ -1,13 +1,14 @@
-let App = {}
+const App = {}
 
 App.express = require(`express`)
 App.app = App.express()
-let http = require(`http`)
-let WebSocket = require(`ws`)
-let path = require(`path`)
-let fs = require(`fs`)
+const http = require(`http`)
+const WebSocket = require(`ws`)
+const path = require(`path`)
+const fs = require(`fs`)
 App.server = http.createServer(App.app)
 App.wss = new WebSocket.Server({server: App.server})
+const Markov = require('markov-strings').default
 App.shared = require(`./js/shared.js`)
 App.actions = require(`./actions.js`)
 require(`./spam.js`)(App)
@@ -852,6 +853,27 @@ App.send_message = (ws, text, pissed = false) => {
   }))
 }
 
+App.setup_markov = () => {
+  let saved_corpus = JSON.parse(fs.readFileSync(`corpus.json`, `utf-8`))
+  App.text_generator = new Markov()
+  App.text_generator.import(saved_corpus)
+}
+
+App.get_markov_text = (words) => {
+  let random_word = words[Math.floor(Math.random() * words.length)]
+  let options = {filter: (result) => result.string.includes(random_word)}
+
+  try {
+    let result = App.text_generator.generate(options)
+    return result.string
+  }
+
+  catch (e) {
+    let fallback_result = App.text_generator.generate()
+    return fallback_result.string
+  }
+}
+
 App.get_version()
 App.get_words()
 App.get_sekrits()
@@ -859,4 +881,5 @@ App.get_zone_data()
 App.setup_sockets()
 App.setup_server()
 App.start_anti_spam()
+App.setup_markov()
 App.start_server()

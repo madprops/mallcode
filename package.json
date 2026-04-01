@@ -11,7 +11,8 @@
   "dependencies": {
     "express": "^4.18.2",
     "ws": "^8.16.0",
-    "@atproto/api": "^0.13.0"
+    "@atproto/api": "^0.13.0",
+    "markov-strings": "^3.0.2"
   },
   "devDependencies": {
     "eslint": "~9.11.1",
