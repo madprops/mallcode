@@ -135,4 +135,15 @@ module.exports = (App) => {
       }
     }
   }
+
+  App.get_zone_echo = (zone) => {
+    try {
+      let echo = App.get_markov_text()
+      echo = App.shared.ticker_text(echo).substring(0, App.max_echo_length).trim()
+      App.zone_data[zone].echo = echo
+    }
+    catch (err) {
+      App.zone_data[zone].echo = ``
+    }
+  }
 }
