@@ -192,6 +192,7 @@ App.show_message = (args = {}) => {
     text: ``,
     html: ``,
     pissed: false,
+    pre: false,
   }
 
   Shared.def_args(def_args, args)
@@ -216,6 +217,13 @@ App.show_message = (args = {}) => {
   }
   else {
     container.classList.remove(`pissed`)
+  }
+
+  if (args.pre) {
+    container.classList.add(`pre`)
+  }
+  else {
+    container.classList.remove(`pre`)
   }
 
   container.innerHTML = content
@@ -1266,26 +1274,13 @@ App.get_about_text = () => {
   ${App.repo}`
 }
 
-App.setup_about = () => {
-  App.msg_about = Msg.factory({
-    before_show: () => {
-      let c = DOM.el(`#about-container`)
-      c.textContent = App.get_about_text()
-    },
-  })
-
-  let template = DOM.el(`#about-template`)
-  let clone = template.content.cloneNode(true)
-  let c = DOM.el(`#about-container`, clone)
-  App.msg_about.set(c)
-}
-
 App.show_about = () => {
-  App.msg_about.show()
+  let text = App.get_about_text()
+  App.show_message({text, pre: true})
 }
 
 App.modal_open = () => {
-  return App.msg_about.any_open()
+  return App.msg_message.any_open()
 }
 
 App.setup_msg_message = () => {
@@ -1319,7 +1314,6 @@ App.init = async () => {
   await App.load_storage()
   App.create_debouncers()
   App.setup_msg_message()
-  App.setup_about()
   App.setup_zone_map()
   App.setup_zone_map_icon()
   App.setup_settings()
