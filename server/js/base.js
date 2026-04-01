@@ -49,7 +49,8 @@ App.sekrit_zones = new Set()
 App.repo = `github.com/madprops/mallcode`
 App.join_sound = true
 App.leave_sound = true
-App.bg_color = `#000000`
+App.bg_color = `rgb(0, 0, 0)`
+App.text_color = `rgb(255, 255, 255)`
 App.echo_delay = 5 * 1000
 App.ticker_speed = 65
 App.colorlib = ColorLib()
@@ -887,11 +888,13 @@ App.get_theme = (zone) => {
 
   if (is_dark) {
     App.text_color = `rgb(255, 255, 255)`
+    App.set_css_var(`text_color`, `black`)
   }
   else {
     App.text_color = `rgb(0, 0, 0)`
   }
 
+  App.set_css_var(`text_color`, App.text_color)
   App.theme_cache = theme
   App.theme_needs_update = false
   return theme
