@@ -106,7 +106,5 @@ App.get_zone_color = (zone_name) => {
     return App.zone_colors[letter]
   }
 
-  else {
-    return `#000000`
-  }
+  return `#000000`
 }

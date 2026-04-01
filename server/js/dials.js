@@ -41,8 +41,8 @@ App.setup_dials = () => {
       return
     }
 
-    new_val = Shared.letters[new_index]
-    s_val = new_val.toString()
+    let new_val = Shared.letters[new_index]
+    let s_val = new_val.toString()
     App.letter_dial_el.value = s_val
     App.letter_dial_el.textContent = s_val
     App.zone_dial_debouncer_2.call()
@@ -78,7 +78,7 @@ App.setup_dials = () => {
       return
     }
 
-    s_val = new_val.toString()
+    let s_val = new_val.toString()
     App.speed_dial_el.value = s_val
     App.speed_dial_el.textContent = s_val
     App.zone_dial_debouncer_2.call()
