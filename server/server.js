@@ -31,6 +31,9 @@ App.sekrit_delay = 60
 App.user_sekrits = {}
 App.max_connections_per_ip = 3
 App.max_info_per_minute = 10
+App.anomaly_duration = 2 * 60
+App.anomaly_speed = 7
+App.anomaly_chance = 1
 
 App.get_version = () => {
   try {
@@ -64,11 +67,11 @@ App.get_words = () => {
 App.get_sekrits = () => {
   try {
     let file = path.join(__dirname, `sekrit.json`)
-    let dynamic_sekrits = {}
+    let anomalies = {}
 
     for (let z in App.sekrits) {
       if (App.sekrits[z].expires) {
-        dynamic_sekrits[z] = App.sekrits[z]
+        anomalies[z] = App.sekrits[z]
       }
     }
 
@@ -88,8 +91,8 @@ App.get_sekrits = () => {
       })
     }
 
-    for (let z in dynamic_sekrits) {
-      App.sekrits[z] = dynamic_sekrits[z]
+    for (let z in anomalies) {
+      App.sekrits[z] = anomalies[z]
     }
 
     for (let user in App.user_sekrits) {
@@ -371,13 +374,16 @@ App.resolve_word = (zone) => {
 App.help_text = `https://www.youtube.com/watch?v=spdfnqS3bDg`
 
 App.process_word = (zone, word, ws) => {
-  if ((word.length >= 3) && (Math.random() < 0.01)) {
+  if ((word.length >= 3) && (Math.random() < App.anomaly_chance)) {
     if (!App.sekrits[word] && !App.shared.is_public_zone(word)) {
+      let zone = App.shared.random_word(3, word)
+      zone = zone.toUpperCase(zone)
+
       App.sekrits[word] = {
         word: word,
-        zone: word,
-        speed: 7,
-        expires: Date.now() + 2 * 60 * 60 * 1000,
+        zone,
+        speed: App.anomaly_speed,
+        expires: Date.now() + App.anomaly_duration * 60 * 1000,
       }
     }
   }
@@ -416,15 +422,9 @@ App.process_word = (zone, word, ws) => {
       App.zone_data[zone].words.shift()
     }
 
-    try {
-      let echo = App.get_markov_text(App.zone_data[zone].words)
-      echo = App.shared.ticker_text(echo).substring(0, 280).trim()
-      App.zone_data[zone].echo = echo
-    }
-    catch (err) {
-      App.zone_data[zone].echo = ``
-    }
-
+    let echo = App.get_markov_text(App.zone_data[zone].words)
+    echo = App.shared.ticker_text(echo).substring(0, 280).trim()
+    App.zone_data[zone].echo = echo
     App.zone_data_changed = true
     App.broadcast_zone_words(zone)
   }
@@ -925,36 +925,16 @@ App.setup_markov = () => {
 }
 
 App.get_markov_text = (words) => {
-  let options = {
-    maxTries: 2000,
-    filter: result => {
-      let lower_string = result.string.toLowerCase()
-      let has_word = words.some(word => lower_string.includes(word))
-
-      // forces the generator to combine at least 2 sentences
-      let is_novel = result.refs.length > 1
-
-      return has_word && is_novel
-    }
-  }
+  let random_word = words[Math.floor(Math.random() * words.length)]
+  let options = {filter: (result) => result.string.includes(random_word)}
 
   try {
     let result = App.text_generator.generate(options)
     return result.string
   }
   catch (e) {
-    try {
-      let fallback_options = {
-        maxTries: 1000,
-        filter: result => result.refs.length > 1
-      }
-
-      let fallback_result = App.text_generator.generate(fallback_options)
-      return fallback_result.string
-    }
-    catch (err) {
-      return ``
-    }
+    let fallback_result = App.text_generator.generate()
+    return fallback_result.string
   }
 }
 
