@@ -120,8 +120,8 @@ body, html {
     z-index: 10;
 }
 
-#echoes {
-    max-width: 100px;
+#echo {
+    max-width: 200px;
     overflow: hidden;
     white-space: nowrap;
     position: relative;
