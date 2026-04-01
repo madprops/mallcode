@@ -53,6 +53,8 @@ App.bg_color = `#000000`
 App.echo_delay = 5 * 1000
 App.ticker_speed = 65
 App.colorlib = ColorLib()
+App.theme_cache = null
+App.theme_needs_update = true
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
@@ -309,7 +311,8 @@ App.setup_canvas = () => {
   App.particles_geometry.setAttribute(`position`, new THREE.BufferAttribute(pos_array, 3))
   let theme = App.get_theme(App.zone)
   let texture = App.create_particle_texture(theme)
-  App.particles_material = new THREE.PointsMaterial({size: 0.15, color: new THREE.Color(theme.particles), map: texture, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false})
+  let blend_mode = theme.is_dark ? THREE.AdditiveBlending : THREE.NormalBlending
+  App.particles_material = new THREE.PointsMaterial({size: 0.15, color: new THREE.Color(theme.particles), map: texture, transparent: true, opacity: 0.6, blending: blend_mode, depthWrite: false})
   App.particle_mesh = new THREE.Points(App.particles_geometry, App.particles_material)
   App.particle_mesh.visible = App.animation
   App.scene.add(App.particle_mesh)
@@ -401,7 +404,9 @@ App.create_text_texture = (text, is_word = false, is_sequence = false, force_wor
 
 App.spawn_sprite = (text, type) => {
   let texture = App.create_text_texture(text, type === `word`, type === `sequence`)
-  let material = new THREE.SpriteMaterial({map: texture, transparent: true, blending: THREE.AdditiveBlending})
+  let theme = App.get_theme(App.zone)
+  let blend_mode = theme.is_dark ? THREE.AdditiveBlending : THREE.NormalBlending
+  let material = new THREE.SpriteMaterial({map: texture, transparent: true, blending: blend_mode})
   let sprite = new THREE.Sprite(material)
 
   if (type === `sequence`) {
@@ -842,6 +847,10 @@ App.get_color = (color_string) => {
 }
 
 App.get_theme = (zone) => {
+  if (!App.theme_needs_update && App.theme_cache) {
+    return App.theme_cache
+  }
+
   let seed = Shared.get_string_hash(zone)
   let random = Shared.create_seeded_random(seed)
   let bg_color_val = App.get_color(App.bg_color)
@@ -868,12 +877,24 @@ App.get_theme = (zone) => {
   let shapes = [`circle`, `square`, `triangle`, `star`]
   let shape = shapes[Shared.random_int({min: 0, max: shapes.length - 1, rand: random})]
 
-  return {
+  let theme = {
     letter: `hsl(${Math.round(hue1)}, ${Shared.random_int({min: 70, max: 100, rand: random})}%, ${Shared.random_int({min: l_min, max: l_max, rand: random})}%)`,
     word: `hsl(${Math.round(hue2)}, ${Shared.random_int({min: 70, max: 100, rand: random})}%, ${Shared.random_int({min: l_min, max: l_max, rand: random})}%)`,
     particles: `hsl(${Math.round(particle_hue)}, ${Shared.random_int({min: 80, max: 100, rand: random})}%, ${Shared.random_int({min: p_min, max: p_max, rand: random})}%)`,
     shape,
+    is_dark,
   }
+
+  if (is_dark) {
+    App.text_color = `rgb(255, 255, 255)`
+  }
+  else {
+    App.text_color = `rgb(0, 0, 0)`
+  }
+
+  App.theme_cache = theme
+  App.theme_needs_update = false
+  return theme
 }
 
 App.setup_zone_map_canvas = () => {
@@ -1281,6 +1302,7 @@ App.on_zone = (data) => {
   App.update_sequence_display()
 
   App.zone = data.zone
+  App.theme_needs_update = true
   App.update_url()
   App.clear_updates()
   App.username = data.username

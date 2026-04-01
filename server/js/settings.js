@@ -172,6 +172,7 @@ App.check_save_settings = () => {
     App.storage[setting.name] = value
   }
 
+  App.theme_needs_update = true
   App.refresh_sound_icon()
   App.refresh_bg_color()
   App.save_storage()
