@@ -916,7 +916,13 @@ App.get_theme = (zone, force = false) => {
   App.theme_cache = theme
 
   if (App.particles_material) {
+    if (App.particles_material.map) {
+      App.particles_material.map.dispose()
+    }
+
     App.particles_material.map = App.create_particle_texture(theme)
+    App.particles_material.color.set(theme.particles)
+    App.particles_material.blending = theme.is_dark ? THREE.AdditiveBlending : THREE.NormalBlending
     App.particles_material.needsUpdate = true
   }
 
@@ -1406,12 +1412,6 @@ App.on_zone = (data) => {
     App.zone_name_el.style.color = theme.particles
     DOM.show(App.zone_name_el)
     DOM.hide(App.zone_dials_el)
-  }
-
-  App.particles_material.color.set(theme.particles)
-
-  if (App.particles_material.map) {
-    App.particles_material.map.dispose()
   }
 
   App.set_css_var(`zone_color`, theme.particles)

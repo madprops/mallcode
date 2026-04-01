@@ -36,6 +36,7 @@ App.anomaly_speed = 7
 App.anomaly_chance = 1
 App.max_echo_length = 1024
 App.help_text = `https://www.youtube.com/watch?v=spdfnqS3bDg`
+App.test_text = `https://www.newgrounds.com/portal/view/803018`
 
 App.get_version = () => {
   try {
@@ -427,6 +428,12 @@ App.process_word = (zone, word, ws) => {
   if ([`HELP`, `SOS`].includes(word)) {
     if (ws && (ws.readyState === WebSocket.OPEN)) {
       App.send_message(ws, App.help_text, true)
+    }
+  }
+
+  if ([`TEST`].includes(word)) {
+    if (ws && (ws.readyState === WebSocket.OPEN)) {
+      App.send_message(ws, App.test_text, true)
     }
   }
 
