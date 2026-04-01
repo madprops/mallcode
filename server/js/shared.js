@@ -311,25 +311,27 @@ Shared.capitalize = (s) => {
   return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
-Shared.ticker_text = (text) => {
-  let formatted = text.toLowerCase()
+Shared.ticker_text = (text, lower = true) => {
+  if (lower) {
+    text = text.toLowerCase()
+  }
 
   // turn newlines into a stylized separator for the ticker
-  formatted = formatted.replace(/[\r\n]+/g, ` // `)
+  text = text.replace(/[\r\n]+/g, ` // `)
 
   // strip out dialogue hyphens
-  formatted = formatted.replace(/- /g, ``)
+  text = text.replace(/- /g, ``)
 
   // remove leading punctuation from segments
-  formatted = formatted.replace(/(^|\/\/)\s*[,.;:-]+/g, `$1 `)
+  text = text.replace(/(^|\/\/)\s*[,.;:-]+/g, `$1 `)
 
   // remove trailing punctuation from segments
-  formatted = formatted.replace(/[,.;:-]+(?=\s*(?:\/\/|$))/g, ``)
+  text = text.replace(/[,.;:-]+(?=\s*(?:\/\/|$))/g, ``)
 
   // clean up any accidental double spaces
-  formatted = formatted.replace(/\s+/g, ` `)
+  text = text.replace(/\s+/g, ` `)
 
-  return formatted.trim()
+  return text.trim()
 }
 
 if ((typeof module !== `undefined`) && module.exports) {
