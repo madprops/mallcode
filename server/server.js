@@ -31,7 +31,7 @@ App.sekrit_delay = 60
 App.user_sekrits = {}
 App.max_connections_per_ip = 3
 App.max_info_per_minute = 10
-App.anomaly_duration = 2 * 60
+App.anomaly_duration = 2 // in hours
 App.anomaly_speed = 7
 App.anomaly_chance = 1
 
@@ -383,7 +383,7 @@ App.process_word = (zone, word, ws) => {
         word: word,
         zone,
         speed: App.anomaly_speed,
-        expires: Date.now() + App.anomaly_duration * 60 * 1000,
+        expires: Date.now() + App.anomaly_duration * 60 * 60 * 1000,
       }
     }
   }
