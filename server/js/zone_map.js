@@ -250,26 +250,27 @@ App.animate_zone_map_icon = () => {
     return
   }
 
-  let theme = App.get_theme(App.zone)
-  let time = App.animation ? performance.now() * 0.002 : 1
-  let pulse1 = (Math.sin(time) + 1) / 2
-  let pulse2 = (Math.cos(time * 0.8) + 1) / 2
-
+  let time = App.animation ? performance.now() * 0.0035 : 1
+  let pulse = (Math.sin(time) + 1) / 2
   let now = performance.now()
   let is_locked = App.is_pressed || ((now - App.remote_lock_time) < Shared.lock_time) || ((now - App.last_input_time) < Shared.lock_time)
 
   App.zone_map_ctx.fillStyle = is_locked ? App.zone_map_icon_locked_color : App.zone_map_icon_unlocked_color
-  App.zone_map_ctx.globalAlpha = 0.6 + pulse1 * 0.4
+  App.zone_map_ctx.globalAlpha = 1.0
   App.zone_map_ctx.beginPath()
-  App.zone_map_ctx.arc(w / 2, h / 2, 10 + pulse2 * 4, 0, Math.PI * 2)
+
+  let core_radius = 12 + pulse * 4
+  App.zone_map_ctx.arc(w / 2, h / 2, core_radius, 0, Math.PI * 2)
   App.zone_map_ctx.fill()
 
   if (App.ws && (App.ws.readyState === WebSocket.OPEN)) {
-    App.zone_map_ctx.strokeStyle = theme.word
-    App.zone_map_ctx.globalAlpha = 0.5 + pulse2 * 0.5
+    App.zone_map_ctx.strokeStyle = App.text_color
+    App.zone_map_ctx.globalAlpha = 0.8
     App.zone_map_ctx.lineWidth = 3
     App.zone_map_ctx.beginPath()
-    App.zone_map_ctx.arc(w / 2, h / 2, 16 + pulse1 * 4, 0, Math.PI * 2)
+
+    let ring_radius = core_radius + 5
+    App.zone_map_ctx.arc(w / 2, h / 2, ring_radius, 0, Math.PI * 2)
     App.zone_map_ctx.stroke()
   }
 
