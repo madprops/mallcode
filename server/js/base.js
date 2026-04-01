@@ -1207,7 +1207,7 @@ App.start = () => {
   App.setup_canvas()
   App.setup_events()
   App.setup_sound()
-  App.animate()
+  requestAnimationFrame(App.animate)
   App.started = true
 }
 
