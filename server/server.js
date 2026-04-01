@@ -888,7 +888,7 @@ App.check_expired_sekrits = () => {
 
       App.wss.clients.forEach(c => {
         if ((c.readyState === WebSocket.OPEN) && (c.zone === zone)) {
-          App.go_to_zone(c, App.default_zone())
+          App.go_to_zone(c, App.random_zone())
         }
       })
     }
@@ -950,6 +950,12 @@ App.default_zone = () => {
   }
 
   return zone
+}
+
+App.random_zone = () => {
+  let letter = App.shared.random_letter()
+  let speed = App.shared.random_speed()
+  return `${letter}${speed}`
 }
 
 App.force_release = (ws, zone) => {

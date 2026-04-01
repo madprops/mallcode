@@ -1,6 +1,7 @@
 let Shared = {}
 
 Shared.letters = [`A`, `B`, `C`, `D`, `E`, `F`, `G`, `H`, `I`, `J`, `K`, `L`, `M`, `N`, `O`, `P`, `Q`, `R`, `S`, `T`, `U`, `V`, `W`, `X`, `Y`, `Z`]
+Shared.speeds = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 Shared.morse_code = {
   ".-":         `A`,
@@ -332,6 +333,18 @@ Shared.ticker_text = (text, lower = true) => {
   text = text.replace(/\s+/g, ` `)
 
   return text.trim()
+}
+
+Shared.random_choice = (array) => {
+  return array[Math.floor(Math.random() * array.length)]
+}
+
+Shared.random_letter = () => {
+  return Shared.random_choice(Shared.letters)
+}
+
+Shared.random_speed = () => {
+  return Shared.random_choice(Shared.speeds)
 }
 
 if ((typeof module !== `undefined`) && module.exports) {
