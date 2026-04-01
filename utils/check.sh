@@ -7,7 +7,7 @@ last_tag=$(git describe --tags --abbrev=0)
 # Pick one
 # files=$(git diff --name-only $last_tag HEAD -- '*.js')
 files=$(git ls-files -- "*.js")
-files=$(echo $files | tr " " "\n" | grep -v "/libs/" | grep -v "words.js" | grep -v "action_funcs_posts.js" | tr "\n" " ")
+files=$(echo $files | tr " " "\n" | grep -v "/libs/" | grep -v "words.js" | grep -v "action_funcs_posts.js" | grep -v "libs.bundle.js" | grep -v "main.bundle.js" | tr "\n" " ")
 
 if [ -n "$files" ]; then
   npm run --silent lint $files
