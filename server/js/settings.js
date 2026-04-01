@@ -28,11 +28,10 @@ App.get_settings = () => {
       max: 9999,
     },
     {
-      comment: `The background color`,
-      name: `bg_color`,
-      value: App.bg_color,
+      comment: `auto or color`,
+      name: `background`,
+      value: App.background,
       type: `string`,
-      color: true,
     },
     {
       comment: `Enable or disable effects`,
@@ -167,9 +166,10 @@ App.check_save_settings = () => {
     App.storage[setting.name] = value
   }
 
+  App.update_background()
+  App.refresh_background()
   App.get_theme(App.zone, true)
   App.refresh_sound_icon()
-  App.refresh_bg_color()
   App.save_storage()
   App.msg_settings.close()
 }

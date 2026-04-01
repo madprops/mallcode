@@ -120,3 +120,62 @@ App.get_zone_color = (zone_name) => {
 
   return `#000000`
 }
+
+App.get_bg_color = (zone) => {
+  if (App.background === `auto`) {
+    return App.get_zone_color(zone)
+  }
+  else {
+    return App.background
+  }
+}
+
+App.get_user_color = (name = `nobody`) => {
+  let seed = Shared.get_string_hash(name)
+  let random = Shared.create_seeded_random(seed)
+  let base_hue = random() * 360
+  return `hsl(${Math.round(base_hue)}, ${Shared.random_int({min: 80, max: 100, rand: random})}%, ${Shared.random_int({min: 55, max: 75, rand: random})}%)`
+}
+
+App.get_color = (color_string) => {
+  if (color_string.startsWith(`#`) || color_string.startsWith(`rgb`)) {
+    return color_string
+  }
+
+  let temp_el = DOM.create(`div`)
+  temp_el.style.color = color_string
+  document.body.appendChild(temp_el)
+  let rgb = window.getComputedStyle(temp_el).color
+  document.body.removeChild(temp_el)
+  return rgb
+}
+
+App.update_background = () => {
+  App.bg_color = App.get_bg_color(App.zone)
+}
+
+App.refresh_background = () => {
+  if (App.canvas) {
+    App.canvas.style.backgroundColor = App.bg_color
+  }
+
+  if (App.scene) {
+    try {
+      App.scene.background = new THREE.Color(App.bg_color)
+    }
+    catch (err) {
+      //
+    }
+  }
+
+  if (App.scene && App.scene.fog) {
+    try {
+      App.scene.fog.color.set(App.bg_color)
+    }
+    catch (err) {
+      //
+    }
+  }
+
+  App.set_css_var(`bg_color`, App.bg_color)
+}

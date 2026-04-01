@@ -50,6 +50,7 @@ App.join_sound = true
 App.leave_sound = true
 App.bg_color = `black`
 App.text_color = `white`
+App.background = `auto`
 App.echo_delay = 5 * 1000
 App.ticker_speed = 69
 App.colorlib = ColorLib()
@@ -902,26 +903,6 @@ App.animate = () => {
   App.renderer.render(App.scene, App.camera)
 }
 
-App.get_user_color = (name = `nobody`) => {
-  let seed = Shared.get_string_hash(name)
-  let random = Shared.create_seeded_random(seed)
-  let base_hue = random() * 360
-  return `hsl(${Math.round(base_hue)}, ${Shared.random_int({min: 80, max: 100, rand: random})}%, ${Shared.random_int({min: 55, max: 75, rand: random})}%)`
-}
-
-App.get_color = (color_string) => {
-  if (color_string.startsWith(`#`) || color_string.startsWith(`rgb`)) {
-    return color_string
-  }
-
-  let temp_el = DOM.create(`div`)
-  temp_el.style.color = color_string
-  document.body.appendChild(temp_el)
-  let rgb = window.getComputedStyle(temp_el).color
-  document.body.removeChild(temp_el)
-  return rgb
-}
-
 App.hide_cover = () => {
   setTimeout(() => {
     let cover = DOM.el(`#cover`)
@@ -981,8 +962,8 @@ App.load_storage = async () => {
           App.max_unfocused_beeps = App.storage.max_unfocused_beeps
         }
 
-        if (App.storage.bg_color !== undefined) {
-          App.bg_color = App.storage.bg_color
+        if (App.storage.background !== undefined) {
+          App.background = App.storage.background
         }
 
         resolve()
@@ -1013,7 +994,7 @@ App.save_storage = () => {
   App.storage.max_unfocused_beeps = App.max_unfocused_beeps
   App.storage.join_sound = App.join_sound
   App.storage.leave_sound = App.leave_sound
-  App.storage.bg_color = App.bg_color
+  App.storage.background = App.background
 
   let tx = App.db.transaction(`store`, `readwrite`)
   let store = tx.objectStore(`store`)
@@ -1035,32 +1016,6 @@ App.refresh_info = () => {
     App.zone_info_el.innerHTML = ``
     App.zone_info_el.appendChild(clone)
   }
-}
-
-App.refresh_bg_color = () => {
-  if (App.canvas) {
-    App.canvas.style.backgroundColor = App.bg_color
-  }
-
-  if (App.scene) {
-    try {
-      App.scene.background = new THREE.Color(App.bg_color)
-    }
-    catch (err) {
-      //
-    }
-  }
-
-  if (App.scene && App.scene.fog) {
-    try {
-      App.scene.fog.color.set(App.bg_color)
-    }
-    catch (err) {
-      //
-    }
-  }
-
-  App.set_css_var(`bg_color`, App.bg_color)
 }
 
 App.set_css_var = (name, value) => {
@@ -1201,8 +1156,8 @@ App.on_zone = (data) => {
   App.clear_updates()
   App.username = data.username
   let z_num = parseInt(App.zone.charAt(1))
-  App.bg_color = App.get_zone_color(data.zone)
-  App.refresh_bg_color()
+  App.update_background()
+  App.refresh_background()
   App.zone_settings = Shared.zone_settings[isNaN(z_num) ? 5 : z_num]
   App.max_press_duration = App.zone_settings.max_press
   App.input_throttle_ms = App.zone_settings.throttle
@@ -1373,6 +1328,7 @@ App.init = async () => {
 
   App.setup_socket()
   App.hide_cover()
-  App.refresh_bg_color()
+  App.update_background()
+  App.refresh_background()
   App.load_fonts()
 }
