@@ -3,6 +3,7 @@ App.i = {}
 
 App.i.path = require(`path`)
 App.i.fs = require(`fs`)
+App.i.markov = require(`markov-strings`).default
 App.dirname = __dirname
 App.express = require(`express`)
 App.app = App.express()
@@ -10,7 +11,6 @@ const http = require(`http`)
 const WebSocket = require(`ws`)
 App.server = http.createServer(App.app)
 App.wss = new WebSocket.Server({server: App.server})
-const Markov = require(`markov-strings`).default
 App.shared = require(`./js/main/shared.js`)
 App.actions = require(`./actions.js`)
 require(`./modules/spam.js`)(App)
