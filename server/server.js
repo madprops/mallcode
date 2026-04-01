@@ -27,7 +27,6 @@ App.zone_data_changed = false
 App.save_data_interval = 2 * 1000
 App.max_words = 10
 App.enable_zone_words = true
-App.sekrit_delay = 60
 App.user_sekrits = {}
 App.max_connections_per_ip = 3
 App.max_info_per_minute = 20
@@ -931,7 +930,17 @@ App.start_server = () => {
     }
   }, App.save_data_interval)
 
-  setInterval(App.get_sekrits, App.sekrit_delay * 1000)
+  fs.watch(__dirname, (event, filename) => {
+    if (filename === `sekrit.json`) {
+      App.get_sekrits()
+    }
+  })
+
+  fs.watch(path.join(__dirname, `..`), (event, filename) => {
+    if (filename === `package.json`) {
+      App.get_version()
+    }
+  })
 }
 
 App.default_zone = () => {
