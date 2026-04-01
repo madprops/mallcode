@@ -107,4 +107,4 @@ Start it with `run.sh`.
 
 Then make a proper `pm2` config for it.
 
-The main file is `server/server.js`.
+The main file is `server/server.js`
