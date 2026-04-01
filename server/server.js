@@ -234,7 +234,8 @@ App.broadcast_zone_words = (zone, client = null) => {
   }
 
   let words = App.zone_data[zone] ? App.zone_data[zone].words : []
-  let msg = JSON.stringify({type: `WORDS`, words})
+  let echo = App.zone_data[zone] && App.zone_data[zone].echo ? App.zone_data[zone].echo : ``
+  let msg = JSON.stringify({type: `WORDS`, words, echo})
 
   if (client) {
     client.send(msg)
@@ -392,6 +393,9 @@ App.process_word = (zone, word, ws) => {
       App.zone_data[zone].words.shift()
     }
 
+    let text = App.get_markov_text(App.zone_data[zone].words)
+    App.zone_data[zone].echo = App.shared.ticker_text(text)
+
     App.zone_data_changed = true
     App.broadcast_zone_words(zone)
   }
@@ -407,14 +411,16 @@ App.go_to_zone = (ws, zone) => {
 
   // If the user is already in this zone, just acknowledge and return
   if (old_zone === zone) {
-    ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username, version: App.version}))
+    let echo = App.zone_data[ws.zone] && App.zone_data[ws.zone].echo ? App.zone_data[ws.zone].echo : ``
+    ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username, version: App.version, echo}))
     App.broadcast_zone_words(ws.zone, ws)
     return
   }
 
   App.force_release(ws, old_zone)
   App.set_zone(ws, zone)
-  ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username, version: App.version}))
+  let echo = App.zone_data[ws.zone] && App.zone_data[ws.zone].echo ? App.zone_data[ws.zone].echo : ``
+  ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username, version: App.version, echo}))
 
   if (old_zone) {
     App.broadcast_zone_update(old_zone, ws.username, `leave`)
@@ -854,7 +860,8 @@ App.send_message = (ws, text, pissed = false) => {
 }
 
 App.setup_markov = () => {
-  let saved_corpus = JSON.parse(fs.readFileSync(`corpus.json`, `utf-8`))
+  let corpus_path = path.join(__dirname, `corpus.json`)
+  let saved_corpus = JSON.parse(fs.readFileSync(corpus_path, `utf-8`))
   App.text_generator = new Markov()
   App.text_generator.import(saved_corpus)
 }
@@ -867,7 +874,6 @@ App.get_markov_text = (words) => {
     let result = App.text_generator.generate(options)
     return result.string
   }
-
   catch (e) {
     let fallback_result = App.text_generator.generate()
     return fallback_result.string
