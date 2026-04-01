@@ -416,8 +416,8 @@ App.process_word = (zone, word, ws) => {
 
     if (Math.random() < App.anomaly_chance) {
       if (!App.sekrits[word] && !App.shared.is_public_zone(word)) {
-        let zone = App.shared.random_word(3, word)
-        let zone_name = zone.toUpperCase()
+        let zone_name = App.shared.random_word(3, word)
+        zone_name = zone_name.toUpperCase()
 
         App.sekrits[word] = {
           word: zone_name,
