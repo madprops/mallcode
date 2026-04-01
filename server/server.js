@@ -33,7 +33,7 @@ App.max_connections_per_ip = 3
 App.max_info_per_minute = 10
 App.anomaly_hours = 2
 App.anomaly_speed = 7
-App.anomaly_chance = 1
+App.anomaly_chance = 0.1
 
 App.get_version = () => {
   try {

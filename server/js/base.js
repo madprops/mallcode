@@ -50,6 +50,7 @@ App.repo = `github.com/madprops/mallcode`
 App.join_sound = true
 App.leave_sound = true
 App.bg_color = `#000000`
+App.echo_delay = 5 * 1000
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
@@ -65,7 +66,7 @@ App.create_debouncers = () => {
     else {
       DOM.hide(App.echo_el)
     }
-  }, 5000)
+  }, App.echo_delay)
 
   App.zone_dial_debouncer = Shared.create_debouncer(() => {
     App.zone_dial_action()
