@@ -156,18 +156,65 @@ App.sound_enabled = () => {
 }
 
 App.refresh_sound_icon = () => {
+  if (!App.sound_ctx) {
+    return
+  }
+
+  let w = App.sound_btn.width
+  let h = App.sound_btn.height
+  App.sound_ctx.clearRect(0, 0, w, h)
+
+  let color = App.text_color || `white`
+  App.sound_ctx.fillStyle = color
+  App.sound_ctx.strokeStyle = color
+  App.sound_ctx.lineWidth = 3
+  App.sound_ctx.lineCap = `round`
+  App.sound_ctx.lineJoin = `round`
+
+  App.sound_ctx.beginPath()
+  App.sound_ctx.moveTo(12, 20)
+  App.sound_ctx.lineTo(12, 28)
+  App.sound_ctx.lineTo(18, 28)
+  App.sound_ctx.lineTo(26, 36)
+  App.sound_ctx.lineTo(26, 12)
+  App.sound_ctx.lineTo(18, 20)
+  App.sound_ctx.closePath()
+
   if (App.volume === `max`) {
-    App.sound_btn.textContent = `🔊`
+    App.sound_ctx.fill()
+
+    App.sound_ctx.beginPath()
+    App.sound_ctx.arc(26, 24, 8, -Math.PI / 3, Math.PI / 3)
+    App.sound_ctx.stroke()
+
+    App.sound_ctx.beginPath()
+    App.sound_ctx.arc(26, 24, 14, -Math.PI / 3, Math.PI / 3)
+    App.sound_ctx.stroke()
   }
   else if (App.volume === `mid`) {
-    App.sound_btn.textContent = `🔉`
+    App.sound_ctx.fill()
+
+    App.sound_ctx.beginPath()
+    App.sound_ctx.arc(26, 24, 8, -Math.PI / 3, Math.PI / 3)
+    App.sound_ctx.stroke()
   }
   else {
-    App.sound_btn.textContent = `🔇`
+    App.sound_ctx.stroke()
+
+    App.sound_ctx.beginPath()
+    App.sound_ctx.moveTo(32, 20)
+    App.sound_ctx.lineTo(40, 28)
+    App.sound_ctx.moveTo(40, 20)
+    App.sound_ctx.lineTo(32, 28)
+    App.sound_ctx.stroke()
   }
 }
 
 App.setup_sound = () => {
+  App.sound_ctx = App.sound_btn.getContext(`2d`)
+  App.sound_btn.width = 48
+  App.sound_btn.height = 48
+
   App.refresh_sound_icon()
 
   App.sound_btn.addEventListener(`click`, () => {

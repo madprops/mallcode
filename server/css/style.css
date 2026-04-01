@@ -62,10 +62,6 @@ body, html {
     }
 }
 
-#sound-toggle {
-    font-size: 22px;
-}
-
 .hud-button {
     cursor: pointer;
 }

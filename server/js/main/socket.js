@@ -233,6 +233,7 @@ App.on_zone = (data) => {
   }
 
   App.set_css_var(`zone_color`, theme.particles)
+  App.refresh_sound_icon()
 }
 
 App.on_zones_info = (data) => {
