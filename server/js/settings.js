@@ -162,11 +162,6 @@ App.check_save_settings = () => {
 
   for (let setting of settings) {
     let value = parsed_toml[setting.name]
-
-    if (setting.color) {
-      value = App.get_color(value)
-    }
-
     setting.value = value
     App[setting.name] = value
     App.storage[setting.name] = value

@@ -49,8 +49,8 @@ App.sekrit_zones = new Set()
 App.repo = `github.com/madprops/mallcode`
 App.join_sound = true
 App.leave_sound = true
-App.bg_color = `rgb(0, 0, 0)`
-App.text_color = `rgb(255, 255, 255)`
+App.bg_color = `black`
+App.text_color = `white`
 App.echo_delay = 5 * 1000
 App.ticker_speed = 66
 App.colorlib = ColorLib()
@@ -905,16 +905,21 @@ App.get_theme = (zone, force = false) => {
   }
 
   if (is_dark) {
-    App.text_color = `rgb(255, 255, 255)`
-    App.set_css_var(`text_color`, `black`)
+    App.text_color = `white`
   }
   else {
-    App.text_color = `rgb(0, 0, 0)`
+    App.text_color = `black`
   }
 
-  App.border_color = App.colorlib.get_lighter_or_darker(App.text_color, 0.6)
+  App.text_color = App.get_color(App.text_color)
   App.set_css_var(`text_color`, App.text_color)
+
+  App.border_color = App.colorlib.get_lighter_or_darker(App.text_color, 0.6)
   App.set_css_var(`border_color`, App.border_color)
+
+  App.highlight_color = App.colorlib.get_lighter_or_darker(App.bg_color, 0.1)
+  App.set_css_var(`highlight_color`, App.highlight_color)
+
   App.theme_cache = theme
 
   if (App.particles_material) {
