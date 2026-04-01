@@ -1,7 +1,7 @@
 const {exec} = require(`child_process`)
 const fs = require(`fs`)
 const path = require(`path`)
-const Shared = require(`./js/shared.js`)
+const Shared = require(`./js/main/shared.js`)
 
 const Actions = {
   word_map: {},

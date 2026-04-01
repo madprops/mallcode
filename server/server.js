@@ -9,7 +9,7 @@ const fs = require(`fs`)
 App.server = http.createServer(App.app)
 App.wss = new WebSocket.Server({server: App.server})
 const Markov = require(`markov-strings`).default
-App.shared = require(`./js/shared.js`)
+App.shared = require(`./js/main/shared.js`)
 App.actions = require(`./actions.js`)
 require(`./spam.js`)(App)
 
@@ -1041,7 +1041,7 @@ App.get_zone_echo = (zone) => {
 
 App.setup_bundler = () => {
   let libs_dir = path.join(__dirname, `./js/libs`)
-  let js_dir = path.join(__dirname, `./js`)
+  let js_dir = path.join(__dirname, `./js/main`)
 
   App.top_libs = []
   App.top_main = [`shared`, `base`]
