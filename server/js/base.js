@@ -140,6 +140,10 @@ App.setup_socket = () => {
     else if (data.type === `USERS`) {
       App.on_users(data)
     }
+    else if (data.type === `GLOBAL_COUNT`) {
+      App.online_count_global = data.count_global
+      App.refresh_info()
+    }
     else if (data.type === `WORDS`) {
       App.update_words_display(data.words, data.echo)
     }

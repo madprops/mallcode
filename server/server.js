@@ -230,16 +230,28 @@ App.broadcast_zone_update = (zone, username = ``, event = ``) => {
     }
   })
 
+  let zone_msg = JSON.stringify({
+    type: `USERS`,
+    count_zone,
+    count_global,
+    username,
+    usernames,
+    event,
+  })
+
+  let global_msg = JSON.stringify({
+    type: `GLOBAL_COUNT`,
+    count_global,
+  })
+
   App.wss.clients.forEach((client) => {
-    if ((client.readyState === WebSocket.OPEN) && (client.zone === zone)) {
-      client.send(JSON.stringify({
-        type: `USERS`,
-        count_zone,
-        count_global,
-        username,
-        usernames,
-        event,
-      }))
+    if (client.readyState === WebSocket.OPEN) {
+      if (client.zone === zone) {
+        client.send(zone_msg)
+      }
+      else {
+        client.send(global_msg)
+      }
     }
   })
 }
