@@ -88,8 +88,6 @@ App.setup_dials = () => {
   DOM.ev(document.documentElement, `click`, () => {
     App.hide_dial_menu()
   })
-
-  DOM.ev(`#zone-map`, `click`, App.show_zone_map)
 }
 
 App.show_dial_menu = (type, anchor_el) => {

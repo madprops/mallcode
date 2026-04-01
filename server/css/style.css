@@ -186,7 +186,7 @@ body, html {
     z-index: 10;
 }
 
-#zone-map {
+#zone-map-icon {
     width: 32px;
     height: 28px;
     cursor: pointer;

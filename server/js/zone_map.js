@@ -221,3 +221,57 @@ App.build_zone_selector = (zones_info) => {
   grid.innerHTML = html
   App.msg_zone_map.show()
 }
+
+App.setup_zone_map_icon = () => {
+  App.zone_map_icon = DOM.el(`#zone-map-icon`)
+
+  if (!App.zone_map_icon) {
+    return
+  }
+
+  App.zone_map_ctx = App.zone_map_icon.getContext(`2d`)
+  App.zone_map_icon.width = 48
+  App.zone_map_icon.height = 48
+
+  DOM.ev(App.zone_map_icon, `click`, App.show_zone_map)
+}
+
+App.animate_zone_map_icon = () => {
+  if (!App.zone_map_ctx) {
+    return
+  }
+
+  let w = App.zone_map_icon.width
+  let h = App.zone_map_icon.height
+  App.zone_map_ctx.fillStyle = App.bg_color
+  App.zone_map_ctx.fillRect(0, 0, w, h)
+
+  if (!App.zone) {
+    return
+  }
+
+  let theme = App.get_theme(App.zone)
+  let time = App.animation ? performance.now() * 0.002 : 1
+  let pulse1 = (Math.sin(time) + 1) / 2
+  let pulse2 = (Math.cos(time * 0.8) + 1) / 2
+
+  let now = performance.now()
+  let is_locked = App.is_pressed || ((now - App.remote_lock_time) < Shared.lock_time) || ((now - App.last_input_time) < Shared.lock_time)
+
+  App.zone_map_ctx.fillStyle = is_locked ? `#ca4e4e` : `#58a564`
+  App.zone_map_ctx.globalAlpha = 0.6 + pulse1 * 0.4
+  App.zone_map_ctx.beginPath()
+  App.zone_map_ctx.arc(w / 2, h / 2, 10 + pulse2 * 4, 0, Math.PI * 2)
+  App.zone_map_ctx.fill()
+
+  if (App.ws && (App.ws.readyState === WebSocket.OPEN)) {
+    App.zone_map_ctx.strokeStyle = theme.word
+    App.zone_map_ctx.globalAlpha = 0.5 + pulse2 * 0.5
+    App.zone_map_ctx.lineWidth = 3
+    App.zone_map_ctx.beginPath()
+    App.zone_map_ctx.arc(w / 2, h / 2, 16 + pulse1 * 4, 0, Math.PI * 2)
+    App.zone_map_ctx.stroke()
+  }
+
+  App.zone_map_ctx.globalAlpha = 1.0
+}

@@ -836,7 +836,7 @@ App.animate = () => {
     }
   }
 
-  App.animate_zone_map()
+  App.animate_zone_map_icon()
   App.renderer.render(App.scene, App.camera)
 }
 
@@ -858,53 +858,6 @@ App.get_color = (color_string) => {
   let rgb = window.getComputedStyle(temp_el).color
   document.body.removeChild(temp_el)
   return rgb
-}
-
-App.setup_zone_map_canvas = () => {
-  App.zone_map_canvas = DOM.el(`#zone-map`)
-
-  if (!App.zone_map_canvas) {
-    return
-  }
-
-  App.zone_map_ctx = App.zone_map_canvas.getContext(`2d`)
-  App.zone_map_canvas.width = 48
-  App.zone_map_canvas.height = 48
-}
-
-App.animate_zone_map = () => {
-  if (!App.zone_map_ctx) {
-    return
-  }
-
-  let w = App.zone_map_canvas.width
-  let h = App.zone_map_canvas.height
-  App.zone_map_ctx.fillStyle = App.bg_color
-  App.zone_map_ctx.fillRect(0, 0, w, h)
-
-  if (!App.zone) {
-    return
-  }
-
-  let theme = App.get_theme(App.zone)
-  let time = App.animation ? performance.now() * 0.002 : 1
-  let pulse1 = (Math.sin(time) + 1) / 2
-  let pulse2 = (Math.cos(time * 0.8) + 1) / 2
-
-  App.zone_map_ctx.fillStyle = theme.particles
-  App.zone_map_ctx.globalAlpha = 0.6 + pulse1 * 0.4
-  App.zone_map_ctx.beginPath()
-  App.zone_map_ctx.arc(w / 2, h / 2, 10 + pulse2 * 4, 0, Math.PI * 2)
-  App.zone_map_ctx.fill()
-
-  App.zone_map_ctx.strokeStyle = theme.word
-  App.zone_map_ctx.globalAlpha = 0.5 + pulse2 * 0.5
-  App.zone_map_ctx.lineWidth = 3
-  App.zone_map_ctx.beginPath()
-  App.zone_map_ctx.arc(w / 2, h / 2, 16 + pulse1 * 4, 0, Math.PI * 2)
-  App.zone_map_ctx.stroke()
-
-  App.zone_map_ctx.globalAlpha = 1.0
 }
 
 App.hide_cover = () => {
@@ -1336,7 +1289,7 @@ App.init = async () => {
   App.setup_msg_message()
   App.setup_about()
   App.setup_zone_map()
-  App.setup_zone_map_canvas()
+  App.setup_zone_map_icon()
   App.setup_settings()
   App.setup_dials()
 
