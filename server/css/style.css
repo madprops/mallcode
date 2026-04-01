@@ -360,12 +360,6 @@ a.clean-link:hover {
     display: none;
 }
 
-#settings-container {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
 .modal-btn {
     background-color: #1d222b;
     font-size: 18px;
@@ -394,11 +388,14 @@ a.clean-link:hover {
 #settings-container {
     width: 480px;
     max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 #settings-editor {
     font-family: monospace;
-    min-height: 200px;
+    height: 460px;
     border: 1px solid #424242;
     padding: 10px;
     background: #23262c;
@@ -409,7 +406,6 @@ a.clean-link:hover {
     text-align: left;
     cursor: text;
     overflow: auto;
-    max-height: 300px;
     font-size: 18px;
     box-sizing: border-box;
     width: 100%;
