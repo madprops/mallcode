@@ -51,7 +51,7 @@ App.join_sound = true
 App.leave_sound = true
 App.bg_color = `#000000`
 App.echo_delay = 5 * 1000
-App.ticker_speed = 60
+App.ticker_speed = 65
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
