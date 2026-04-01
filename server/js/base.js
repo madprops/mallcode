@@ -75,6 +75,10 @@ App.create_debouncers = () => {
     App.zone_dial_action()
   }, App.zone_dial_delay)
 
+  App.zone_dial_debouncer_2 = Shared.create_debouncer(() => {
+    App.zone_dial_action()
+  }, App.zone_dial_delay_2)
+
   App.beep_debouncer = Shared.create_debouncer(() => {
     if (App.current_user && App.is_pressed) {
       App.play_beep(App.current_user)

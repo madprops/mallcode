@@ -1,4 +1,5 @@
 App.zone_dial_delay = 100
+App.zone_dial_delay_2 = 1000
 App.dial_visible = false
 
 App.setup_dials = () => {
@@ -16,10 +17,72 @@ App.setup_dials = () => {
     App.stop_beep()
   })
 
+  DOM.ev(App.letter_dial_el, `wheel`, (e) => {
+    let direction = e.deltaY > 0 ? 1 : -1
+    let val = App.letter_dial_el.value
+    let index = Shared.letters.indexOf(val)
+    let new_index
+
+    if (direction > 0) {
+      new_index = index + 1
+    }
+    else {
+      new_index = index - 1
+    }
+
+    if (new_index < 0) {
+      new_index = 0
+    }
+    else if (new_index >= Shared.letters.length) {
+      new_index = Shared.letters.length - 1
+    }
+
+    if (index === new_index) {
+      return
+    }
+
+    new_val = Shared.letters[new_index]
+    s_val = new_val.toString()
+    App.letter_dial_el.value = s_val
+    App.letter_dial_el.textContent = s_val
+    App.zone_dial_debouncer_2.call()
+    e.preventDefault()
+  })
+
   DOM.ev(App.speed_dial_el, `click`, (e) => {
     e.stopPropagation()
     App.show_dial_menu(`speed`, App.speed_dial_el)
     App.stop_beep()
+  })
+
+  DOM.ev(App.speed_dial_el, `wheel`, (e) => {
+    let direction = e.deltaY > 0 ? 1 : -1
+    let val = App.speed_dial_el.value
+    let new_val
+
+    if (direction > 0) {
+      new_val = parseInt(val) + 1
+    }
+    else {
+      new_val = parseInt(val) - 1
+    }
+
+    if (new_val < 1) {
+      new_val = 1
+    }
+    else if (new_val > 9) {
+      new_val = 9
+    }
+
+    if (val === new_val) {
+      return
+    }
+
+    s_val = new_val.toString()
+    App.speed_dial_el.value = s_val
+    App.speed_dial_el.textContent = s_val
+    App.zone_dial_debouncer_2.call()
+    e.preventDefault()
   })
 
   DOM.ev(document.documentElement, `click`, () => {
