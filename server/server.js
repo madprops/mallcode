@@ -64,6 +64,14 @@ App.get_words = () => {
 App.get_sekrits = () => {
   try {
     let file = path.join(__dirname, `sekrit.json`)
+    let dynamic_sekrits = {}
+
+    for (let z in App.sekrits) {
+      if (App.sekrits[z].expires) {
+        dynamic_sekrits[z] = App.sekrits[z]
+      }
+    }
+
     App.sekrits = {}
 
     if (fs.existsSync(file)) {
@@ -78,6 +86,10 @@ App.get_sekrits = () => {
           }
         }
       })
+    }
+
+    for (let z in dynamic_sekrits) {
+      App.sekrits[z] = dynamic_sekrits[z]
     }
 
     for (let user in App.user_sekrits) {
@@ -359,6 +371,17 @@ App.resolve_word = (zone) => {
 App.help_text = `https://www.youtube.com/watch?v=spdfnqS3bDg`
 
 App.process_word = (zone, word, ws) => {
+  if ((word.length >= 3) && (Math.random() < 0.01)) {
+    if (!App.sekrits[word] && !App.shared.is_public_zone(word)) {
+      App.sekrits[word] = {
+        word: word,
+        zone: word,
+        speed: 7,
+        expires: Date.now() + 2 * 60 * 60 * 1000,
+      }
+    }
+  }
+
   let sekrit = Object.values(App.sekrits).find(s => s.word === word)
 
   if (sekrit) {
@@ -393,9 +416,15 @@ App.process_word = (zone, word, ws) => {
       App.zone_data[zone].words.shift()
     }
 
-    let echo = App.get_markov_text(App.zone_data[zone].words)
-    echo = App.shared.ticker_text(echo).substring(0, 280).trim()
-    App.zone_data[zone].echo = echo
+    try {
+      let echo = App.get_markov_text(App.zone_data[zone].words)
+      echo = App.shared.ticker_text(echo).substring(0, 280).trim()
+      App.zone_data[zone].echo = echo
+    }
+    catch (err) {
+      App.zone_data[zone].echo = ``
+    }
+
     App.zone_data_changed = true
     App.broadcast_zone_words(zone)
   }
@@ -767,6 +796,33 @@ App.on_active_ws_same = (ws, data, z_state) => {
   return false
 }
 
+App.check_expired_sekrits = () => {
+  let now = Date.now()
+
+  for (let zone in App.sekrits) {
+    let sekrit = App.sekrits[zone]
+
+    if (sekrit.expires && (now > sekrit.expires)) {
+      delete App.sekrits[zone]
+
+      if (App.zone_data[zone]) {
+        delete App.zone_data[zone]
+        App.zone_data_changed = true
+      }
+
+      if (App.zone_states[zone]) {
+        delete App.zone_states[zone]
+      }
+
+      App.wss.clients.forEach(c => {
+        if ((c.readyState === WebSocket.OPEN) && (c.zone === zone)) {
+          App.go_to_zone(c, App.default_zone())
+        }
+      })
+    }
+  }
+}
+
 App.start_server = () => {
   let port = process.env.PORT || 3773
 
@@ -782,6 +838,8 @@ App.start_server = () => {
         delete App.blocked_ips[ip]
       }
     }
+
+    App.check_expired_sekrits()
 
     App.wss.clients.forEach((ws) => {
       if (!ws.is_alive) {
@@ -867,16 +925,22 @@ App.setup_markov = () => {
 }
 
 App.get_markov_text = (words) => {
-  let random_word = words[Math.floor(Math.random() * words.length)]
-  let options = {filter: (result) => result.string.includes(random_word)}
+  let options = {
+    maxTries: 1000,
+    filter: result => words.some(word => result.string.includes(word))
+  }
 
   try {
     let result = App.text_generator.generate(options)
     return result.string
-  }
-  catch (e) {
-    let fallback_result = App.text_generator.generate()
-    return fallback_result.string
+  } catch (e) {
+    try {
+      let fallback_options = {maxTries: 100}
+      let fallback_result = App.text_generator.generate(fallback_options)
+      return fallback_result.string
+    } catch (err) {
+      return `signal lost...`
+    }
   }
 }
 
