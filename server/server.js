@@ -142,7 +142,7 @@ App.is_public_zone = (zone) => {
 }
 
 App.word_match = (word) => {
-  return App.words.has(word)
+  return App.words.has(word.toLowerCase())
 }
 
 App.get_zone_data = () => {
@@ -430,7 +430,7 @@ App.process_word = (zone, word, ws) => {
     }
   }
 
-  if ((word.length >= 3) && App.word_match(word.toLowerCase())) {
+  if ((word.length >= 3) && App.word_match(word)) {
     if (!App.zone_data[zone]) {
       App.zone_data[zone] = {words: []}
     }
