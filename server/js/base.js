@@ -293,8 +293,8 @@ App.create_particle_texture = (theme) => {
 App.setup_canvas = () => {
   App.canvas = DOM.el(`#glcanvas`)
   App.renderer = new THREE.WebGLRenderer({canvas: App.canvas, antialias: true, alpha: true})
-  App.renderer.setPixelRatio(window.devicePixelRatio)
   App.renderer.setSize(window.innerWidth, window.innerHeight)
+  App.renderer.setPixelRatio(window.devicePixelRatio)
   App.scene = new THREE.Scene()
   App.scene.background = new THREE.Color(App.bg_color)
   App.scene.fog = new THREE.FogExp2(App.bg_color, 0.0015)
@@ -1207,7 +1207,7 @@ App.start = () => {
   App.setup_canvas()
   App.setup_events()
   App.setup_sound()
-  requestAnimationFrame(App.animate)
+  App.animate()
   App.started = true
 }
 
