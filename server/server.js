@@ -3,6 +3,7 @@ App.i = {}
 
 App.i.path = require(`path`)
 App.i.fs = require(`fs`)
+App.dirname = __dirname
 App.express = require(`express`)
 App.app = App.express()
 const http = require(`http`)

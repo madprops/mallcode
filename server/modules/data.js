@@ -3,7 +3,7 @@
 module.exports = (App) => {
   App.get_version = () => {
     try {
-      App.package = JSON.parse(App.i.fs.readFileSync(App.i.path.join(__dirname, `../package.json`), `utf8`))
+      App.package = JSON.parse(App.i.fs.readFileSync(App.i.path.join(App.dirname, `../package.json`), `utf8`))
       App.version = App.package.version || `0.0.0`
     }
     catch (err) {
@@ -13,7 +13,7 @@ module.exports = (App) => {
 
   App.get_words = () => {
     try {
-      let data = App.i.fs.readFileSync(App.i.path.join(__dirname, `words.txt`), `utf8`)
+      let data = App.i.fs.readFileSync(App.i.path.join(App.dirname, `words.txt`), `utf8`)
 
       data.split(`\n`).forEach(line => {
         let word = line.trim()
@@ -32,7 +32,7 @@ module.exports = (App) => {
 
   App.get_sekrits = () => {
     try {
-      let file = App.i.path.join(__dirname, `sekrit.json`)
+      let file = App.i.path.join(App.dirname, `sekrit.json`)
       let anomalies = {}
 
       for (let z in App.sekrits) {
@@ -99,7 +99,7 @@ module.exports = (App) => {
 
   App.get_zone_data = () => {
     App.zone_data = {}
-    App.data_file = App.i.path.join(__dirname, `data.json`)
+    App.data_file = App.i.path.join(App.dirname, `data.json`)
 
     try {
       if (App.i.fs.existsSync(App.data_file)) {

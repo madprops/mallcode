@@ -1,6 +1,6 @@
 module.exports = (App) => {
   App.setup_markov = () => {
-    let corpus_path = App.i.path.join(__dirname, `corpus.json`)
+    let corpus_path = App.i.path.join(App.dirname, `corpus.json`)
     let saved_corpus = JSON.parse(App.i.fs.readFileSync(corpus_path, `utf-8`))
     App.text_generator = new Markov()
     App.text_generator.import(saved_corpus)
