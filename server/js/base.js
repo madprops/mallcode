@@ -55,7 +55,6 @@ App.echo_delay = 5 * 1000
 App.ticker_speed = 66
 App.colorlib = ColorLib()
 App.theme_cache = null
-App.theme_needs_update = true
 App.dial_visible = false
 
 App.create_debouncers = () => {
@@ -311,7 +310,7 @@ App.setup_canvas = () => {
   }
 
   App.particles_geometry.setAttribute(`position`, new THREE.BufferAttribute(pos_array, 3))
-  let theme = App.get_theme(App.zone)
+  let theme = App.get_theme(App.zone, true)
   let texture = App.create_particle_texture(theme)
   let blend_mode = theme.is_dark ? THREE.AdditiveBlending : THREE.NormalBlending
   App.particles_material = new THREE.PointsMaterial({size: 0.15, color: new THREE.Color(theme.particles), map: texture, transparent: true, opacity: 0.6, blending: blend_mode, depthWrite: false})
@@ -865,8 +864,8 @@ App.get_color = (color_string) => {
   return rgb
 }
 
-App.get_theme = (zone) => {
-  if (!App.theme_needs_update && App.theme_cache) {
+App.get_theme = (zone, force = false) => {
+  if (!force && App.theme_cache) {
     return App.theme_cache
   }
 
@@ -915,7 +914,12 @@ App.get_theme = (zone) => {
 
   App.set_css_var(`text_color`, App.text_color)
   App.theme_cache = theme
-  App.theme_needs_update = false
+
+  if (App.particles_material) {
+    App.particles_material.map = App.create_particle_texture(theme)
+    App.particles_material.needsUpdate = true
+  }
+
   return theme
 }
 
@@ -1325,7 +1329,6 @@ App.on_word_end = (data) => {
         s.userData.decay_rate = 0.25
         s.userData.growth = 2
         let old_map = s.material.map
-        console.log(4)
         s.material.map = App.create_text_texture(word, false, false, true)
         old_map.dispose()
         found = true
@@ -1361,7 +1364,6 @@ App.on_zone = (data) => {
   App.update_sequence_display()
 
   App.zone = data.zone
-  App.theme_needs_update = true
   App.update_url()
   App.clear_updates()
   App.username = data.username
@@ -1375,7 +1377,7 @@ App.on_zone = (data) => {
   App.play_warp_drive()
   App.update_echo_display(data.echo)
   DOM.hide(App.username_info_el)
-  let theme = App.get_theme(App.zone)
+  let theme = App.get_theme(App.zone, true)
 
   if (App.echo) {
     DOM.show(App.echo_el)
@@ -1413,8 +1415,6 @@ App.on_zone = (data) => {
   }
 
   App.set_css_var(`zone_color`, theme.particles)
-  App.particles_material.map = App.create_particle_texture(theme)
-  App.particles_material.needsUpdate = true
 }
 
 App.on_zones_info = (data) => {
