@@ -179,7 +179,7 @@ App.trigger_down = (is_local = true, event_time = null) => {
   App.last_typist_was_local = is_local
 
   if (App.sound_enabled() && App.current_user) {
-    App.beep_debouncer.call()
+    App.play_beep(App.current_user)
   }
 
   App.particle_mesh.material.size = 0.5
