@@ -14,7 +14,7 @@ module.exports = (App) => {
 
     if (z_state.last_up_time) {
       let server_gap = now - z_state.last_up_time
-      gap = App.shared.validate_timing(data.gap, server_gap, 2000)
+      gap = App.shared.validate_timing(data.gap, server_gap, 500)
     }
 
     ws.unit_duration = App.shared.process_gap(gap, ws.unit_duration, z_state.current_sequence.length, z_state.settings)
@@ -42,7 +42,7 @@ module.exports = (App) => {
 
     if (z_state.press_start_time) {
       let server_duration = now - z_state.press_start_time
-      let duration = App.shared.validate_timing(data.duration, server_duration, 2000)
+      let duration = App.shared.validate_timing(data.duration, server_duration, 500)
 
       let res = App.shared.process_duration(duration, ws.unit_duration, z_state.current_sequence, z_state.settings)
       ws.unit_duration = res.unit_duration
@@ -57,7 +57,7 @@ module.exports = (App) => {
       })
 
       App.send_sequence({sequence: z_state.current_sequence, username: ws.username, zone: ws.zone, unit_duration: ws.unit_duration})
-      let letter_delay = (ws.unit_duration * z_state.settings.letter_mult) + 250 + 1500
+      let letter_delay = (ws.unit_duration * z_state.settings.letter_mult) + 250
       z_state.letter_timeout = setTimeout(() => App.resolve_letter(ws.zone), letter_delay)
     }
   }
@@ -155,7 +155,7 @@ module.exports = (App) => {
     z_state.current_sequence = ``
     z_state.control_start_time = Date.now()
     let unit = z_state.last_active_ws ? z_state.last_active_ws.unit_duration || z_state.settings.unit_duration : z_state.settings.unit_duration
-    let word_delay = (unit * z_state.settings.word_mult) + 250 + 1500
+    let word_delay = (unit * z_state.settings.word_mult) + 250
     z_state.word_timeout = setTimeout(() => App.resolve_word(zone), word_delay)
   }
 
