@@ -1,6 +1,7 @@
 App.zone_refresh_delay = 10
 App.max_zone_map_updates = 12
 App.zone_map_updates = 0
+App.zone_map_heat_hours = 6
 
 App.update_zone_map_styles = () => {
   let c = DOM.el(`#zone-map-container`)
@@ -151,8 +152,8 @@ App.get_zone_colors = (last_activity, current_time) => {
 
   if (last_activity > 0) {
     let time_since_active = current_time - last_activity
-    let fraction_of_hour = time_since_active / 3600000
-    activity = Math.max(0, 1 - fraction_of_hour)
+    let fraction_of_time = time_since_active / (3600000 * App.zone_map_heat_hours)
+    activity = Math.max(0, 1 - fraction_of_time)
   }
 
   let hue = Math.round(120 - (activity * 120))
