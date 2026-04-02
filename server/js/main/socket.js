@@ -168,6 +168,10 @@ App.on_zone = (data) => {
     App.handle_release(null, false)
   }
 
+  App.remote_lock_time = -Shared.lock_time
+  App.last_input_time = 0
+  App.last_typist_was_local = true
+
   App.current_sequence = ``
   App.current_letters = []
   App.update_sequence_display()
