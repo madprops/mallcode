@@ -271,7 +271,7 @@ Shared.process_duration = (duration, unit_duration, sequence, settings) => {
   let max_seq_length = 15
 
   if (sequence.length < max_seq_length) {
-    if (safe_duration < (unit_duration * 1.5)) {
+    if (safe_duration < (unit_duration * 2)) {
       sequence += `.`
       let estimated_unit = safe_duration
       unit_duration = unit_duration * 0.7 + estimated_unit * 0.3

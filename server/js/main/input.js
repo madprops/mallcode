@@ -5,6 +5,10 @@ App.handle_press = (e, is_local = true) => {
 
   let event_time = e && e.timeStamp ? e.timeStamp : performance.now()
 
+  if (event_time > 1e12) {
+    event_time = performance.now()
+  }
+
   if (e && ((e.type === `mousedown`) || (e.type === `touchstart`))) {
     if (!document.hasFocus() || ((performance.now() - App.last_focus_time) < 100)) {
       return
@@ -82,6 +86,10 @@ App.handle_release = (e, is_local = true) => {
   }
 
   let event_time = e && e.timeStamp ? e.timeStamp : performance.now()
+
+  if (event_time > 1e12) {
+    event_time = performance.now()
+  }
 
   if (e && (e.type === `keyup`)) {
     if ([`Meta`, `OS`, `Control`, `Alt`, `Shift`, `F5`, `F12`].includes(e.key)) {
