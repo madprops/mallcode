@@ -65,7 +65,6 @@ module.exports = (App) => {
         if (char === `.`) {
           required_time += min_u
         }
-
         else if (char === `-`) {
           required_time += min_u * 3
         }
