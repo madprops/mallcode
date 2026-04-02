@@ -56,7 +56,6 @@ module.exports = (App) => {
         }
       })
 
-      App.send_sequence({sequence: z_state.current_sequence, username: ws.username, zone: ws.zone, unit_duration: ws.unit_duration})
       let letter_delay = (ws.unit_duration * z_state.settings.letter_mult) + 250
       z_state.letter_timeout = setTimeout(() => App.resolve_letter(ws.zone), letter_delay)
     }
@@ -113,29 +112,6 @@ module.exports = (App) => {
     return false
   }
 
-  App.send_sequence = (args = {}) => {
-    let def_args = {
-      sequence: ``,
-      username: ``,
-      zone: ``,
-      resolve: false,
-      unit_duration: null,
-    }
-
-    if (!args.username) {
-      args.username = App.get_last_username(args.zone)
-    }
-
-    App.shared.def_args(def_args, args)
-    let msg_seq = JSON.stringify({type: `SEQUENCE`, sequence: args.sequence, username: args.username, resolve: args.resolve, unit_duration: args.unit_duration})
-
-    App.wss.clients.forEach((c) => {
-      if ((c.readyState === WebSocket.OPEN) && (c.zone === args.zone)) {
-        c.send(msg_seq)
-      }
-    })
-  }
-
   App.resolve_letter = (zone) => {
     let z_state = App.zone_states[zone]
 
@@ -149,8 +125,6 @@ module.exports = (App) => {
     if (letter !== ``) {
       z_state.letters.push(letter)
     }
-
-    App.send_sequence({sequence: z_state.current_sequence, zone, resolve: true})
 
     z_state.current_sequence = ``
     z_state.control_start_time = Date.now()

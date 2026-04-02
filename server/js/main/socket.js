@@ -33,13 +33,6 @@ App.setup_socket = () => {
     else if (data.type === `UP`) {
       App.on_up(data)
     }
-    else if (data.type === `SEQUENCE`) {
-      let ok = App.on_sequence(data)
-
-      if (!ok) {
-        return
-      }
-    }
     else if (data.type === `WORD_END`) {
       App.on_word_end(data)
     }
@@ -81,34 +74,6 @@ App.on_ws_close = () => {
   setTimeout(() => {
     App.setup_socket()
   }, App.reconnect_delay)
-}
-
-App.on_sequence = (data) => {
-  if (data.username === App.username) {
-    return true
-  }
-
-  if (data.unit_duration) {
-    App.unit_duration = data.unit_duration
-  }
-
-  if (data.resolve) {
-    let letter = Shared.morse_code[data.sequence] || ``
-
-    if (letter) {
-      App.spawn_sprite(letter, `letter`)
-      App.current_letters.push(letter)
-    }
-
-    App.current_sequence = ``
-    App.update_sequence_display()
-  }
-  else {
-    App.current_sequence = data.sequence
-    App.update_sequence_display()
-  }
-
-  return true
 }
 
 App.on_up_or_down = (data) => {

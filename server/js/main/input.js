@@ -135,9 +135,10 @@ App.trigger_down = (is_local = true) => {
 
   let now = performance.now()
 
+  clearTimeout(App.letter_timeout)
+  clearTimeout(App.word_timeout)
+
   if (is_local) {
-    clearTimeout(App.letter_timeout)
-    clearTimeout(App.word_timeout)
     App.last_typist_was_local = true
     App.current_user = App.username
     App.username_info_el.textContent = App.username
@@ -151,10 +152,7 @@ App.trigger_down = (is_local = true) => {
 
   if (App.last_input_time > 0) {
     gap = now - App.last_input_time
-
-    if (is_local) {
-      App.unit_duration = Shared.process_gap(gap, App.unit_duration, App.current_sequence.length, App.zone_settings)
-    }
+    App.unit_duration = Shared.process_gap(gap, App.unit_duration, App.current_sequence.length, App.zone_settings)
   }
 
   App.last_input_time = now
@@ -174,7 +172,7 @@ App.trigger_down = (is_local = true) => {
   clearTimeout(App.max_press_timeout)
 
   App.max_press_timeout = setTimeout(() => {
-    App.handle_release(null, true)
+    App.handle_release(null, is_local)
   }, App.max_press_duration)
 }
 
@@ -189,19 +187,20 @@ App.trigger_up = (is_local = true) => {
   let duration = now - App.press_start_time
   App.last_input_time = now
 
+  let res = Shared.process_duration(duration, App.unit_duration, App.current_sequence, App.zone_settings)
+  App.unit_duration = res.unit_duration
+  App.current_sequence = res.sequence
+  App.update_sequence_display()
+
   if (is_local) {
-    let res = Shared.process_duration(duration, App.unit_duration, App.current_sequence, App.zone_settings)
-    App.unit_duration = res.unit_duration
-    App.current_sequence = res.sequence
-    App.update_sequence_display()
     App.echo_debouncer.call()
-
-    let letter_delay = (App.unit_duration * App.zone_settings.letter_mult) + 250
-
-    App.letter_timeout = setTimeout(() => {
-      App.resolve_local_letter()
-    }, letter_delay)
   }
+
+  let letter_delay = (App.unit_duration * App.zone_settings.letter_mult) + 250
+
+  App.letter_timeout = setTimeout(() => {
+    App.resolve_local_letter(is_local)
+  }, letter_delay)
 
   if ((is_local !== false) && App.ws && (App.ws.readyState === WebSocket.OPEN)) {
     App.ws.send(JSON.stringify({type: `UP`, duration}))
@@ -211,7 +210,7 @@ App.trigger_up = (is_local = true) => {
   App.particle_mesh.material.size = 0.15
 }
 
-App.resolve_local_letter = () => {
+App.resolve_local_letter = (is_local = true) => {
   if (!App.current_sequence) {
     return
   }
@@ -226,11 +225,13 @@ App.resolve_local_letter = () => {
   App.current_sequence = ``
   App.update_sequence_display()
 
-  let word_delay = (App.unit_duration * App.zone_settings.word_mult) + 250
+  if (is_local) {
+    let word_delay = (App.unit_duration * App.zone_settings.word_mult) + 250
 
-  App.word_timeout = setTimeout(() => {
-    App.resolve_local_word()
-  }, word_delay)
+    App.word_timeout = setTimeout(() => {
+      App.resolve_local_word()
+    }, word_delay)
+  }
 }
 
 App.resolve_local_word = () => {

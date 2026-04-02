@@ -188,7 +188,6 @@ module.exports = (App) => {
       z_state.lock_expires = 0
       z_state.control_start_time = 0
       z_state.takeover_time = 0
-      App.send_sequence({username: ws.username, zone})
     }
   }
 
