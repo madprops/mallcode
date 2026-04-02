@@ -326,10 +326,16 @@ App.stop_beep = () => {
   // 20ms release cuts off cleanly without a popping artifact
   let release = 0.02
 
-  App.gain_node.gain.cancelScheduledValues(stop_time)
-  App.gain_node.gain.setValueAtTime(App.gain_node.gain.value, stop_time)
-  App.gain_node.gain.linearRampToValueAtTime(0, stop_time + release)
-  App.active_osc.stop(stop_time + release + 0.01)
+  try {
+    App.gain_node.gain.cancelScheduledValues(stop_time)
+    App.gain_node.gain.setValueAtTime(App.gain_node.gain.value, stop_time)
+    App.gain_node.gain.linearRampToValueAtTime(0, stop_time + release)
+    App.active_osc.stop(stop_time + release + 0.01)
+  }
+  catch (err) {
+    App.active_osc.stop()
+  }
+
   App.active_osc = null
   App.gain_node = null
 }

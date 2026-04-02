@@ -104,7 +104,7 @@ App.setup_events = () => {
   })
 
   DOM.ev(App.canvas, `mousedown`, App.handle_press)
-  DOM.ev(App.canvas, `mouseup`, App.handle_release)
+  DOM.ev(window, `mouseup`, App.handle_release)
   DOM.ev(window, `keydown`, App.handle_press)
   DOM.ev(window, `keyup`, App.handle_release)
 
