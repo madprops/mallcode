@@ -56,7 +56,7 @@ module.exports = (App) => {
           return
         }
 
-        App.update_zone_activity(ws.zone, true)
+        App.update_zone_activity(ws.zone)
         let z_state = App.get_zone_state(ws.zone)
 
         if (!ws.unit_duration) {

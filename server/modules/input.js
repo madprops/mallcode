@@ -40,7 +40,7 @@ module.exports = (App) => {
 
       let res = App.shared.process_duration(duration, ws.unit_duration, z_state.current_sequence, z_state.settings)
       ws.unit_duration = res.unit_duration
-      
+
       if (typeof data.sequence === `string`) {
         z_state.current_sequence = data.sequence
       }
@@ -277,6 +277,7 @@ module.exports = (App) => {
 
       App.get_zone_echo(zone)
       App.zone_data_changed = true
+      App.update_zone_activity(zone, true)
       App.broadcast_zone_words(zone)
       App.check_anomaly(word)
     }
