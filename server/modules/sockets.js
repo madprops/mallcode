@@ -64,6 +64,10 @@ module.exports = (App) => {
         }
 
         if (z_state.last_active_ws && (z_state.last_active_ws !== ws)) {
+          if ([`LETTER`, `WORD`].includes(signal)) {
+            return
+          }
+
           let can_takeover = App.on_active_ws_different(ws, data, z_state)
 
           if (!can_takeover) {
@@ -71,10 +75,12 @@ module.exports = (App) => {
           }
         }
         else if (z_state.last_active_ws === ws) {
-          let is_blocked = App.on_active_ws_same(ws, data, z_state)
+          if ([`DOWN`, `UP`].includes(signal)) {
+            let is_blocked = App.on_active_ws_same(ws, data, z_state)
 
-          if (is_blocked) {
-            return
+            if (is_blocked) {
+              return
+            }
           }
         }
 
@@ -84,7 +90,9 @@ module.exports = (App) => {
           z_state.takeover_time = now
         }
 
-        z_state.lock_expires = now + 3000
+        if ((signal === `DOWN`) || (signal === `UP`)) {
+          z_state.lock_expires = now + 3000
+        }
 
         if (signal === `DOWN`) {
           App.on_down(ws, data, z_state)
