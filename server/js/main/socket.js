@@ -23,7 +23,7 @@ App.setup_socket = () => {
       return
     }
 
-    if (data.username && [`DOWN`, `UP`].includes(data.type)) {
+    if (data.username && [`DOWN`, `UP`, `LETTER`, `WORD`].includes(data.type)) {
       App.on_up_or_down(data)
     }
 
@@ -33,8 +33,11 @@ App.setup_socket = () => {
     else if (data.type === `UP`) {
       App.on_up(data)
     }
-    else if (data.type === `WORD_END`) {
-      App.on_word_end(data)
+    else if (data.type === `LETTER`) {
+      App.on_letter(data)
+    }
+    else if (data.type === `WORD`) {
+      App.on_word(data)
     }
     else if (data.type === `ZONE`) {
       App.on_zone(data)
@@ -97,14 +100,33 @@ App.on_up = (data) => {
   App.remote_lock_time = performance.now()
   App.last_typist_was_local = false
   App.handle_release(null, false)
+
+  if (data.sequence !== undefined) {
+    App.current_sequence = data.sequence
+    App.update_sequence_display()
+  }
 }
 
-App.on_word_end = (data) => {
+App.on_letter = (data) => {
   if (data.username === App.username) {
     return
   }
 
-  let word = App.current_letters.join(``)
+  if (data.letter) {
+    App.spawn_sprite(data.letter, `letter`)
+    App.current_letters.push(data.letter)
+  }
+
+  App.current_sequence = ``
+  App.update_sequence_display()
+}
+
+App.on_word = (data) => {
+  if (data.username === App.username) {
+    return
+  }
+
+  let word = data.word
   let found = false
 
   if (App.current_letters.length === 1) {

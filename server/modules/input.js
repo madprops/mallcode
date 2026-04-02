@@ -48,7 +48,7 @@ module.exports = (App) => {
       ws.unit_duration = res.unit_duration
       z_state.current_sequence = res.sequence
 
-      let msg_up = JSON.stringify({type: `UP`, username: ws.username})
+      let msg_up = JSON.stringify({type: `UP`, username: ws.username, sequence: res.sequence})
 
       App.wss.clients.forEach((client) => {
         if ((client !== ws) && (client.readyState === WebSocket.OPEN) && (client.zone === ws.zone)) {
@@ -126,6 +126,15 @@ module.exports = (App) => {
       z_state.letters.push(letter)
     }
 
+    let username = z_state.last_active_ws ? z_state.last_active_ws.username : ``
+    let msg_letter = JSON.stringify({type: `LETTER`, username, letter})
+
+    App.wss.clients.forEach((c) => {
+      if ((c.readyState === WebSocket.OPEN) && (c.zone === zone)) {
+        c.send(msg_letter)
+      }
+    })
+
     z_state.current_sequence = ``
     z_state.control_start_time = Date.now()
     let unit = z_state.last_active_ws ? z_state.last_active_ws.unit_duration || z_state.settings.unit_duration : z_state.settings.unit_duration
@@ -142,7 +151,7 @@ module.exports = (App) => {
 
     let word = z_state.letters.join(``)
     App.actions.check_word(z_state.last_active_ws, zone, word)
-    let msg = JSON.stringify({type: `WORD_END`, username: z_state.last_active_ws ? z_state.last_active_ws.username : ``})
+    let msg = JSON.stringify({type: `WORD`, username: z_state.last_active_ws ? z_state.last_active_ws.username : ``, word})
     z_state.letters = []
 
     App.wss.clients.forEach((c) => {

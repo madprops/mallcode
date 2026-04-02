@@ -169,7 +169,7 @@ module.exports = (App) => {
     if (z_state && (z_state.last_active_ws === ws)) {
       if (z_state.is_pressed) {
         z_state.is_pressed = false
-        let msg_up = JSON.stringify({type: `UP`, username: ws.username})
+        let msg_up = JSON.stringify({type: `UP`, username: ws.username, sequence: z_state.current_sequence})
 
         App.wss.clients.forEach((client) => {
           if ((client.readyState === WebSocket.OPEN) && (client.zone === zone)) {
