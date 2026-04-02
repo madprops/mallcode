@@ -232,9 +232,20 @@ body, html {
     filter: brightness(1.2);
 }
 
+@keyframes currentZonePulse {
+    from {
+        border-color: #00aaff;
+        box-shadow: 0 0 2px rgba(0, 170, 255, 0.2);
+    }
+    to {
+        border-color: #00e5ff;
+        box-shadow: 0 0 12px rgba(0, 170, 255, 0.8);
+    }
+}
+
 .zone-map-current {
-    border-color: #00aaff !important;
     border-width: 2px !important;
+    animation: currentZonePulse 0.5s infinite alternate ease-in-out;
 }
 
 .zone-map-populated {
