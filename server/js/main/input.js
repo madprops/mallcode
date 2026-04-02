@@ -3,6 +3,8 @@ App.handle_press = (e, is_local = true) => {
     return
   }
 
+  let event_time = e && e.timeStamp ? e.timeStamp : performance.now()
+
   if (e && ((e.type === `mousedown`) || (e.type === `touchstart`))) {
     if (!document.hasFocus() || ((performance.now() - App.last_focus_time) < 100)) {
       return
@@ -57,7 +59,7 @@ App.handle_press = (e, is_local = true) => {
 
     if (!App.is_iambic_keying) {
       App.is_iambic_keying = true
-      App.iambic_loop()
+      App.iambic_loop(event_time)
     }
 
     return
@@ -67,17 +69,19 @@ App.handle_press = (e, is_local = true) => {
     return
   }
 
-  if (is_local && ((now - App.last_input_time) < App.input_throttle_ms)) {
+  if (is_local && ((event_time - App.last_input_time) < App.input_throttle_ms)) {
     return
   }
 
-  App.trigger_down(is_local)
+  App.trigger_down(is_local, event_time)
 }
 
 App.handle_release = (e, is_local = true) => {
   if (App.moving || App.dial_visible || App.modal_open()) {
     return
   }
+
+  let event_time = e && e.timeStamp ? e.timeStamp : performance.now()
 
   if (e && (e.type === `keyup`)) {
     if ([`Meta`, `OS`, `Control`, `Alt`, `Shift`, `F5`, `F12`].includes(e.key)) {
@@ -125,15 +129,15 @@ App.handle_release = (e, is_local = true) => {
     return
   }
 
-  App.trigger_up(is_local)
+  App.trigger_up(is_local, event_time)
 }
 
-App.trigger_down = (is_local = true) => {
+App.trigger_down = (is_local = true, event_time = null) => {
   if (App.is_pressed) {
     return
   }
 
-  let now = performance.now()
+  let now = event_time || performance.now()
 
   if (is_local) {
     clearTimeout(App.letter_timeout)
@@ -150,7 +154,7 @@ App.trigger_down = (is_local = true) => {
     let gap = 0
 
     if (App.last_input_time > 0) {
-      gap = now - App.last_input_time
+      gap = Math.max(0, now - App.last_input_time)
       App.unit_duration = Shared.process_gap(gap, App.unit_duration, App.current_sequence.length, App.zone_settings)
     }
 
@@ -176,15 +180,15 @@ App.trigger_down = (is_local = true) => {
   }, App.max_press_duration)
 }
 
-App.trigger_up = (is_local = true) => {
+App.trigger_up = (is_local = true, event_time = null) => {
   if (!App.is_pressed) {
     return
   }
 
-  let now = performance.now()
+  let now = event_time || performance.now()
   App.is_pressed = false
   clearTimeout(App.max_press_timeout)
-  let duration = now - App.press_start_time
+  let duration = Math.max(0, now - App.press_start_time)
   App.last_input_time = now
 
   if (is_local) {

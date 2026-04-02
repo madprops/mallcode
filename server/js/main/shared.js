@@ -86,15 +86,15 @@ Shared.morse_code = {
 }
 
 Shared.zone_settings = {
-  1: {unit_duration: 350, iambic_duration: 240, letter_mult: 5.0, word_mult: 10, max_press: 2000, throttle: 60, forgiving: true},
-  2: {unit_duration: 300, iambic_duration: 220, letter_mult: 4.5, word_mult: 9, max_press: 1800, throttle: 50, forgiving: true},
-  3: {unit_duration: 250, iambic_duration: 200, letter_mult: 4.0, word_mult: 8, max_press: 1500, throttle: 45, forgiving: true},
-  4: {unit_duration: 210, iambic_duration: 180, letter_mult: 3.5, word_mult: 7, max_press: 1200, throttle: 40, forgiving: true},
-  5: {unit_duration: 180, iambic_duration: 160, letter_mult: 3.5, word_mult: 7, max_press: 1000, throttle: 35, forgiving: false},
-  6: {unit_duration: 150, iambic_duration: 140, letter_mult: 3.0, word_mult: 7, max_press: 800, throttle: 30, forgiving: false},
-  7: {unit_duration: 120, iambic_duration: 120, letter_mult: 3.0, word_mult: 7, max_press: 700, throttle: 25, forgiving: false},
-  8: {unit_duration: 100, iambic_duration: 100, letter_mult: 3.0, word_mult: 7, max_press: 600, throttle: 20, forgiving: false},
-  9: {unit_duration: 80, iambic_duration: 80, letter_mult: 3.0, word_mult: 7, max_press: 500, throttle: 15, forgiving: false},
+  1: {unit_duration: 350, iambic_duration: 240, letter_mult: 5.0, word_mult: 10, max_press: 2000, throttle: 5, forgiving: true},
+  2: {unit_duration: 300, iambic_duration: 220, letter_mult: 4.5, word_mult: 9, max_press: 1800, throttle: 5, forgiving: true},
+  3: {unit_duration: 250, iambic_duration: 200, letter_mult: 4.0, word_mult: 8, max_press: 1500, throttle: 5, forgiving: true},
+  4: {unit_duration: 210, iambic_duration: 180, letter_mult: 3.5, word_mult: 7, max_press: 1200, throttle: 5, forgiving: true},
+  5: {unit_duration: 180, iambic_duration: 160, letter_mult: 3.5, word_mult: 7, max_press: 1000, throttle: 5, forgiving: false},
+  6: {unit_duration: 150, iambic_duration: 140, letter_mult: 3.0, word_mult: 7, max_press: 800, throttle: 5, forgiving: false},
+  7: {unit_duration: 120, iambic_duration: 120, letter_mult: 3.0, word_mult: 7, max_press: 700, throttle: 5, forgiving: false},
+  8: {unit_duration: 100, iambic_duration: 100, letter_mult: 3.0, word_mult: 7, max_press: 600, throttle: 5, forgiving: false},
+  9: {unit_duration: 80, iambic_duration: 80, letter_mult: 3.0, word_mult: 7, max_press: 500, throttle: 5, forgiving: false},
 }
 
 Shared.lock_time = 3000
