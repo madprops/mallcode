@@ -226,6 +226,10 @@ App.resolve_local_letter = (is_local = true) => {
   App.update_sequence_display()
 
   if (is_local) {
+    if (App.ws && (App.ws.readyState === WebSocket.OPEN)) {
+      App.ws.send(JSON.stringify({type: `LETTER`}))
+    }
+
     let word_delay = (App.unit_duration * App.zone_settings.word_mult) + 250
 
     App.word_timeout = setTimeout(() => {
@@ -264,6 +268,10 @@ App.resolve_local_word = () => {
   }
 
   App.current_letters = []
+
+  if (App.ws && (App.ws.readyState === WebSocket.OPEN)) {
+    App.ws.send(JSON.stringify({type: `WORD`}))
+  }
 }
 
 App.iambic_loop = () => {

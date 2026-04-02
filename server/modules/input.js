@@ -77,8 +77,65 @@ module.exports = (App) => {
       let server_elapsed = now - (z_state.control_start_time || now)
       let deficit = Math.max(0, required_time - server_elapsed)
 
-      let letter_delay = (ws.unit_duration * z_state.settings.letter_mult) + 250 + deficit
+      let letter_delay = (ws.unit_duration * z_state.settings.letter_mult) + 250 + deficit + 1500
       z_state.letter_timeout = setTimeout(() => App.resolve_letter(ws.zone), letter_delay)
+    }
+  }
+
+  App.on_client_letter = (ws, data, z_state) => {
+    if (z_state.last_active_ws !== ws) {
+      return
+    }
+
+    clearTimeout(z_state.letter_timeout)
+
+    // Verify the sequence before resolving
+    if (z_state.current_sequence) {
+      App.actions.check_code(ws, ws.zone, z_state.current_sequence)
+      let letter = App.shared.morse_code[z_state.current_sequence] || ``
+
+      if (letter !== ``) {
+        z_state.letters.push(letter)
+      }
+
+      let msg_letter = JSON.stringify({type: `LETTER`, username: ws.username, letter})
+
+      App.wss.clients.forEach((c) => {
+        if ((c.readyState === WebSocket.OPEN) && (c.zone === ws.zone)) {
+          c.send(msg_letter)
+        }
+      })
+
+      z_state.current_sequence = ``
+      z_state.control_start_time = Date.now()
+
+      let unit = ws.unit_duration || z_state.settings.unit_duration
+      let word_delay = (unit * z_state.settings.word_mult) + 250 + 1500
+      clearTimeout(z_state.word_timeout)
+      z_state.word_timeout = setTimeout(() => App.resolve_word(ws.zone), word_delay)
+    }
+  }
+
+  App.on_client_word = (ws, data, z_state) => {
+    if (z_state.last_active_ws !== ws) {
+      return
+    }
+
+    clearTimeout(z_state.word_timeout)
+
+    if (z_state.letters.length) {
+      let word = z_state.letters.join(``)
+      App.actions.check_word(ws, ws.zone, word)
+      let msg = JSON.stringify({type: `WORD`, username: ws.username, word})
+      z_state.letters = []
+
+      App.wss.clients.forEach((c) => {
+        if ((c.readyState === WebSocket.OPEN) && (c.zone === ws.zone)) {
+          c.send(msg)
+        }
+      })
+
+      App.process_word(ws.zone, word, ws)
     }
   }
 
@@ -159,7 +216,7 @@ module.exports = (App) => {
     z_state.current_sequence = ``
     z_state.control_start_time = Date.now()
     let unit = z_state.last_active_ws ? z_state.last_active_ws.unit_duration || z_state.settings.unit_duration : z_state.settings.unit_duration
-    let word_delay = (unit * z_state.settings.word_mult) + 250
+    let word_delay = (unit * z_state.settings.word_mult) + 250 + 1500
     z_state.word_timeout = setTimeout(() => App.resolve_word(zone), word_delay)
   }
 

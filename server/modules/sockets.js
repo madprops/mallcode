@@ -45,7 +45,7 @@ module.exports = (App) => {
           return
         }
 
-        if ((signal !== `DOWN`) && (signal !== `UP`)) {
+        if (![`DOWN`, `UP`, `LETTER`, `WORD`].includes(signal)) {
           return
         }
 
@@ -91,6 +91,12 @@ module.exports = (App) => {
         }
         else if (signal === `UP`) {
           App.on_up(ws, data, z_state)
+        }
+        else if (signal === `LETTER`) {
+          App.on_client_letter(ws, data, z_state)
+        }
+        else if (signal === `WORD`) {
+          App.on_client_word(ws, data, z_state)
         }
       })
 
