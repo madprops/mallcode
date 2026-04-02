@@ -82,7 +82,9 @@ App.handle_press = (e, is_local = true) => {
 
 App.handle_release = (e, is_local = true) => {
   if (App.moving || App.dial_visible || App.modal_open()) {
-    return
+    if (!App.is_pressed && !App.is_iambic_keying) {
+      return
+    }
   }
 
   let event_time = e && e.timeStamp ? e.timeStamp : performance.now()
