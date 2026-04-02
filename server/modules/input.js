@@ -56,7 +56,23 @@ module.exports = (App) => {
         }
       })
 
-      let letter_delay = (ws.unit_duration * z_state.settings.letter_mult) + 250
+      let min_u = z_state.settings.forgiving ? 150 : z_state.settings.unit_duration * 0.8
+      let required_time = 0
+      
+      for (let i = 0; i < z_state.current_sequence.length; i++) {
+        let char = z_state.current_sequence[i]
+        if (char === `.`) required_time += min_u
+        else if (char === `-`) required_time += (min_u * 3)
+      }
+      
+      if (z_state.current_sequence.length > 1) {
+        required_time += (z_state.current_sequence.length - 1) * min_u
+      }
+
+      let server_elapsed = now - (z_state.control_start_time || now)
+      let deficit = Math.max(0, required_time - server_elapsed)
+
+      let letter_delay = (ws.unit_duration * z_state.settings.letter_mult) + 250 + deficit
       z_state.letter_timeout = setTimeout(() => App.resolve_letter(ws.zone), letter_delay)
     }
   }
