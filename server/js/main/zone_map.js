@@ -1,7 +1,7 @@
 App.zone_refresh_delay = 10
 App.max_zone_map_updates = 12
 App.zone_map_updates = 0
-App.zone_map_heat_hours = 6
+App.zone_map_heat_hours = 12
 
 App.update_zone_map_styles = () => {
   let c = DOM.el(`#zone-map-container`)
