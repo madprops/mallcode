@@ -40,10 +40,6 @@ App.user_sekrits = {}
 App.max_connections_per_ip = 3
 App.max_info_per_minute = 20
 App.max_echo_length = 1024
-App.anomaly_hours = 2
-App.anomaly_speed = 7
-App.anomaly_chance = 1
-App.max_anomalies = 6
 
 App.messages = [
   {

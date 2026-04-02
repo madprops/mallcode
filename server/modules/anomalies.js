@@ -1,4 +1,9 @@
 module.exports = (App) => {
+  App.anomaly_hours = 2
+  App.anomaly_speed = 9
+  App.anomaly_chance = 1
+  App.max_anomalies = 6
+
   App.get_anomaly_chance = () => {
     let base_chance = App.anomaly_chance / 100
     let current_anomalies = Object.values(App.sekrits).filter(s => s.expires).length
