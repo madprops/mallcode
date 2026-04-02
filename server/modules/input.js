@@ -10,12 +10,7 @@ module.exports = (App) => {
     clearTimeout(z_state.letter_timeout)
     clearTimeout(z_state.word_timeout)
 
-    let gap = 0
-
-    if (z_state.last_up_time) {
-      let server_gap = now - z_state.last_up_time
-      gap = App.shared.validate_timing(data.gap, server_gap, 500)
-    }
+    let gap = typeof data.gap === `number` ? data.gap : 0
 
     ws.unit_duration = App.shared.process_gap(gap, ws.unit_duration, z_state.current_sequence.length, z_state.settings)
     let msg_down = JSON.stringify({type: `DOWN`, username: ws.username})
@@ -41,12 +36,17 @@ module.exports = (App) => {
     z_state.last_up_time = now
 
     if (z_state.press_start_time) {
-      let server_duration = now - z_state.press_start_time
-      let duration = App.shared.validate_timing(data.duration, server_duration, 500)
+      let duration = typeof data.duration === `number` ? data.duration : 0
 
       let res = App.shared.process_duration(duration, ws.unit_duration, z_state.current_sequence, z_state.settings)
       ws.unit_duration = res.unit_duration
-      z_state.current_sequence = res.sequence
+      
+      if (typeof data.sequence === `string`) {
+        z_state.current_sequence = data.sequence
+      }
+      else {
+        z_state.current_sequence = res.sequence
+      }
 
       let msg_up = JSON.stringify({type: `UP`, username: ws.username, sequence: res.sequence})
 

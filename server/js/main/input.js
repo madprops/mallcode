@@ -202,7 +202,7 @@ App.trigger_up = (is_local = true) => {
     }, letter_delay)
 
     if (App.ws && (App.ws.readyState === WebSocket.OPEN)) {
-      App.ws.send(JSON.stringify({type: `UP`, duration}))
+      App.ws.send(JSON.stringify({type: `UP`, duration, sequence: App.current_sequence}))
     }
   }
 
