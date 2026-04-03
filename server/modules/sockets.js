@@ -320,7 +320,8 @@ module.exports = (App) => {
         let z = sekrit.zone
 
         if (!zones_info[z]) {
-          let words = App.zone_data[z] ? (App.zone_data[z].words || []) : []
+          let words = App.zone_data[z] ? App.zone_data[z].words || [] : []
+
           zones_info[z] = {
             last_activity: App.zone_data[z] ? App.zone_data[z].last_activity : 0,
             user_count: 0,
@@ -361,7 +362,7 @@ module.exports = (App) => {
 
         if (App.is_public_zone(client.zone) || user_sekrits.includes(client.zone) || is_anomaly) {
           if (!zones_info[client.zone]) {
-            let words = App.zone_data[client.zone] ? (App.zone_data[client.zone].words || []) : []
+            let words = App.zone_data[client.zone] ? App.zone_data[client.zone].words || [] : []
 
             zones_info[client.zone] = {
               last_activity: 0,
