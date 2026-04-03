@@ -219,6 +219,7 @@ App.init = async () => {
   await App.load_storage()
   App.create_debouncers()
   App.setup_msg_message()
+  App.setup_tooltips()
   App.setup_zone_map()
   App.setup_zone_map_icon()
   App.setup_settings()

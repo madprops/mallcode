@@ -23,10 +23,10 @@ App.update_zone_map_styles = () => {
     btn.style.borderColor = style.border
 
     if (style.latest_word) {
-      btn.title = style.latest_word
+      btn.dataset.tooltip = style.latest_word
     }
     else {
-      btn.removeAttribute(`title`)
+      btn.removeAttribute(`data-tooltip`)
     }
   }
 }
@@ -189,7 +189,7 @@ App.get_zone_styling = (zone, current_time) => {
 
 App.get_zone_btn_html = (zone, current_time) => {
   let style = App.get_zone_styling(zone, current_time)
-  let title_attr = style.latest_word ? ` title="${style.latest_word}"` : ``
+  let title_attr = style.latest_word ? ` data-tooltip="${style.latest_word}"` : ``
   return `<button class="${style.cls}" data-zone="${zone}" style="color: ${style.color}; background-color: ${style.bg};"${title_attr}>${zone}</button>`
 }
 
