@@ -21,6 +21,13 @@ App.update_zone_map_styles = () => {
     btn.style.color = style.color
     btn.style.backgroundColor = style.bg
     btn.style.borderColor = style.border
+
+    if (style.latest_word) {
+      btn.title = style.latest_word
+    }
+    else {
+      btn.removeAttribute(`title`)
+    }
   }
 }
 
@@ -164,7 +171,7 @@ App.get_zone_colors = (last_activity, current_time) => {
 }
 
 App.get_zone_styling = (zone, current_time) => {
-  let info = App.zones_info[zone] || {last_activity: 0, user_count: 0}
+  let info = App.zones_info[zone] || {last_activity: 0, user_count: 0, latest_word: ``}
   let colors = App.get_zone_colors(info.last_activity, current_time)
   let is_current = zone === App.zone
   let is_populated = info.user_count > 0
@@ -177,12 +184,13 @@ App.get_zone_styling = (zone, current_time) => {
     cls += ` zone-map-populated`
   }
 
-  return {color: colors.color, bg: colors.bg, cls}
+  return {color: colors.color, bg: colors.bg, cls, latest_word: info.latest_word || ``}
 }
 
 App.get_zone_btn_html = (zone, current_time) => {
   let style = App.get_zone_styling(zone, current_time)
-  return `<button class="${style.cls}" data-zone="${zone}" style="color: ${style.color}; background-color: ${style.bg};">${zone}</button>`
+  let title_attr = style.latest_word ? ` title="${style.latest_word}"` : ``
+  return `<button class="${style.cls}" data-zone="${zone}" style="color: ${style.color}; background-color: ${style.bg};"${title_attr}>${zone}</button>`
 }
 
 App.build_zone_selector = (zones_info) => {

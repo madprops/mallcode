@@ -303,9 +303,12 @@ module.exports = (App) => {
 
     for (let z in App.zone_data) {
       if (App.is_public_zone(z)) {
+        let words = App.zone_data[z].words || []
+
         zones_info[z] = {
           last_activity: App.zone_data[z].last_activity,
           user_count: 0,
+          latest_word: words.length > 0 ? words[words.length - 1] : ``,
         }
       }
     }
@@ -317,9 +320,11 @@ module.exports = (App) => {
         let z = sekrit.zone
 
         if (!zones_info[z]) {
+          let words = App.zone_data[z] ? (App.zone_data[z].words || []) : []
           zones_info[z] = {
             last_activity: App.zone_data[z] ? App.zone_data[z].last_activity : 0,
             user_count: 0,
+            latest_word: words.length > 0 ? words[words.length - 1] : ``,
           }
         }
       }
@@ -339,9 +344,12 @@ module.exports = (App) => {
     for (let z of user_sekrits) {
       if (App.zone_data[z]) {
         if (!zones_info[z]) {
+          let words = App.zone_data[z].words || []
+
           zones_info[z] = {
             last_activity: App.zone_data[z].last_activity,
             user_count: 0,
+            latest_word: words.length > 0 ? words[words.length - 1] : ``,
           }
         }
       }
@@ -353,7 +361,13 @@ module.exports = (App) => {
 
         if (App.is_public_zone(client.zone) || user_sekrits.includes(client.zone) || is_anomaly) {
           if (!zones_info[client.zone]) {
-            zones_info[client.zone] = {last_activity: 0, user_count: 0}
+            let words = App.zone_data[client.zone] ? (App.zone_data[client.zone].words || []) : []
+
+            zones_info[client.zone] = {
+              last_activity: 0,
+              user_count: 0,
+              latest_word: words.length > 0 ? words[words.length - 1] : ``,
+            }
           }
 
           zones_info[client.zone].user_count += 1
