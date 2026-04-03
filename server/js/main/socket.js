@@ -58,6 +58,9 @@ App.setup_socket = () => {
     else if (data.type === `ZONES_INFO`) {
       App.on_zones_info(data)
     }
+    else if (data.type === `ANOMALY`) {
+      App.announce_anomaly(data)
+    }
   }
 
   App.ws.onclose = () => {

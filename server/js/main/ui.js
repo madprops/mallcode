@@ -84,9 +84,15 @@ App.refresh_info = () => {
   }
 }
 
-App.show_update = (msg) => {
+App.show_update = (msg, func) => {
   let el = DOM.create(`div`)
   el.textContent = msg
+
+  if (func) {
+    DOM.ev(el, `click`, func)
+    el.classList.add(`pointer`)
+  }
+
   App.updates_el.prepend(el)
 
   setTimeout(() => {

@@ -1,7 +1,7 @@
 module.exports = (App) => {
   App.anomaly_hours = 2
   App.anomaly_speed = 9
-  App.anomaly_chance = 1
+  App.anomaly_chance = 100
   App.max_anomalies = 6
 
   App.get_anomaly_chance = () => {
@@ -24,17 +24,31 @@ module.exports = (App) => {
 
   App.check_anomaly = (word) => {
     if (Math.random() < App.get_anomaly_chance()) {
-      if (!App.sekrits[word] && !App.shared.is_public_zone(word)) {
-        let zone_name = App.shared.random_word(3, word)
-        zone_name = zone_name.toUpperCase()
-
-        App.sekrits[zone_name] = {
-          word: zone_name,
-          zone: zone_name,
-          speed: App.anomaly_speed,
-          expires: Date.now() + App.anomaly_hours * 60 * 60 * 1000,
-        }
-      }
+      App.create_anomaly(word)
     }
+  }
+
+  App.create_anomaly = (word) => {
+    let zone_name = App.shared.random_word(3, word)
+    zone_name = zone_name.toUpperCase()
+
+    App.sekrits[zone_name] = {
+      word: zone_name,
+      zone: zone_name,
+      speed: App.anomaly_speed,
+      expires: Date.now() + App.anomaly_hours * 60 * 60 * 1000,
+    }
+
+    App.announce_anomaly(zone_name)
+  }
+
+  App.announce_anomaly = (zone) => {
+    let msg = JSON.stringify({type: `ANOMALY`, zone})
+
+    App.wss.clients.forEach((c) => {
+      if (c.readyState === WebSocket.OPEN) {
+        c.send(msg)
+      }
+    })
   }
 }

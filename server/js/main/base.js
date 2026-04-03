@@ -197,6 +197,16 @@ App.load_fonts = () => {
   document.fonts.load(`1em piss_font`)
 }
 
+App.announce_anomaly = (data) => {
+  App.show_update(`${data.zone} is created`, () => {
+    App.go_to_zone(data.zone)
+  })
+}
+
+App.go_to_zone = (zone) => {
+  App.ws.send(JSON.stringify({type: `RESTORE_ZONE`, zone}))
+}
+
 App.start = () => {
   App.setup_canvas()
   App.setup_events()

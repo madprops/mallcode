@@ -461,3 +461,7 @@ a.clean-link:hover {
     box-sizing: border-box;
     width: 100%;
 }
+
+.pointer {
+    cursor: pointer;
+}

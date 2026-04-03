@@ -163,6 +163,6 @@ App.zone_dial_action = () => {
   let new_zone = `${letter}${speed}`
 
   if ((new_zone !== App.zone) && App.ws && (App.ws.readyState === WebSocket.OPEN)) {
-    App.ws.send(JSON.stringify({type: `RESTORE_ZONE`, zone: new_zone}))
+    App.go_to_zone(new_zone)
   }
 }
