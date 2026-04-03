@@ -472,14 +472,13 @@ a.clean-link:hover {
     z-index: 2147483647;
     opacity: 0;
     transition: opacity 0.05s ease-in-out;
-    background-color: rgba(15, 15, 20, 0.95);
+    background-color: rgba(48, 48, 59, 0.95);
     color: #fff;
     padding: 6px 10px;
-    border-radius: 6px;
+    border-radius: 4px;
     font-size: 14px;
     white-space: nowrap;
     transform: translate(-50%, -100%);
     margin-top: -10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 2px solid rgb(200, 186, 186);
 }

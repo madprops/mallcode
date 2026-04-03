@@ -22,8 +22,8 @@ App.update_zone_map_styles = () => {
     btn.style.backgroundColor = style.bg
     btn.style.borderColor = style.border
 
-    if (style.latest_word) {
-      btn.dataset.tooltip = style.latest_word
+    if (style.tooltip) {
+      btn.dataset.tooltip = style.tooltip
     }
     else {
       btn.removeAttribute(`data-tooltip`)
@@ -184,12 +184,26 @@ App.get_zone_styling = (zone, current_time) => {
     cls += ` zone-map-populated`
   }
 
-  return {color: colors.color, bg: colors.bg, cls, latest_word: info.latest_word || ``}
+  let tooltip = ``
+
+  if (info.user_count > 0) {
+    tooltip += Shared.singular_or_plural(info.user_count, `user`, `users`)
+  }
+
+  if (info.latest_word) {
+    if (tooltip) {
+      tooltip += ` | `
+    }
+
+    tooltip += info.latest_word
+  }
+
+  return {color: colors.color, bg: colors.bg, cls, tooltip}
 }
 
 App.get_zone_btn_html = (zone, current_time) => {
   let style = App.get_zone_styling(zone, current_time)
-  let title_attr = style.latest_word ? ` data-tooltip="${style.latest_word}"` : ``
+  let title_attr = style.tooltip ? ` data-tooltip="${style.tooltip}"` : ``
   return `<button class="${style.cls}" data-zone="${zone}" style="color: ${style.color}; background-color: ${style.bg};"${title_attr}>${zone}</button>`
 }
 

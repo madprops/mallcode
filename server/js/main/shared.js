@@ -348,6 +348,11 @@ Shared.random_speed = () => {
   return Shared.random_choice(Shared.speeds)
 }
 
+Shared.singular_or_plural = (num, singular, plural) => {
+  let s = num === 1 ? singular : plural
+  return `${num} ${s}`
+}
+
 if ((typeof module !== `undefined`) && module.exports) {
   module.exports = Shared
 }
