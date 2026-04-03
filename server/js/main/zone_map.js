@@ -1,4 +1,4 @@
-App.zone_refresh_delay = 10
+App.zone_refresh_delay = 60
 App.max_zone_map_updates = 12
 App.zone_map_updates = 0
 App.zone_map_heat_hours = 12
