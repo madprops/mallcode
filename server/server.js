@@ -26,7 +26,6 @@ App.zone_states = {}
 App.next_client_id = 1
 App.words = new Set()
 App.sekrits = {}
-App.default_speed = 7
 App.block_seconds = 60
 App.spam_limit = 10
 App.blocked_ips = {}

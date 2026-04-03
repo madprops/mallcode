@@ -183,10 +183,9 @@ App.on_zone = (data) => {
   App.update_url()
   App.clear_updates()
   App.username = data.username
-  let z_num = parseInt(App.zone.charAt(1))
   App.update_background()
   App.refresh_background()
-  App.zone_settings = Shared.zone_settings[isNaN(z_num) ? 5 : z_num]
+  App.zone_settings = Shared.zone_settings[data.speed || Shared.default_speed]
   App.max_press_duration = App.zone_settings.max_press
   App.input_throttle_ms = App.zone_settings.throttle
   App.unit_duration = App.zone_settings.unit_duration

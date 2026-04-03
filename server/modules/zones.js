@@ -26,7 +26,7 @@ module.exports = (App) => {
       z_num = App.sekrits[zone].speed
     }
     else if (isNaN(z_num)) {
-      z_num = App.default_speed
+      z_num = App.shared.default_speed
     }
 
     return App.shared.zone_settings[z_num] || App.shared.zone_settings[5]
@@ -62,10 +62,23 @@ module.exports = (App) => {
   App.go_to_zone = (ws, zone) => {
     let old_zone = ws.zone
 
+    let speed = 5
+    let z_num = parseInt(zone.charAt(1))
+
+    if (App.sekrits[zone] && App.sekrits[zone].speed) {
+      speed = App.sekrits[zone].speed
+    }
+    else if (!isNaN(z_num)) {
+      speed = z_num
+    }
+    else if (App.shared.default_speed) {
+      speed = App.shared.default_speed
+    }
+
     // If the user is already in this zone, just acknowledge and return
     if (old_zone === zone) {
       let echo = App.zone_data[ws.zone] && App.zone_data[ws.zone].echo ? App.zone_data[ws.zone].echo : ``
-      ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username, version: App.version, echo}))
+      ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username, version: App.version, echo, speed}))
       App.broadcast_zone_words(ws.zone, ws)
       return
     }
@@ -73,7 +86,7 @@ module.exports = (App) => {
     App.force_release(ws, old_zone)
     App.set_zone(ws, zone)
     let echo = App.zone_data[ws.zone] && App.zone_data[ws.zone].echo ? App.zone_data[ws.zone].echo : ``
-    ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username, version: App.version, echo}))
+    ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username, version: App.version, echo, speed}))
 
     if (old_zone) {
       App.broadcast_zone_update(old_zone, ws.username, `leave`)
@@ -93,11 +106,11 @@ module.exports = (App) => {
     let hash = App.shared.get_string_hash(date_str)
     let rng = App.shared.create_seeded_random(hash)
     let letter = String.fromCharCode(65 + Math.floor(rng() * 26))
-    let zone = `${letter}${App.default_speed}`
+    let zone = `${letter}${App.shared.default_speed}`
 
     while (App.sekrits[zone]) {
       letter = String.fromCharCode(65 + Math.floor(rng() * 26))
-      zone = `${letter}${App.default_speed}`
+      zone = `${letter}${App.shared.default_speed}`
     }
 
     return zone
