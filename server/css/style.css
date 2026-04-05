@@ -211,7 +211,7 @@ body, html {
 #zone-map-grid {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
-    gap: 8px;
+    gap: 0;
     max-height: 60vh;
     overflow-y: auto;
     padding: 4px;
@@ -219,13 +219,16 @@ body, html {
 }
 
 .zone-map-btn {
-    padding: 8px 4px;
+    padding: 8px 0;
     font-size: 16px;
     font-family: monospace;
     font-weight: bold;
     cursor: pointer;
-    border: 1px solid;
-    min-width: 40px;
+    min-width: 42px;
+    outline: 1px solid rgb(95, 230, 138);
+    border: 4px solid transparent;
+    background-clip: padding-box;
+    outline-offset: -4px;
 }
 
 .zone-map-btn:hover {
@@ -234,22 +237,21 @@ body, html {
 
 @keyframes currentZonePulse {
     from {
-        border-color: #00aaff;
+        outline-color: #00aaff;
         box-shadow: 0 0 2px rgba(0, 170, 255, 0.2);
     }
     to {
-        border-color: #00e5ff;
+        outline-color: #00e5ff;
         box-shadow: 0 0 12px rgba(0, 170, 255, 0.8);
     }
 }
 
 .zone-map-current {
-    border-width: 2px !important;
     animation: currentZonePulse 0.5s infinite alternate ease-in-out;
 }
 
 .zone-map-populated {
-    border-color: #00ffe1 !important;
+    outline-color: #00ffe1 !important;
 }
 
 #zone-map-grid::-webkit-scrollbar {
@@ -261,13 +263,14 @@ body, html {
 }
 
 #zone-map-sekrit-row {
-    gap: 10px;
+    gap: 0;
     max-width: 500px;
     flex-wrap: wrap-reverse;
     padding-bottom: 10px;
 }
 
 #zone-map-sekrit-row .zone-map-btn {
+    font-family: sans-serif;
     padding: 5px 10px;
 }
 

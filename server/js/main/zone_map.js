@@ -198,13 +198,17 @@ App.get_zone_styling = (zone, current_time) => {
     tooltip += info.latest_word
   }
 
+  if (!tooltip) {
+    tooltip = `Empty`
+  }
+
   return {color: colors.color, bg: colors.bg, cls, tooltip}
 }
 
 App.get_zone_btn_html = (zone, current_time) => {
   let style = App.get_zone_styling(zone, current_time)
   let title_attr = style.tooltip ? ` data-tooltip="${style.tooltip}"` : ``
-  return `<button class="${style.cls}" data-zone="${zone}" style="color: ${style.color}; background-color: ${style.bg};"${title_attr}>${zone}</button>`
+  return `<div class="${style.cls}" data-zone="${zone}" style="color: ${style.color}; background-color: ${style.bg};"${title_attr}>${zone}</div>`
 }
 
 App.build_zone_selector = (zones_info) => {
