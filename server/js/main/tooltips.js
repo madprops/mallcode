@@ -36,3 +36,11 @@ App.create_tooltip = (target) => {
 App.hide_tooltip = () => {
   App.tooltip_el.style.opacity = `0`
 }
+
+App.show_tooltips = () => {
+  DOM.show(App.tooltip_el)
+}
+
+App.hide_tooltips = () => {
+  DOM.hide(App.tooltip_el)
+}

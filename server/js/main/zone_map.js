@@ -53,30 +53,29 @@ App.setup_zone_map = () => {
   let clone = template.content.cloneNode(true)
   let c = DOM.el(`#zone-map-container`, clone)
   App.msg_zone_map.set(c)
-
-  let grid_el = DOM.el(`#zone-map-grid`, c)
-  let is_down = false
-  let start_y
-  let scroll_top
+  App.zone_map_grid_el = DOM.el(`#zone-map-grid`, c)
   App.zone_map_has_dragged = false
+  App.zone_map_down = false
 
   let start_drag = (e) => {
-    is_down = true
+    App.zone_map_down = true
     App.zone_map_has_dragged = false
-    start_y = e.pageY || (e.touches && e.touches[0].pageY)
-    scroll_top = grid_el.scrollTop
-    grid_el.style.cursor = `grabbing`
-    grid_el.style.userSelect = `none`
+    App.zone_map_start_y = e.pageY || (e.touches && e.touches[0].pageY)
+    App.zone_map_scroll_top = App.zone_map_grid_el.scrollTop
+    App.zone_map_grid_el.style.cursor = `grabbing`
+    App.zone_map_grid_el.style.userSelect = `none`
+    App.hide_tooltips()
   }
 
   let end_drag = () => {
-    is_down = false
-    grid_el.style.cursor = `grab`
-    grid_el.style.userSelect = ``
+    App.zone_map_down = false
+    App.zone_map_grid_el.style.cursor = `grab`
+    App.zone_map_grid_el.style.userSelect = ``
+    App.show_tooltips()
   }
 
   let move_drag = (e) => {
-    if (!is_down) {
+    if (!App.zone_map_down) {
       return
     }
 
@@ -86,7 +85,7 @@ App.setup_zone_map = () => {
       return
     }
 
-    let walk = page_y - start_y
+    let walk = page_y - App.zone_map_start_y
 
     if (Math.abs(walk) > 5) {
       App.zone_map_has_dragged = true
@@ -96,20 +95,20 @@ App.setup_zone_map = () => {
       }
     }
 
-    grid_el.scrollTop = scroll_top - walk
+    App.zone_map_grid_el.scrollTop = App.zone_map_scroll_top - walk
   }
 
-  grid_el.style.cursor = `grab`
+  App.zone_map_grid_el.style.cursor = `grab`
 
-  DOM.ev(grid_el, `mousedown`, start_drag)
-  DOM.ev(grid_el, `mouseleave`, end_drag)
-  DOM.ev(grid_el, `mouseup`, end_drag)
-  DOM.ev(grid_el, `mousemove`, move_drag)
+  DOM.ev(App.zone_map_grid_el, `mousedown`, start_drag)
+  DOM.ev(App.zone_map_grid_el, `mouseleave`, end_drag)
+  DOM.ev(App.zone_map_grid_el, `mouseup`, end_drag)
+  DOM.ev(App.zone_map_grid_el, `mousemove`, move_drag)
 
-  DOM.ev(grid_el, `touchstart`, start_drag, {passive: true})
-  DOM.ev(grid_el, `touchend`, end_drag)
-  DOM.ev(grid_el, `touchcancel`, end_drag)
-  DOM.ev(grid_el, `touchmove`, move_drag, {passive: false})
+  DOM.ev(App.zone_map_grid_el, `touchstart`, start_drag, {passive: true})
+  DOM.ev(App.zone_map_grid_el, `touchend`, end_drag)
+  DOM.ev(App.zone_map_grid_el, `touchcancel`, end_drag)
+  DOM.ev(App.zone_map_grid_el, `touchmove`, move_drag, {passive: false})
 
   DOM.ev(c, `click`, (e) => {
     if (!e.target.classList.contains(`zone-map-btn`)) {
