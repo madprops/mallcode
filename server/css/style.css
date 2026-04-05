@@ -238,16 +238,16 @@ body, html {
 @keyframes currentZonePulse {
     from {
         outline-color: #00aaff;
-        box-shadow: 0 0 2px rgba(0, 170, 255, 0.2);
+        box-shadow: inset 0 0 2px rgba(0, 170, 255, 0.2);
     }
     to {
         outline-color: #00e5ff;
-        box-shadow: 0 0 12px rgba(0, 170, 255, 0.8);
+        box-shadow: inset 0 0 8px rgba(0, 170, 255, 0.8);
     }
 }
 
 .zone-map-current {
-    animation: currentZonePulse 0.5s infinite alternate ease-in-out;
+    animation: currentZonePulse 0.42s infinite alternate ease-in-out;
 }
 
 .zone-map-populated {
@@ -270,7 +270,7 @@ body, html {
 }
 
 #zone-map-sekrit-row .zone-map-btn {
-    font-family: sans-serif;
+    font-family: noto_font;
     padding: 5px 10px;
 }
 
