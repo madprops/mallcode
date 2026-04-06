@@ -1,6 +1,13 @@
 App.get_settings = () => {
   return [
     {
+      comment: `Language to use`,
+      name: `volume`,
+      value: App.volume,
+      type: `string`,
+      options: [`max`, `mid`, `mute`],
+    },
+    {
       comment: `Volume level of the beeps`,
       name: `volume`,
       value: App.volume,

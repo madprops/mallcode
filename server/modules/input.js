@@ -48,7 +48,11 @@ module.exports = (App) => {
         z_state.current_sequence = res.sequence
       }
 
-      let msg_up = JSON.stringify({type: `UP`, username: ws.username, sequence: z_state.current_sequence})
+      if (typeof data.language === `string`) {
+        z_state.current_language = data.language
+      }
+
+      let msg_up = JSON.stringify({type: `UP`, username: ws.username, sequence: z_state.current_sequence, language: z_state.current_language || `latin`})
 
       App.wss.clients.forEach((client) => {
         if ((client !== ws) && (client.readyState === WebSocket.OPEN) && (client.zone === ws.zone)) {
@@ -92,7 +96,8 @@ module.exports = (App) => {
     // Verify the sequence before resolving
     if (z_state.current_sequence) {
       App.actions.check_code(ws, ws.zone, z_state.current_sequence)
-      let letter = App.shared.morse_code[z_state.current_sequence] || ``
+      let dictionary = App.shared.dictionaries[z_state.current_language || `latin`] || App.shared.dictionaries.latin
+      let letter = dictionary[z_state.current_sequence] || ``
 
       if (letter !== ``) {
         z_state.letters.push(letter)
@@ -198,7 +203,8 @@ module.exports = (App) => {
     }
 
     App.actions.check_code(z_state.last_active_ws, zone, z_state.current_sequence)
-    let letter = App.shared.morse_code[z_state.current_sequence] || ``
+    let dictionary = App.shared.dictionaries[z_state.current_language || `latin`] || App.shared.dictionaries.latin
+    let letter = dictionary[z_state.current_sequence] || ``
 
     if (letter !== ``) {
       z_state.letters.push(letter)

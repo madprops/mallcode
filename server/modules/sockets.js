@@ -183,7 +183,7 @@ module.exports = (App) => {
     if (z_state && (z_state.last_active_ws === ws)) {
       if (z_state.is_pressed) {
         z_state.is_pressed = false
-        let msg_up = JSON.stringify({type: `UP`, username: ws.username, sequence: z_state.current_sequence})
+        let msg_up = JSON.stringify({type: `UP`, username: ws.username, sequence: z_state.current_sequence, language: z_state.current_language || `latin`})
 
         App.wss.clients.forEach((client) => {
           if ((client.readyState === WebSocket.OPEN) && (client.zone === zone)) {
@@ -193,6 +193,7 @@ module.exports = (App) => {
       }
 
       z_state.current_sequence = ``
+      z_state.current_language = `latin`
       z_state.letters = []
       z_state.press_start_time = 0
       z_state.last_up_time = 0

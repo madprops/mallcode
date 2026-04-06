@@ -108,6 +108,10 @@ App.on_up = (data) => {
     App.current_sequence = data.sequence
     App.update_sequence_display()
   }
+
+  if (data.language !== undefined) {
+    App.remote_language = data.language
+  }
 }
 
 App.on_letter = (data) => {
