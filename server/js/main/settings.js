@@ -1,13 +1,6 @@
 App.get_settings = () => {
   return [
     {
-      comment: `Language to use`,
-      name: `volume`,
-      value: App.volume,
-      type: `string`,
-      options: [`max`, `mid`, `mute`],
-    },
-    {
       comment: `Volume level of the beeps`,
       name: `volume`,
       value: App.volume,
@@ -52,6 +45,12 @@ App.get_settings = () => {
       value: App.sequence,
       type: `string`,
       options: [`base`, `above`, `below`],
+    },
+    {
+      comment: `Language to use for letter`,
+      name: `language`,
+      value: App.language,
+      type: `string`,
     },
   ]
 }

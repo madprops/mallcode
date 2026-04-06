@@ -55,6 +55,7 @@ App.echo_delay = 5 * 1000
 App.ticker_speed = 69
 App.colorlib = ColorLib()
 App.theme_cache = null
+App.language = `latin`
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
