@@ -270,7 +270,7 @@ body, html {
 }
 
 #zone-map-sekrit-row .zone-map-btn {
-    font-family: noto_font;
+    font-family: noto_font, sans-serif;
     padding: 5px 10px;
 }
 

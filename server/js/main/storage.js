@@ -39,6 +39,14 @@ App.load_storage = async () => {
           }
         }
 
+        if (App.storage.language !== undefined) {
+          App.language = App.storage.language
+
+          if (!App.languages.includes(App.language)) {
+            App.language = `latin`
+          }
+        }
+
         App.join_sound = Boolean(App.storage.join_sound)
         App.leave_sound = Boolean(App.storage.leave_sound)
 
