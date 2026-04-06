@@ -1,4 +1,15 @@
-App.languages = [`latin`, `greek`, `cyrillic`, `hebrew`, `arabic`, `persian`, `devanagari`, `korean`, `thai`, `esperanto`]
+App.languages = [
+  `latin`,
+  `greek`,
+  `cyrillic`,
+  `hebrew`,
+  `arabic`,
+  `persian`,
+  `esperanto`,
+  `devanagari`,
+  `korean`,
+  `thai`,
+]
 
 App.get_settings = () => {
   return [
