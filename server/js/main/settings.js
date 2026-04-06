@@ -1,3 +1,5 @@
+App.languages = [`latin`, `greek`, `cyrillic`, `hebrew`, `arabic`, `persian`, `devanagari`, `korean`, `thai`]
+
 App.get_settings = () => {
   return [
     {
@@ -106,13 +108,31 @@ App.setup_settings = () => {
   App.settings_editor = CodeJar(editor_el, highlight_fn)
   DOM.ev(btn, `click`, App.check_save_settings)
   App.msg_settings.set(c)
+  DOM.ev(`#lang-settings-btn`, `click`, App.show_language_picker)
+
+  App.msg_language = Msg.factory({})
+  let lc = DOM.create(`div`, `flex-column-center`, `lang-picker`)
+
+  for (let lang of App.languages) {
+    let item = DOM.create(`div`, `lang-item`)
+    item.textContent = lang
+
+    DOM.ev(item, `click`, () => {
+      App.msg_language.close()
+      App.check_save_settings({language: lang})
+    })
+
+    lc.append(item)
+  }
+
+  App.msg_language.set(lc)
 }
 
 App.show_settings = () => {
   App.msg_settings.show()
 }
 
-App.check_save_settings = () => {
+App.check_save_settings = (args = {}) => {
   let content = App.settings_editor.toString()
   let parsed_toml = {}
 
@@ -123,6 +143,12 @@ App.check_save_settings = () => {
     console.error(error)
     alert(`Invalid TOML format. Please check your syntax.`)
     return
+  }
+
+  for (let key in args) {
+    if (parsed_toml[key] !== undefined) {
+      parsed_toml[key] = args[key]
+    }
   }
 
   let settings = App.get_settings()
@@ -179,4 +205,8 @@ App.check_save_settings = () => {
   App.refresh_animation()
   App.save_storage()
   App.msg_settings.close()
+}
+
+App.show_language_picker = () => {
+  App.msg_language.show()
 }

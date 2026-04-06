@@ -494,3 +494,19 @@ a.clean-link:hover {
     flex-grow: 1;
     flex-shrink: 1;
 }
+
+#lang-picker {
+    gap: 5px;
+    font-size: 18px;
+    overflow: auto;
+    scrollbar-width: none;
+}
+
+#lang-picker::-webkit-scrollbar {
+  display: none;
+}
+
+.lang-item:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
