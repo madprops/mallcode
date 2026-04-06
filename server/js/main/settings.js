@@ -8,6 +8,7 @@ App.languages = [
   `esperanto`,
   `devanagari`,
   `korean`,
+  `wabun`,
   `thai`,
 ]
 
