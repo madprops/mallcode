@@ -1,4 +1,4 @@
-App.languages = [
+App.scripts = [
   `latin`,
   `greek`,
   `cyrillic`,
@@ -61,9 +61,9 @@ App.get_settings = () => {
       options: [`base`, `above`, `below`],
     },
     {
-      comment: `Language to use for letter`,
-      name: `language`,
-      value: App.language,
+      comment: `Character set to use for letters`,
+      name: `script`,
+      value: App.script,
       type: `string`,
     },
   ]
@@ -120,24 +120,24 @@ App.setup_settings = () => {
   App.settings_editor = CodeJar(editor_el, highlight_fn)
   DOM.ev(btn, `click`, App.check_save_settings)
   App.msg_settings.set(c)
-  DOM.ev(`#lang-settings-btn`, `click`, App.show_language_picker)
+  DOM.ev(`#script-settings-btn`, `click`, App.show_script_picker)
 
-  App.msg_language = Msg.factory({})
-  let lc = DOM.create(`div`, `flex-column-center`, `lang-picker`)
+  App.msg_script = Msg.factory({})
+  let lc = DOM.create(`div`, `flex-column-center`, `script-picker`)
 
-  for (let lang of App.languages) {
-    let item = DOM.create(`div`, `lang-item`)
+  for (let lang of App.scripts) {
+    let item = DOM.create(`div`, `script-item`)
     item.textContent = lang
 
     DOM.ev(item, `click`, () => {
-      App.msg_language.close()
-      App.check_save_settings({language: lang})
+      App.msg_script.close()
+      App.check_save_settings({script: lang})
     })
 
     lc.append(item)
   }
 
-  App.msg_language.set(lc)
+  App.msg_script.set(lc)
 }
 
 App.show_settings = () => {
@@ -219,6 +219,6 @@ App.check_save_settings = (args = {}) => {
   App.msg_settings.close()
 }
 
-App.show_language_picker = () => {
-  App.msg_language.show()
+App.show_script_picker = () => {
+  App.msg_script.show()
 }

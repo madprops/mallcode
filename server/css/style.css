@@ -502,7 +502,7 @@ a.clean-link:hover {
     flex-shrink: 1;
 }
 
-#lang-picker {
+#script-picker {
     gap: 5px;
     font-size: 18px;
     overflow: auto;
@@ -510,11 +510,11 @@ a.clean-link:hover {
     user-select: none;
 }
 
-#lang-picker::-webkit-scrollbar {
+#script-picker::-webkit-scrollbar {
   display: none;
 }
 
-.lang-item:hover {
+.script-item:hover {
     text-decoration: underline;
     cursor: pointer;
 }

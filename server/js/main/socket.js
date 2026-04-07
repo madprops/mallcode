@@ -111,8 +111,8 @@ App.on_up = (data) => {
     App.update_sequence_display()
   }
 
-  if (data.language !== undefined) {
-    App.remote_language = data.language
+  if (data.script !== undefined) {
+    App.remote_script = data.script
   }
 }
 

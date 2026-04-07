@@ -55,7 +55,7 @@ App.echo_delay = 5 * 1000
 App.ticker_speed = 69
 App.colorlib = ColorLib()
 App.theme_cache = null
-App.language = Shared.default_lang
+App.script = Shared.default_script
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
@@ -208,8 +208,8 @@ App.go_to_zone = (zone) => {
   App.ws.send(JSON.stringify({type: `RESTORE_ZONE`, zone}))
 }
 
-App.get_language = () => {
-  return App.language || Shared.default_lang
+App.get_script = () => {
+  return App.script || Shared.default_lang
 }
 
 App.start = () => {

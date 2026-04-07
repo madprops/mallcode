@@ -216,7 +216,7 @@ App.trigger_up = (is_local = true, event_time = null) => {
     }, letter_delay)
 
     if (App.ws && (App.ws.readyState === WebSocket.OPEN)) {
-      App.ws.send(JSON.stringify({type: `UP`, duration, sequence: App.current_sequence, language: App.get_language()}))
+      App.ws.send(JSON.stringify({type: `UP`, duration, sequence: App.current_sequence, script: App.get_script()}))
     }
   }
 
@@ -229,7 +229,7 @@ App.resolve_local_letter = (is_local = true) => {
     return
   }
 
-  let letter = Shared.get_letter(App.language, App.current_sequence)
+  let letter = Shared.get_letter(App.script, App.current_sequence)
 
   if (letter !== ``) {
     App.spawn_sprite(letter, `letter`)

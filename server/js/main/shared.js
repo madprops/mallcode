@@ -3,7 +3,7 @@ let Shared = {}
 Shared.letters = [`A`, `B`, `C`, `D`, `E`, `F`, `G`, `H`, `I`, `J`, `K`, `L`, `M`, `N`, `O`, `P`, `Q`, `R`, `S`, `T`, `U`, `V`, `W`, `X`, `Y`, `Z`]
 Shared.speeds = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 Shared.default_speed = 7
-Shared.default_lang = `latin`
+Shared.default_script = `latin`
 
 Shared.prosigns = {
   "...-.": `SN`,
@@ -451,11 +451,11 @@ Shared.dictionaries = {
   },
 }
 
-Shared.deflang = Shared.dictionaries[Shared.default_lang]
+Shared.def_script = Shared.dictionaries[Shared.default_script]
 
-Shared.get_letter = (lang, sequence) => {
-  let dictionary = Shared.dictionaries[lang || Shared.default_lang] || Shared.deflang
-  return dictionary[sequence] || Shared.deflang[sequence] || Shared.prosigns[sequence] || ``
+Shared.get_letter = (script, sequence) => {
+  let dictionary = Shared.dictionaries[script || Shared.default_script] || Shared.def_script
+  return dictionary[sequence] || Shared.def_script[sequence] || Shared.prosigns[sequence] || ``
 }
 
 Shared.zone_settings = {

@@ -39,11 +39,11 @@ App.load_storage = async () => {
           }
         }
 
-        if (App.storage.language !== undefined) {
-          App.language = App.storage.language
+        if (App.storage.script !== undefined) {
+          App.script = App.storage.script
 
-          if (!App.languages.includes(App.language)) {
-            App.language = Shared.default_lang
+          if (!App.scripts.includes(App.script)) {
+            App.script = Shared.default_lang
           }
         }
 
