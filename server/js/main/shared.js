@@ -18,7 +18,7 @@ Shared.prosigns = {
   "...--.......": `SPES`,
   "-..---": `DO`,
   "...---...": `SOS`,
-  "-...-.-": `BK`
+  "-...-.-": `BK`,
 }
 
 Shared.dictionaries = {
