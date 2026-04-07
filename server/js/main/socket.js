@@ -73,6 +73,8 @@ App.setup_socket = () => {
 }
 
 App.on_ws_close = () => {
+  App.moving = false
+
   if (App.is_pressed) {
     App.handle_release(null, true)
   }

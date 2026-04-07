@@ -116,7 +116,21 @@ App.show_dial_menu = (type, anchor_el) => {
       App.hide_dial_menu()
       anchor_el.value = item
       anchor_el.textContent = item
+      let zone = App.get_dial_zone()
+
+      if (zone === App.zone) {
+        return
+      }
+
       App.moving = true
+      clearTimeout(App.moving_timeout)
+
+      App.moving_timeout = setTimeout(() => {
+        if (App.moving) {
+          App.moving = false
+        }
+      }, 5 * 100)
+
       App.defocus_dial()
       App.zone_dial_debouncer.call()
     })
@@ -157,10 +171,14 @@ App.defocus_dial = () => {
   App.speed_dial_el.blur()
 }
 
-App.zone_dial_action = () => {
+App.get_dial_zone = () => {
   let letter = App.letter_dial_el.value
   let speed = App.speed_dial_el.value
-  let new_zone = `${letter}${speed}`
+  return `${letter}${speed}`
+}
+
+App.zone_dial_action = () => {
+  let new_zone = App.get_dial_zone()
 
   if ((new_zone !== App.zone) && App.ws && (App.ws.readyState === WebSocket.OPEN)) {
     App.go_to_zone(new_zone)
