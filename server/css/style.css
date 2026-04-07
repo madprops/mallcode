@@ -507,6 +507,7 @@ a.clean-link:hover {
     font-size: 18px;
     overflow: auto;
     scrollbar-width: none;
+    user-select: none;
 }
 
 #lang-picker::-webkit-scrollbar {
