@@ -41,19 +41,21 @@ module.exports = (App) => {
 
       App.sekrits = {}
 
-      if (App.i.fs.existsSync(file)) {
-        let data = JSON.parse(App.i.fs.readFileSync(file, `utf8`))
-
-        data.forEach(s => {
-          if (s.word && s.zone) {
-            App.sekrits[s.zone.toUpperCase()] = {
-              word: s.word.toUpperCase(),
-              zone: s.zone.toUpperCase(),
-              speed: s.speed,
-            }
-          }
-        })
+      if (!App.i.fs.existsSync(file)) {
+        throw new Error(`sekrits.json is missing!`)
       }
+
+      let data = JSON.parse(App.i.fs.readFileSync(file, `utf8`))
+
+      data.forEach(s => {
+        if (s.word && s.zone) {
+          App.sekrits[s.zone.toUpperCase()] = {
+            word: s.word.toUpperCase(),
+            zone: s.zone.toUpperCase(),
+            speed: s.speed,
+          }
+        }
+      })
 
       for (let z in anomalies) {
         App.sekrits[z] = anomalies[z]

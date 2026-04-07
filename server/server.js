@@ -130,8 +130,8 @@ App.start_server = () => {
 
 App.get_version()
 App.get_words()
-App.get_sekrits()
 App.get_zone_data()
+App.get_sekrits()
 App.setup_sockets()
 App.setup_server()
 App.start_anti_spam()
