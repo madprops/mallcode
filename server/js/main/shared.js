@@ -453,6 +453,11 @@ Shared.dictionaries = {
 
 Shared.deflang = Shared.dictionaries[Shared.default_lang]
 
+Shared.get_letter = (lang, sequence) => {
+  let dictionary = Shared.dictionaries[lang || Shared.default_lang] || Shared.deflang
+  return dictionary[sequence] || Shared.deflang[sequence] || Shared.prosigns[sequence] || ``
+}
+
 Shared.zone_settings = {
   1: {unit_duration: 350, iambic_duration: 240, letter_mult: 5.0, word_mult: 10, max_press: 2000, throttle: 5, forgiving: true},
   2: {unit_duration: 300, iambic_duration: 220, letter_mult: 4.5, word_mult: 9, max_press: 1800, throttle: 5, forgiving: true},
@@ -466,11 +471,6 @@ Shared.zone_settings = {
 }
 
 Shared.lock_time = 3000
-
-Shared.get_letter = (lang, sequence) => {
-  let dictionary = Shared.dictionaries[lang || Shared.default_lang] || Shared.deflang
-  return dictionary[sequence] || Shared.deflang[sequence]
-}
 
 Shared.get_string_hash = (str) => {
   let hash = 0x811c9dc5
