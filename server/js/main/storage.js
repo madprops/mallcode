@@ -43,7 +43,7 @@ App.load_storage = async () => {
           App.language = App.storage.language
 
           if (!App.languages.includes(App.language)) {
-            App.language = `latin`
+            App.language = Shared.default_lang
           }
         }
 
