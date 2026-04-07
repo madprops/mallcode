@@ -36,27 +36,28 @@ App.create_text_texture = (text, is_word = false, is_sequence = false, force_wor
   let ctx = text_canvas.getContext(`2d`)
   ctx.clearRect(0, 0, text_canvas.width, text_canvas.height)
   let theme = App.get_theme(App.zone)
+  let is_cjk = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f\uac00-\ud7af]/.test(text)
 
   if (is_word) {
-    ctx.font = `bold 80px ${App.font_string}`
+    let font_size = is_cjk ? 110 : 80
+    ctx.font = `bold ${font_size}px ${App.font_string}`
     ctx.fillStyle = theme.word
     ctx.textAlign = `center`
-    ctx.textBaseline = `middle`
     ctx.shadowColor = ctx.fillStyle
     ctx.shadowBlur = 30
-    ctx.fillText(text, text_canvas.width / 2, text_canvas.height / 2)
+    let metrics = ctx.measureText(text)
+    let visual_center_y = (text_canvas.height / 2) + ((metrics.actualBoundingBoxAscent - metrics.actualBoundingBoxDescent) / 2)
+    ctx.fillText(text, text_canvas.width / 2, visual_center_y)
   }
   else if (is_sequence) {
     ctx.fillStyle = App.get_user_color(App.current_user)
     ctx.shadowColor = ctx.fillStyle
     ctx.shadowBlur = 10
-
     let dot_diameter = 18
     let dot_radius = dot_diameter / 2
     let dash_width = dot_diameter * 2
     let dash_height = dot_diameter * 0.9
     let spacing = dot_diameter
-
     let total_width = 0
 
     if (text.length > 0) {
@@ -74,7 +75,6 @@ App.create_text_texture = (text, is_word = false, is_sequence = false, force_wor
 
     let current_x = (text_canvas.width - total_width) / 2
     let center_y = text_canvas.height / 2
-
     let dash_y_offset = 0
     let offset = dot_radius * 1.5
 
@@ -99,13 +99,15 @@ App.create_text_texture = (text, is_word = false, is_sequence = false, force_wor
     }
   }
   else {
-    ctx.font = `bold 180px ${App.font_string}`
+    let font_size = is_cjk ? 240 : 180
+    ctx.font = `bold ${font_size}px ${App.font_string}`
     ctx.fillStyle = force_word_color ? theme.word : theme.letter
     ctx.textAlign = `center`
-    ctx.textBaseline = `middle`
     ctx.shadowColor = ctx.fillStyle
     ctx.shadowBlur = 30
-    ctx.fillText(text, text_canvas.width / 2, text_canvas.height / 2)
+    let metrics = ctx.measureText(text)
+    let visual_center_y = (text_canvas.height / 2) + ((metrics.actualBoundingBoxAscent - metrics.actualBoundingBoxDescent) / 2)
+    ctx.fillText(text, text_canvas.width / 2, visual_center_y)
   }
 
   return new THREE.CanvasTexture(text_canvas)
