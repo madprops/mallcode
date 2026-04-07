@@ -80,7 +80,6 @@ module.exports = (App) => {
 
       let server_elapsed = now - (z_state.control_start_time || now)
       let deficit = Math.max(0, required_time - server_elapsed)
-
       let letter_delay = (ws.unit_duration * z_state.settings.letter_mult) + 250 + deficit + 1500
       z_state.letter_timeout = setTimeout(() => App.resolve_letter(ws.zone), letter_delay)
     }

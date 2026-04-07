@@ -6,5 +6,6 @@ creds.json
 action_funcs.js
 post_words.txt
 sekrit.json
+sekrits.json
 corpus.json
 *.bundle.js

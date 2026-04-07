@@ -30,7 +30,7 @@ module.exports = (App) => {
 
   App.get_sekrits = () => {
     try {
-      let file = App.i.path.join(App.dirname, `sekrit.json`)
+      let file = App.i.path.join(App.dirname, `sekrits.json`)
       let anomalies = {}
 
       for (let z in App.sekrits) {
@@ -91,7 +91,7 @@ module.exports = (App) => {
       })
     }
     catch (err) {
-      console.error(`Error loading sekrit.json:`, err)
+      console.error(`Error loading sekrits.`, err)
     }
   }
 

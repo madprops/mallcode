@@ -116,7 +116,7 @@ App.start_server = () => {
   }, App.save_data_interval)
 
   App.i.fs.watch(__dirname, (event, filename) => {
-    if (filename === `sekrit.json`) {
+    if (filename === `sekrits.json`) {
       App.get_sekrits()
     }
   })
