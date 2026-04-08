@@ -147,3 +147,13 @@ Witnessing other skilled users, listening to how they form the words, can help u
 Each user has a semi-unique name, color, and sound. It gives them some personality.
 
 So on group conversations, it's easier to know who's currently talking.
+
+---
+
+The sekrit zones allow exclusive groups to be formed.
+
+Depending on the word, people can arrive there randomly or by having the code shared to them.
+
+This could be used in commercial systems where having access to certain zones unlocks services and menus in the establishment.
+
+And there's always some effort to unlock the zones, some morse code must be performed.
