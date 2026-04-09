@@ -427,7 +427,7 @@ App.is_iambic_left = (e) => {
     return true
   }
 
-  if (e.key === `Control` && e.location === 1) {
+  if ((e.key === `Control`) && (e.location === 1)) {
     return true
   }
 }
@@ -441,7 +441,7 @@ App.is_iambic_right = (e) => {
     return true
   }
 
-  if (e.key === `Control` && e.location === 2) {
+  if ((e.key === `Control`) && (e.location === 2)) {
     return true
   }
 }
