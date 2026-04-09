@@ -135,41 +135,43 @@ App.setup_settings = () => {
 }
 
 App.setup_scripts = () => {
-  App.msg_script = Msg.factory({})
-  let lc = DOM.create(`div`, `flex-column-center settings-picker`)
-
-  for (let value of App.scripts) {
-    let item = DOM.create(`div`, `settings-picker-item`)
-    item.textContent = value
-
-    DOM.ev(item, `click`, () => {
-      App.msg_script.close()
-      App.check_save_settings({script: value})
-    })
-
-    lc.append(item)
-  }
-
-  App.msg_script.set(lc)
+  App.msg_script = App.make_settings_msg(App.scripts, `Scripts`, () => {
+    App.msg_script.close()
+    App.check_save_settings({script: value})
+  })
 }
 
 App.setup_iambic = () => {
-  App.msg_iambic = Msg.factory({})
+  App.msg_iambic = App.make_settings_msg(App.iambic_modes, `Iambic`, () => {
+    App.msg_iambic.close()
+    App.check_save_settings({iambic_mode: value})
+  })
+}
+
+App.make_settings_msg = (items, title, action) => {
+  let msg = Msg.factory({
+    enable_titlebar: true,
+    window_x: `none`,
+    center_titlebar: true,
+    titlebar_class: `blue`,
+  })
+
   let lc = DOM.create(`div`, `flex-column-center settings-picker`)
 
-  for (let value of App.iambic_modes) {
+  for (let value of items) {
     let item = DOM.create(`div`, `settings-picker-item`)
     item.textContent = value
 
     DOM.ev(item, `click`, () => {
-      App.msg_iambic.close()
-      App.check_save_settings({iambic_mode: value})
+      action()
     })
 
     lc.append(item)
   }
 
-  App.msg_iambic.set(lc)
+  msg.set(lc)
+  msg.set_title(title)
+  return msg
 }
 
 App.show_settings = () => {

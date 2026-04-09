@@ -431,7 +431,7 @@ a.clean-link:hover {
     white-space: pre-wrap;
 }
 
-.Msg-content {
+.Msg-window {
     background: linear-gradient(135deg, #111118, #1a1a2e) !important;
     color: #00ffcc !important;
     border: 1px solid #00ffcc !important;
