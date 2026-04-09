@@ -52,7 +52,7 @@ module.exports = (App) => {
           App.sekrits[s.zone.toUpperCase()] = {
             word: s.word.toUpperCase(),
             zone: s.zone.toUpperCase(),
-            speed: s.speed,
+            speed: s.speed || App.shared.default_sekrit_speed,
           }
         }
       })
