@@ -1,6 +1,3 @@
-App.iambic_left = [`KeyZ`, `ArrowLeft`, `ControlLeft`]
-App.iambic_right = [`KeyX`, `ArrowRight`, `ControlRight`]
-
 App.handle_press = (e, is_local = true) => {
   if (App.moving || App.dial_visible || App.modal_open()) {
     return
@@ -35,11 +32,11 @@ App.handle_press = (e, is_local = true) => {
   let is_dash = false
 
   if (is_local && e && (e.type === `keydown`)) {
-    if (App.iambic_left.includes(e.code)) {
+    if (App.is_iambic_left(e)) {
       is_iambic = true
       is_dot = true
     }
-    else if (App.iambic_right.includes(e.code)) {
+    else if (App.is_iambic_right(e)) {
       if (App.iambic_mode === `bug`) {
         // Bug mode dashes act as a straight key. Cancel any running dots.
         clearTimeout(App.iambic_timeout)
@@ -133,11 +130,11 @@ App.handle_release = (e, is_local = true) => {
   let is_dash = false
 
   if (is_local && e && (e.type === `keyup`)) {
-    if (App.iambic_left.includes(e.code)) {
+    if (App.is_iambic_left(e)) {
       is_iambic = true
       is_dot = true
     }
-    else if (App.iambic_right.includes(e.code)) {
+    else if (App.is_iambic_right(e)) {
       if (App.iambic_mode === `bug`) {
         // Bypassed for straight key logic
       }
@@ -419,4 +416,32 @@ App.iambic_loop = () => {
       App.iambic_loop()
     }, App.unit_duration)
   }, active_duration)
+}
+
+App.is_iambic_left = (e) => {
+  if ([`z`, `Z`].includes(e.key)) {
+    return true
+  }
+
+  if (`ArrowLeft` === e.key) {
+    return true
+  }
+
+  if (e.key === `Control` && e.location === 1) {
+    return true
+  }
+}
+
+App.is_iambic_right = (e) => {
+  if ([`x`, `X`].includes(e.key)) {
+    return true
+  }
+
+  if (`ArrowRight` === e.key) {
+    return true
+  }
+
+  if (e.key === `Control` && e.location === 2) {
+    return true
+  }
 }
