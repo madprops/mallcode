@@ -1,3 +1,143 @@
+App.handle_press = (e, is_local = true) => {
+  if (App.moving || App.dial_visible || App.modal_open()) {
+    return
+  }
+
+  let event_time = e && e.timeStamp ? e.timeStamp : performance.now()
+
+  if (event_time > 1e12) {
+    event_time = performance.now()
+  }
+
+  if (e && ((e.type === `mousedown`) || (e.type === `touchstart`))) {
+    if (!document.hasFocus() || ((performance.now() - App.last_focus_time) < 100)) {
+      return
+    }
+  }
+
+  if (e && (e.type === `keydown`)) {
+    if ([`Meta`, `OS`, `Alt`, `Shift`, `F5`, `F11`, `F12`].includes(e.key)) {
+      return
+    }
+
+    e.preventDefault()
+  }
+
+  if (e && e.repeat) {
+    return
+  }
+
+  let is_iambic = false
+  let is_dot = false
+  let is_dash = false
+
+  if (is_local && e && (e.type === `keydown`)) {
+    if ([`KeyZ`, `ArrowLeft`, `ControlLeft`].includes(e.code)) {
+      is_iambic = true
+      is_dot = true
+    }
+    else if ([`KeyX`, `ArrowRight`, `ControlRight`].includes(e.code)) {
+      is_iambic = true
+      is_dash = true
+    }
+  }
+
+  let now = performance.now()
+
+  if (is_local && !App.last_typist_was_local && ((now - App.remote_lock_time) < Shared.lock_time)) {
+    return
+  }
+
+  if (is_iambic) {
+    if (is_dot) {
+      App.paddle_dot_down = true
+    }
+
+    if (is_dash) {
+      App.paddle_dash_down = true
+    }
+
+    if (!App.is_iambic_keying) {
+      App.is_iambic_keying = true
+      App.iambic_loop(event_time)
+    }
+
+    return
+  }
+
+  if (App.is_pressed) {
+    return
+  }
+
+  if (is_local && ((event_time - App.last_input_time) < App.input_throttle_ms)) {
+    return
+  }
+
+  App.trigger_down(is_local, event_time)
+}
+
+App.handle_release = (e, is_local = true) => {
+  if (App.moving || App.dial_visible || App.modal_open()) {
+    if (!App.is_pressed && !App.is_iambic_keying) {
+      return
+    }
+  }
+
+  let event_time = e && e.timeStamp ? e.timeStamp : performance.now()
+
+  if (event_time > 1e12) {
+    event_time = performance.now()
+  }
+
+  if (e && (e.type === `keyup`)) {
+    if ([`Meta`, `OS`, `Alt`, `Shift`, `F5`, `F12`].includes(e.key)) {
+      return
+    }
+
+    e.preventDefault()
+  }
+
+  let is_iambic = false
+  let is_dot = false
+  let is_dash = false
+
+  if (is_local && e && (e.type === `keyup`)) {
+    if ([`KeyZ`, `ArrowLeft`, `ControlLeft`].includes(e.code)) {
+      is_iambic = true
+      is_dot = true
+    }
+    else if ([`KeyX`, `ArrowRight`, `ControlRight`].includes(e.code)) {
+      is_iambic = true
+      is_dash = true
+    }
+  }
+
+  if (is_iambic) {
+    if (is_dot) {
+      App.paddle_dot_down = false
+    }
+
+    if (is_dash) {
+      App.paddle_dash_down = false
+    }
+
+    return
+  }
+
+  if (!e && is_local) {
+    App.paddle_dot_down = false
+    App.paddle_dash_down = false
+    clearTimeout(App.iambic_timeout)
+    App.is_iambic_keying = false
+  }
+
+  if (!App.is_pressed) {
+    return
+  }
+
+  App.trigger_up(is_local, event_time)
+}
+
 App.trigger_down = (is_local = true, event_time = null) => {
   if (App.is_pressed) {
     return
@@ -144,152 +284,8 @@ App.resolve_local_word = () => {
   }
 }
 
-App.handle_press = (e, is_local = true) => {
-  if (App.moving || App.dial_visible || App.modal_open()) {
-    return
-  }
-
-  let event_time = e && e.timeStamp ? e.timeStamp : performance.now()
-
-  if (event_time > 1e12) {
-    event_time = performance.now()
-  }
-
-  if (e && ((e.type === `mousedown`) || (e.type === `touchstart`))) {
-    if (!document.hasFocus() || ((performance.now() - App.last_focus_time) < 100)) {
-      return
-    }
-  }
-
-  if (e && (e.type === `keydown`)) {
-    if ([`Meta`, `OS`, `Alt`, `Shift`, `F5`, `F11`, `F12`].includes(e.key)) {
-      return
-    }
-
-    e.preventDefault()
-  }
-
-  if (e && e.repeat) {
-    return
-  }
-
-  let is_iambic = false
-  let is_dot = false
-  let is_dash = false
-
-  if (is_local && e && (e.type === `keydown`)) {
-    if ([`KeyZ`, `ArrowLeft`, `ControlLeft`].includes(e.code)) {
-      is_iambic = true
-      is_dot = true
-    }
-    else if ([`KeyX`, `ArrowRight`, `ControlRight`].includes(e.code)) {
-      is_iambic = true
-      is_dash = true
-    }
-  }
-
-  let now = performance.now()
-
-  if (is_local && !App.last_typist_was_local && ((now - App.remote_lock_time) < Shared.lock_time)) {
-    return
-  }
-
-  if (is_iambic) {
-    if (is_dot) {
-      App.paddle_dot_down = true
-      App.memory_dot = true
-    }
-
-    if (is_dash) {
-      App.paddle_dash_down = true
-      App.memory_dash = true
-    }
-
-    if (!App.is_iambic_keying) {
-      App.is_iambic_keying = true
-      App.iambic_loop(event_time)
-    }
-
-    return
-  }
-
-  if (App.is_pressed) {
-    return
-  }
-
-  if (is_local && ((event_time - App.last_input_time) < App.input_throttle_ms)) {
-    return
-  }
-
-  App.trigger_down(is_local, event_time)
-}
-
-App.handle_release = (e, is_local = true) => {
-  if (App.moving || App.dial_visible || App.modal_open()) {
-    if (!App.is_pressed && !App.is_iambic_keying) {
-      return
-    }
-  }
-
-  let event_time = e && e.timeStamp ? e.timeStamp : performance.now()
-
-  if (event_time > 1e12) {
-    event_time = performance.now()
-  }
-
-  if (e && (e.type === `keyup`)) {
-    if ([`Meta`, `OS`, `Alt`, `Shift`, `F5`, `F12`].includes(e.key)) {
-      return
-    }
-
-    e.preventDefault()
-  }
-
-  let is_iambic = false
-  let is_dot = false
-  let is_dash = false
-
-  if (is_local && e && (e.type === `keyup`)) {
-    if ([`KeyZ`, `ArrowLeft`, `ControlLeft`].includes(e.code)) {
-      is_iambic = true
-      is_dot = true
-    }
-    else if ([`KeyX`, `ArrowRight`, `ControlRight`].includes(e.code)) {
-      is_iambic = true
-      is_dash = true
-    }
-  }
-
-  if (is_iambic) {
-    if (is_dot) {
-      App.paddle_dot_down = false
-    }
-
-    if (is_dash) {
-      App.paddle_dash_down = false
-    }
-
-    return
-  }
-
-  if (!e && is_local) {
-    App.paddle_dot_down = false
-    App.paddle_dash_down = false
-    App.memory_dot = false
-    App.memory_dash = false
-    clearTimeout(App.iambic_timeout)
-    App.is_iambic_keying = false
-  }
-
-  if (!App.is_pressed) {
-    return
-  }
-
-  App.trigger_up(is_local, event_time)
-}
-
 App.iambic_loop = () => {
-  if (!App.paddle_dot_down && !App.paddle_dash_down && !App.memory_dot && !App.memory_dash) {
+  if (!App.paddle_dot_down && !App.paddle_dash_down) {
     App.is_iambic_keying = false
     App.last_iambic_sent = null
     return
@@ -297,7 +293,7 @@ App.iambic_loop = () => {
 
   let send_type = null
 
-  if (App.memory_dot && App.memory_dash) {
+  if (App.paddle_dot_down && App.paddle_dash_down) {
     if (App.last_iambic_sent === `dot`) {
       send_type = `dash`
     }
@@ -305,10 +301,10 @@ App.iambic_loop = () => {
       send_type = `dot`
     }
   }
-  else if (App.memory_dot) {
+  else if (App.paddle_dot_down) {
     send_type = `dot`
   }
-  else if (App.memory_dash) {
+  else if (App.paddle_dash_down) {
     send_type = `dash`
   }
 
@@ -317,13 +313,6 @@ App.iambic_loop = () => {
 
   if (send_type === `dash`) {
     active_duration = App.iambic_duration * 3
-  }
-
-  if (send_type === `dot`) {
-    App.memory_dot = App.paddle_dot_down
-  }
-  else {
-    App.memory_dash = App.paddle_dash_down
   }
 
   App.trigger_down(true)
