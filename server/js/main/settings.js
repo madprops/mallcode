@@ -12,7 +12,7 @@ App.scripts = [
   `thai`,
 ]
 
-App.iambic_modes = [`a`, `b`, `ultimatic`, `bug`, `single`]
+App.iambic_modes = [`b`, `a`, `ultimatic`, `bug`, `single`]
 
 App.get_settings = () => {
   return [
