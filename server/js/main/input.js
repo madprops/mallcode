@@ -342,13 +342,11 @@ App.iambic_loop = () => {
         }
       }
     }
+    else if (App.last_iambic_sent === `dot`) {
+      send_type = `dash`
+    }
     else {
-      if (App.last_iambic_sent === `dot`) {
-        send_type = `dash`
-      }
-      else {
-        send_type = `dot`
-      }
+      send_type = `dot`
     }
   }
   else if (App.dot_memory) {
