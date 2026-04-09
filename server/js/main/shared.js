@@ -467,7 +467,7 @@ Shared.zone_settings = {
   6: {unit_duration: 100, iambic_duration: 100, letter_mult: 3.0, word_mult: 7, max_press: 600, throttle: 5, forgiving: false},
   7: {unit_duration: 80, iambic_duration: 80, letter_mult: 3.0, word_mult: 7, max_press: 500, throttle: 5, forgiving: false},
   8: {unit_duration: 60, iambic_duration: 60, letter_mult: 3.0, word_mult: 7, max_press: 400, throttle: 5, forgiving: false},
-  9: {unit_duration: 40, iambic_duration: 40, letter_mult: 3.0, word_mult: 7, max_press: 300, throttle: 5, forgiving: false}
+  9: {unit_duration: 40, iambic_duration: 40, letter_mult: 3.0, word_mult: 7, max_press: 300, throttle: 5, forgiving: false},
 }
 
 Shared.lock_time = 3000
