@@ -12,6 +12,8 @@ App.scripts = [
   `thai`,
 ]
 
+App.iambic_modes = [`a`, `b`, `ultimatic`, `bug`, `single`]
+
 App.get_settings = () => {
   return [
     {
@@ -71,7 +73,6 @@ App.get_settings = () => {
       name: `iambic_mode`,
       value: App.iambic_mode,
       type: `string`,
-      options: [`a`, `b`]
     },
   ]
 }
@@ -128,23 +129,47 @@ App.setup_settings = () => {
   DOM.ev(btn, `click`, App.check_save_settings)
   App.msg_settings.set(c)
   DOM.ev(`#script-settings-btn`, `click`, App.show_script_picker)
+  DOM.ev(`#iambic-settings-btn`, `click`, App.show_iambic_picker)
+  App.setup_scripts()
+  App.setup_iambic()
+}
 
+App.setup_scripts = () => {
   App.msg_script = Msg.factory({})
-  let lc = DOM.create(`div`, `flex-column-center`, `script-picker`)
+  let lc = DOM.create(`div`, `flex-column-center settings-picker`)
 
-  for (let lang of App.scripts) {
-    let item = DOM.create(`div`, `script-item`)
-    item.textContent = lang
+  for (let value of App.scripts) {
+    let item = DOM.create(`div`, `settings-picker-item`)
+    item.textContent = value
 
     DOM.ev(item, `click`, () => {
       App.msg_script.close()
-      App.check_save_settings({script: lang})
+      App.check_save_settings({script: value})
     })
 
     lc.append(item)
   }
 
   App.msg_script.set(lc)
+}
+
+App.setup_iambic = () => {
+  App.msg_iambic = Msg.factory({})
+  let lc = DOM.create(`div`, `flex-column-center settings-picker`)
+
+  for (let value of App.iambic_modes) {
+    let item = DOM.create(`div`, `settings-picker-item`)
+    item.textContent = value
+
+    DOM.ev(item, `click`, () => {
+      App.msg_iambic.close()
+      App.check_save_settings({iambic_mode: value})
+    })
+
+    lc.append(item)
+  }
+
+  App.msg_iambic.set(lc)
 }
 
 App.show_settings = () => {
@@ -228,4 +253,8 @@ App.check_save_settings = (args = {}) => {
 
 App.show_script_picker = () => {
   App.msg_script.show()
+}
+
+App.show_iambic_picker = () => {
+  App.msg_iambic.show()
 }

@@ -503,7 +503,7 @@ a.clean-link:hover {
     flex-shrink: 1;
 }
 
-#script-picker {
+.settings-picker {
     gap: 5px;
     font-size: 18px;
     overflow: auto;
@@ -511,11 +511,15 @@ a.clean-link:hover {
     user-select: none;
 }
 
-#script-picker::-webkit-scrollbar {
-  display: none;
+.settings-picker::-webkit-scrollbar {
+    display: none;
 }
 
-.script-item:hover {
+.settings-picker-item {
+    text-transform: capitalize;
+}
+
+.settings-picker-item:hover {
     text-decoration: underline;
     cursor: pointer;
 }

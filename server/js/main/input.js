@@ -37,8 +37,13 @@ App.handle_press = (e, is_local = true) => {
       is_dot = true
     }
     else if ([`KeyX`, `ArrowRight`, `ControlRight`].includes(e.code)) {
-      is_iambic = true
-      is_dash = true
+      if (App.iambic_mode === `bug`) {
+        // Bug mode dashes act as a straight key, so bypass iambic logic
+      }
+      else {
+        is_iambic = true
+        is_dash = true
+      }
     }
   }
 
@@ -52,11 +57,13 @@ App.handle_press = (e, is_local = true) => {
     if (is_dot) {
       App.paddle_dot_down = true
       App.dot_memory = true
+      App.last_paddle_pressed = `dot`
     }
 
     if (is_dash) {
       App.paddle_dash_down = true
       App.dash_memory = true
+      App.last_paddle_pressed = `dash`
     }
 
     if (!App.is_iambic_keying) {
@@ -109,8 +116,13 @@ App.handle_release = (e, is_local = true) => {
       is_dot = true
     }
     else if ([`KeyX`, `ArrowRight`, `ControlRight`].includes(e.code)) {
-      is_iambic = true
-      is_dash = true
+      if (App.iambic_mode === `bug`) {
+        // Bypassed for straight key logic
+      }
+      else {
+        is_iambic = true
+        is_dash = true
+      }
     }
   }
 
@@ -307,11 +319,36 @@ App.iambic_loop = () => {
   let send_type = null
 
   if (App.dot_memory && App.dash_memory) {
-    if (App.last_iambic_sent === `dot`) {
-      send_type = `dash`
+    if (App.iambic_mode === `ultimatic`) {
+      send_type = App.last_paddle_pressed
+    }
+    else if (App.iambic_mode === `single`) {
+      if ((App.last_iambic_sent === `dot`) && App.paddle_dot_down) {
+        send_type = `dot`
+        App.dash_memory = false
+      }
+      else if ((App.last_iambic_sent === `dash`) && App.paddle_dash_down) {
+        send_type = `dash`
+        App.dot_memory = false
+      }
+      else {
+        send_type = App.last_paddle_pressed || `dot`
+
+        if (send_type === `dot`) {
+          App.dash_memory = false
+        }
+        else {
+          App.dot_memory = false
+        }
+      }
     }
     else {
-      send_type = `dot`
+      if (App.last_iambic_sent === `dot`) {
+        send_type = `dash`
+      }
+      else {
+        send_type = `dot`
+      }
     }
   }
   else if (App.dot_memory) {
@@ -342,8 +379,8 @@ App.iambic_loop = () => {
     App.trigger_up(true)
 
     App.iambic_timeout = setTimeout(() => {
-      // Clear memory natively if using Mode A to prevent the extra element injection
-      if ((App.iambic_mode === `a`) || !App.iambic_mode) {
+      // Clear memory natively for all modes except B to prevent extra element injection
+      if (App.iambic_mode !== `b`) {
         if (!App.paddle_dot_down) {
           App.dot_memory = false
         }
