@@ -157,3 +157,11 @@ Depending on the word, people can arrive there randomly or by having the code sh
 This could be used in commercial systems where having access to certain zones unlocks services and menus in the establishment.
 
 And there's always some effort to unlock the zones, some morse code must be performed.
+
+---
+
+Trying to hack and patch this for sport can be part of the fun.
+
+Finding ways to automate messages without doing morse code / effort (cheating).
+
+And detecting and understanding the exploits to patch them.
