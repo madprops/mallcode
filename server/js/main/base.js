@@ -56,6 +56,7 @@ App.ticker_speed = 69
 App.colorlib = ColorLib()
 App.theme_cache = null
 App.script = Shared.default_script
+App.iambic_mode = `b`
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {

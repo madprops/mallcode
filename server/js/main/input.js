@@ -51,10 +51,12 @@ App.handle_press = (e, is_local = true) => {
   if (is_iambic) {
     if (is_dot) {
       App.paddle_dot_down = true
+      App.dot_memory = true
     }
 
     if (is_dash) {
       App.paddle_dash_down = true
+      App.dash_memory = true
     }
 
     if (!App.is_iambic_keying) {
@@ -127,6 +129,8 @@ App.handle_release = (e, is_local = true) => {
   if (!e && is_local) {
     App.paddle_dot_down = false
     App.paddle_dash_down = false
+    App.dot_memory = false
+    App.dash_memory = false
     clearTimeout(App.iambic_timeout)
     App.is_iambic_keying = false
   }
@@ -285,15 +289,24 @@ App.resolve_local_word = () => {
 }
 
 App.iambic_loop = () => {
-  if (!App.paddle_dot_down && !App.paddle_dash_down) {
+  if (App.paddle_dot_down) {
+    App.dot_memory = true
+  }
+
+  if (App.paddle_dash_down) {
+    App.dash_memory = true
+  }
+
+  if (!App.dot_memory && !App.dash_memory) {
     App.is_iambic_keying = false
     App.last_iambic_sent = null
+
     return
   }
 
   let send_type = null
 
-  if (App.paddle_dot_down && App.paddle_dash_down) {
+  if (App.dot_memory && App.dash_memory) {
     if (App.last_iambic_sent === `dot`) {
       send_type = `dash`
     }
@@ -301,10 +314,10 @@ App.iambic_loop = () => {
       send_type = `dot`
     }
   }
-  else if (App.paddle_dot_down) {
+  else if (App.dot_memory) {
     send_type = `dot`
   }
-  else if (App.paddle_dash_down) {
+  else if (App.dash_memory) {
     send_type = `dash`
   }
 
@@ -315,6 +328,13 @@ App.iambic_loop = () => {
     active_duration = App.iambic_duration * 3
   }
 
+  if (send_type === `dot`) {
+    App.dot_memory = false
+  }
+  else {
+    App.dash_memory = false
+  }
+
   App.trigger_down(true)
   clearTimeout(App.iambic_timeout)
 
@@ -322,6 +342,17 @@ App.iambic_loop = () => {
     App.trigger_up(true)
 
     App.iambic_timeout = setTimeout(() => {
+      // Clear memory natively if using Mode A to prevent the extra element injection
+      if ((App.iambic_mode === `a`) || !App.iambic_mode) {
+        if (!App.paddle_dot_down) {
+          App.dot_memory = false
+        }
+
+        if (!App.paddle_dash_down) {
+          App.dash_memory = false
+        }
+      }
+
       App.iambic_loop()
     }, App.iambic_duration)
   }, active_duration)

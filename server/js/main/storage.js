@@ -58,6 +58,10 @@ App.load_storage = async () => {
           App.background = App.storage.background
         }
 
+        if (App.storage.iambic_mode !== undefined) {
+          App.iambic_mode = App.storage.iambic_mode
+        }
+
         resolve()
       }
 

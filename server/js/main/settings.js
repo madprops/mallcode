@@ -66,6 +66,13 @@ App.get_settings = () => {
       value: App.script,
       type: `string`,
     },
+    {
+      comment: `The mode of the iambic keyer`,
+      name: `iambic_mode`,
+      value: App.iambic_mode,
+      type: `string`,
+      options: [`a`, `b`]
+    },
   ]
 }
 
