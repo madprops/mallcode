@@ -1,3 +1,6 @@
+App.iambic_left = [`KeyZ`, `ArrowLeft`, `ControlLeft`]
+App.iambic_right = [`KeyX`, `ArrowRight`, `ControlRight`]
+
 App.handle_press = (e, is_local = true) => {
   if (App.moving || App.dial_visible || App.modal_open()) {
     return
@@ -32,13 +35,17 @@ App.handle_press = (e, is_local = true) => {
   let is_dash = false
 
   if (is_local && e && (e.type === `keydown`)) {
-    if ([`KeyZ`, `ArrowLeft`, `ControlLeft`].includes(e.code)) {
+    if (App.iambic_left.includes(e.code)) {
       is_iambic = true
       is_dot = true
     }
-    else if ([`KeyX`, `ArrowRight`, `ControlRight`].includes(e.code)) {
+    else if (App.iambic_right.includes(e.code)) {
       if (App.iambic_mode === `bug`) {
-        // Bug mode dashes act as a straight key, so bypass iambic logic
+        // Bug mode dashes act as a straight key. Cancel any running dots.
+        clearTimeout(App.iambic_timeout)
+        App.is_iambic_keying = false
+        App.paddle_dot_down = false
+        App.dot_memory = false
       }
       else {
         is_iambic = true
@@ -53,7 +60,22 @@ App.handle_press = (e, is_local = true) => {
     return
   }
 
+  // Straight key pressed. Cancel any running iambic loop.
+  if (is_local && !is_iambic) {
+    clearTimeout(App.iambic_timeout)
+    App.is_iambic_keying = false
+    App.paddle_dot_down = false
+    App.paddle_dash_down = false
+    App.dot_memory = false
+    App.dash_memory = false
+  }
+
   if (is_iambic) {
+    // Ignore iambic paddle presses if straight key (or bug dash) is currently held down
+    if (is_local && App.is_pressed && !App.is_iambic_keying) {
+      return
+    }
+
     if (is_dot) {
       App.paddle_dot_down = true
       App.dot_memory = true
@@ -111,11 +133,11 @@ App.handle_release = (e, is_local = true) => {
   let is_dash = false
 
   if (is_local && e && (e.type === `keyup`)) {
-    if ([`KeyZ`, `ArrowLeft`, `ControlLeft`].includes(e.code)) {
+    if (App.iambic_left.includes(e.code)) {
       is_iambic = true
       is_dot = true
     }
-    else if ([`KeyX`, `ArrowRight`, `ControlRight`].includes(e.code)) {
+    else if (App.iambic_right.includes(e.code)) {
       if (App.iambic_mode === `bug`) {
         // Bypassed for straight key logic
       }
@@ -138,6 +160,7 @@ App.handle_release = (e, is_local = true) => {
     return
   }
 
+  // Global blur / reset
   if (!e && is_local) {
     App.paddle_dot_down = false
     App.paddle_dash_down = false
@@ -148,6 +171,11 @@ App.handle_release = (e, is_local = true) => {
   }
 
   if (!App.is_pressed) {
+    return
+  }
+
+  // Prevent non-iambic releases (like mouseup) from interrupting an active iambic element
+  if (is_local && !is_iambic && App.is_iambic_keying) {
     return
   }
 
@@ -357,10 +385,10 @@ App.iambic_loop = () => {
   }
 
   App.last_iambic_sent = send_type
-  let active_duration = App.iambic_duration
+  let active_duration = App.unit_duration
 
   if (send_type === `dash`) {
-    active_duration = App.iambic_duration * 3
+    active_duration = App.unit_duration * 3
   }
 
   if (send_type === `dot`) {
@@ -389,6 +417,6 @@ App.iambic_loop = () => {
       }
 
       App.iambic_loop()
-    }, App.iambic_duration)
+    }, App.unit_duration)
   }, active_duration)
 }

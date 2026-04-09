@@ -195,7 +195,6 @@ App.on_zone = (data) => {
   App.max_press_duration = App.zone_settings.max_press
   App.input_throttle_ms = App.zone_settings.throttle
   App.unit_duration = App.zone_settings.unit_duration
-  App.iambic_duration = App.zone_settings.iambic_duration
   App.refresh_info()
   App.play_warp_drive()
   App.update_echo_display(data.echo)

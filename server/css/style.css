@@ -516,6 +516,7 @@ a.clean-link:hover {
 }
 
 .settings-picker-item {
+    width: 100%;
     text-transform: capitalize;
 }
 

@@ -459,16 +459,18 @@ Shared.get_letter = (script, sequence) => {
   return dictionary[sequence] || Shared.def_script[sequence] || Shared.prosigns[sequence] || ``
 }
 
+// Speeds mapped approximately to real-world WPM (5 WPM up to 30 WPM)
+// WPM formula = 1200 / unit_duration
 Shared.zone_settings = {
-  1: {unit_duration: 250, iambic_duration: 200, letter_mult: 4.0, word_mult: 8, max_press: 1500, throttle: 5, forgiving: true},
-  2: {unit_duration: 210, iambic_duration: 180, letter_mult: 3.5, word_mult: 7, max_press: 1200, throttle: 5, forgiving: true},
-  3: {unit_duration: 180, iambic_duration: 160, letter_mult: 3.5, word_mult: 7, max_press: 1000, throttle: 5, forgiving: false},
-  4: {unit_duration: 150, iambic_duration: 140, letter_mult: 3.0, word_mult: 7, max_press: 800, throttle: 5, forgiving: false},
-  5: {unit_duration: 120, iambic_duration: 120, letter_mult: 3.0, word_mult: 7, max_press: 700, throttle: 5, forgiving: false},
-  6: {unit_duration: 100, iambic_duration: 100, letter_mult: 3.0, word_mult: 7, max_press: 600, throttle: 5, forgiving: false},
-  7: {unit_duration: 80, iambic_duration: 80, letter_mult: 3.0, word_mult: 7, max_press: 500, throttle: 5, forgiving: false},
-  8: {unit_duration: 60, iambic_duration: 60, letter_mult: 3.0, word_mult: 7, max_press: 400, throttle: 5, forgiving: false},
-  9: {unit_duration: 40, iambic_duration: 40, letter_mult: 3.0, word_mult: 7, max_press: 300, throttle: 5, forgiving: false},
+  1: {unit_duration: 240, letter_mult: 3.5, word_mult: 7.5, max_press: 1500, throttle: 5},  // ~5 WPM
+  2: {unit_duration: 170, letter_mult: 3.5, word_mult: 7.5, max_press: 1200, throttle: 5},  // ~7 WPM
+  3: {unit_duration: 120, letter_mult: 3.2, word_mult: 7.2, max_press: 1000, throttle: 5}, // ~10 WPM
+  4: {unit_duration: 90, letter_mult: 3.0, word_mult: 7.0, max_press: 800,  throttle: 5}, // ~13 WPM
+  5: {unit_duration: 75, letter_mult: 3.0, word_mult: 7.0, max_press: 700,  throttle: 5}, // ~16 WPM
+  6: {unit_duration: 60, letter_mult: 3.0, word_mult: 7.0, max_press: 600,  throttle: 5}, // ~20 WPM
+  7: {unit_duration: 50, letter_mult: 3.0, word_mult: 7.0, max_press: 500,  throttle: 5}, // ~24 WPM
+  8: {unit_duration: 40, letter_mult: 3.0, word_mult: 7.0, max_press: 400,  throttle: 5}, // ~30 WPM
+  9: {unit_duration: 34, letter_mult: 3.0, word_mult: 7.0, max_press: 300,  throttle: 5}, // ~35 WPM
 }
 
 Shared.lock_time = 3000
@@ -630,8 +632,8 @@ Shared.process_gap = (gap, unit_duration, sequence_length, settings) => {
     if (safe_gap < (unit_duration * 2)) {
       let estimated_unit = safe_gap
       unit_duration = unit_duration * 0.8 + estimated_unit * 0.2
-      let min_u = settings.forgiving ? 150 : settings.unit_duration * 0.8
-      let max_u = settings.forgiving ? 500 : settings.unit_duration * 1.2
+      let min_u = settings.unit_duration * 0.8
+      let max_u = settings.unit_duration * 1.2
       unit_duration = Math.max(min_u, Math.min(max_u, unit_duration))
     }
   }
@@ -657,8 +659,8 @@ Shared.process_duration = (duration, unit_duration, sequence, settings) => {
     }
   }
 
-  let min_u = settings.forgiving ? 150 : settings.unit_duration * 0.8
-  let max_u = settings.forgiving ? 500 : settings.unit_duration * 1.2
+  let min_u = settings.unit_duration * 0.8
+  let max_u = settings.unit_duration * 1.2
   unit_duration = Math.max(min_u, Math.min(max_u, unit_duration))
 
   return {unit_duration, sequence}

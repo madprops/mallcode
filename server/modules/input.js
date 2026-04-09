@@ -60,7 +60,7 @@ module.exports = (App) => {
         }
       })
 
-      let min_u = z_state.settings.forgiving ? 150 : z_state.settings.unit_duration * 0.8
+      let min_u = z_state.settings.unit_duration * 0.8
       let required_time = 0
 
       for (let i = 0; i < z_state.current_sequence.length; i++) {
