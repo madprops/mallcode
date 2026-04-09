@@ -135,14 +135,14 @@ App.setup_settings = () => {
 }
 
 App.setup_scripts = () => {
-  App.msg_script = App.make_settings_msg(App.scripts, `Scripts`, () => {
+  App.msg_script = App.make_settings_msg(App.scripts, `Scripts`, (value) => {
     App.msg_script.close()
     App.check_save_settings({script: value})
   })
 }
 
 App.setup_iambic = () => {
-  App.msg_iambic = App.make_settings_msg(App.iambic_modes, `Iambic`, () => {
+  App.msg_iambic = App.make_settings_msg(App.iambic_modes, `Iambic`, (value) => {
     App.msg_iambic.close()
     App.check_save_settings({iambic_mode: value})
   })
