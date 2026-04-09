@@ -190,7 +190,7 @@ App.get_about_text = () => {
   There's also sekrit zones and anomalies.
   You might encounter other users.
   Each user has a personality.
-  Iambic keys: z/x and left/right.
+  Iambic keys: LCtrl/RCtrl, Z/X, Left/Right.
   Developed by Merkoba in 2026.
   ${App.repo}`
 }
