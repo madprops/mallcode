@@ -16,11 +16,7 @@ App.handle_press = (e, is_local = true) => {
   }
 
   if (e && (e.type === `keydown`)) {
-    if ([`Meta`, `OS`, `Control`, `Alt`, `Shift`, `F5`, `F11`, `F12`].includes(e.key)) {
-      return
-    }
-
-    if (e.ctrlKey || e.metaKey || e.altKey) {
+    if ([`Meta`, `OS`, `Alt`, `Shift`, `F5`, `F11`, `F12`].includes(e.key)) {
       return
     }
 
@@ -36,11 +32,11 @@ App.handle_press = (e, is_local = true) => {
   let is_dash = false
 
   if (is_local && e && (e.type === `keydown`)) {
-    if ([`z`, `Z`, `ArrowLeft`].includes(e.key)) {
+    if ([`KeyZ`, `ArrowLeft`, `ControlLeft`].includes(e.code)) {
       is_iambic = true
       is_dot = true
     }
-    else if ([`x`, `X`, `ArrowRight`].includes(e.key)) {
+    else if ([`KeyX`, `ArrowRight`, `ControlRight`].includes(e.code)) {
       is_iambic = true
       is_dash = true
     }
@@ -94,7 +90,7 @@ App.handle_release = (e, is_local = true) => {
   }
 
   if (e && (e.type === `keyup`)) {
-    if ([`Meta`, `OS`, `Control`, `Alt`, `Shift`, `F5`, `F12`].includes(e.key)) {
+    if ([`Meta`, `OS`, `Alt`, `Shift`, `F5`, `F12`].includes(e.key)) {
       return
     }
 
@@ -106,11 +102,11 @@ App.handle_release = (e, is_local = true) => {
   let is_dash = false
 
   if (is_local && e && (e.type === `keyup`)) {
-    if ([`z`, `Z`, `ArrowLeft`].includes(e.key)) {
+    if ([`KeyZ`, `ArrowLeft`, `ControlLeft`].includes(e.code)) {
       is_iambic = true
       is_dot = true
     }
-    else if ([`x`, `X`, `ArrowRight`].includes(e.key)) {
+    else if ([`KeyX`, `ArrowRight`, `ControlRight`].includes(e.code)) {
       is_iambic = true
       is_dash = true
     }
