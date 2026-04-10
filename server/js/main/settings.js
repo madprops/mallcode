@@ -150,10 +150,10 @@ App.setup_iambic = () => {
 
 App.make_settings_msg = (items, title, action) => {
   let msg = Msg.factory({
-    enable_titlebar: true,
     window_x: `none`,
     center_titlebar: true,
     titlebar_class: `blue`,
+    enable_titlebar: true,
   })
 
   let lc = DOM.create(`div`, `flex-column-center settings-picker`)
@@ -163,7 +163,7 @@ App.make_settings_msg = (items, title, action) => {
     item.textContent = value
 
     DOM.ev(item, `click`, () => {
-      action()
+      action(value)
     })
 
     lc.append(item)

@@ -138,7 +138,7 @@ App.on_word = (data) => {
   let word = data.word
   let found = false
 
-  if (App.current_letters.length === 1) {
+  if (word.length === 1) {
     for (let i = App.sprites.length - 1; i >= 0; i--) {
       let s = App.sprites[i]
 
