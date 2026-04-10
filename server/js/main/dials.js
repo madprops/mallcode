@@ -106,9 +106,30 @@ App.show_dial_menu = (type, anchor_el) => {
     }
   }
 
-  for (let item of items) {
+  let row_size
+
+  if (type === `letter`) {
+    row_size = 2
+  }
+  else if (type === `speed`) {
+    row_size = 3
+  }
+
+  let row = null
+
+  for (let i = 0; i < items.length; i++) {
+    let item = items[i]
+
+    if (i % row_size === 0) {
+      row = DOM.create(`div`)
+      row.style.display = `flex`
+      App.dial_menu_el.appendChild(row)
+    }
+
     let el = DOM.create(`div`)
     el.className = `dial-menu-item`
+    el.style.flex = `1`
+    el.style.textAlign = `center`
     el.textContent = item
 
     DOM.ev(el, `click`, (e) => {
@@ -135,20 +156,36 @@ App.show_dial_menu = (type, anchor_el) => {
       App.zone_dial_debouncer.call()
     })
 
-    App.dial_menu_el.appendChild(el)
+    row.appendChild(el)
+  }
+
+  let remainder = items.length % row_size
+  if ((remainder !== 0) && row) {
+    for (let i = 0; i < row_size - remainder; i++) {
+      let dummy = DOM.create(`div`)
+      dummy.style.flex = `1`
+      row.appendChild(dummy)
+    }
   }
 
   DOM.show(App.dial_menu_el)
 
   let rect = anchor_el.getBoundingClientRect()
+  let menu_width = rect.width * row_size
+  let left_pos = rect.left
+
+  if (left_pos + menu_width > window.innerWidth - 10) {
+    left_pos = window.innerWidth - menu_width - 10
+  }
+
   App.dial_menu_el.style.top = `${rect.bottom + 5}px`
-  App.dial_menu_el.style.left = `${rect.left}px`
-  App.dial_menu_el.style.minWidth = `${rect.width}px`
+  App.dial_menu_el.style.left = `${left_pos}px`
+  App.dial_menu_el.style.minWidth = `${menu_width}px`
 
   let current_val = anchor_el.value
 
   if (current_val) {
-    let selected_el = Array.from(App.dial_menu_el.children).find(c => c.textContent === current_val.toString())
+    let selected_el = Array.from(App.dial_menu_el.querySelectorAll(`.dial-menu-item`)).find(c => c.textContent === current_val.toString())
 
     if (selected_el) {
       selected_el.scrollIntoView({block: `center`})
