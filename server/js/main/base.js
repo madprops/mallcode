@@ -59,6 +59,9 @@ App.script = Shared.default_script
 App.iambic_mode = `b`
 App.particle_size_big = 0.5
 App.particle_size_small = 0.25
+App.zoom_speed_press = 0.15
+App.zoom_speed_release = 0.05
+App.zoom_speed = App.zoom_speed_release
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
@@ -93,6 +96,7 @@ App.create_debouncers = () => {
   App.zoom_debouncer = Shared.create_debouncer(() => {
     App.target_z = 40
     App.particle_mesh.material.size = App.particle_size_small
+    App.zoom_speed = App.zoom_speed_release
   }, 1 * 400)
 }
 
