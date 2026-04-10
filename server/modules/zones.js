@@ -163,7 +163,7 @@ module.exports = (App) => {
   App.check_zone_echo = (zone) => {
     let echo_num = App.shared.random_int({min: 1, max: 100})
 
-    if (echo_num <= App.echo_chance || !App.zone_data[zone].echo) {
+    if ((echo_num <= App.echo_chance) || !App.zone_data[zone].echo) {
       App.get_zone_echo(zone)
     }
   }
