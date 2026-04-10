@@ -465,12 +465,12 @@ Shared.zone_settings = {
   1: {unit_duration: 240, letter_mult: 4.0, word_mult: 8.0, max_press: 1500, throttle: 5}, // ~5 WPM (extra spacing for absolute beginners)
   2: {unit_duration: 170, letter_mult: 3.5, word_mult: 7.5, max_press: 1200, throttle: 5}, // ~7 WPM
   3: {unit_duration: 120, letter_mult: 3.2, word_mult: 7.2, max_press: 1000, throttle: 5}, // ~10 WPM
-  4: {unit_duration: 92,  letter_mult: 3.0, word_mult: 7.0, max_press: 800, throttle: 5},  // ~13 WPM (standard spacing begins)
-  5: {unit_duration: 75,  letter_mult: 3.0, word_mult: 7.0, max_press: 700, throttle: 5},  // ~16 WPM
-  6: {unit_duration: 60,  letter_mult: 3.0, word_mult: 7.0, max_press: 600, throttle: 5},  // ~20 WPM (competent operator threshold)
-  7: {unit_duration: 48,  letter_mult: 3.0, word_mult: 7.0, max_press: 500, throttle: 5},  // ~25 WPM
-  8: {unit_duration: 40,  letter_mult: 3.0, word_mult: 7.0, max_press: 400, throttle: 5},  // ~30 WPM (veteran level)
-  9: {unit_duration: 34,  letter_mult: 3.0, word_mult: 7.0, max_press: 300, throttle: 5}   // ~35 WPM (pro showoff level)
+  4: {unit_duration: 92, letter_mult: 3.0, word_mult: 7.0, max_press: 800, throttle: 5}, // ~13 WPM (standard spacing begins)
+  5: {unit_duration: 75, letter_mult: 3.0, word_mult: 7.0, max_press: 700, throttle: 5}, // ~16 WPM
+  6: {unit_duration: 60, letter_mult: 3.0, word_mult: 7.0, max_press: 600, throttle: 5}, // ~20 WPM (competent operator threshold)
+  7: {unit_duration: 48, letter_mult: 3.0, word_mult: 7.0, max_press: 500, throttle: 5}, // ~25 WPM
+  8: {unit_duration: 40, letter_mult: 3.0, word_mult: 7.0, max_press: 400, throttle: 5}, // ~30 WPM (veteran level)
+  9: {unit_duration: 34, letter_mult: 3.0, word_mult: 7.0, max_press: 300, throttle: 5}, // ~35 WPM (pro showoff level)
 }
 
 Shared.lock_time = 3000
