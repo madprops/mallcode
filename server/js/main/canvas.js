@@ -193,10 +193,24 @@ App.animate = () => {
     App.camera.position.z = 40
   }
 
-  let target_z = App.is_pressed ? 35 : 40
+  if (App.target_z === undefined) {
+    App.target_z = 40
+  }
+
+  if (App.is_pressed !== App.was_pressed) {
+    if (App.is_pressed) {
+      App.zoom_debouncer.cancel()
+      App.target_z = 35
+    }
+    else {
+      App.zoom_debouncer.call()
+    }
+
+    App.was_pressed = App.is_pressed
+  }
 
   if (App.animation) {
-    App.camera.position.z = THREE.MathUtils.lerp(App.camera.position.z, target_z, 0.15)
+    App.camera.position.z = THREE.MathUtils.lerp(App.camera.position.z, App.target_z, 0.15)
   }
   else {
     App.camera.position.z = 40

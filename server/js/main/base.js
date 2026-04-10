@@ -87,6 +87,10 @@ App.create_debouncers = () => {
       App.stop_beep()
     }
   }, App.stop_beep_delay)
+
+  App.zoom_debouncer = Shared.create_debouncer(() => {
+    App.target_z = 40
+  }, 1 * 400)
 }
 
 App.setup_events = () => {
