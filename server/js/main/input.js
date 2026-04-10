@@ -326,15 +326,20 @@ App.resolve_local_word = () => {
 }
 
 App.iambic_loop = () => {
-  if (App.paddle_dot_down) {
-    App.dot_memory = true
+  if (App.iambic_mode === `b`) {
+    if (App.paddle_dot_down) {
+      App.dot_memory = true
+    }
+
+    if (App.paddle_dash_down) {
+      App.dash_memory = true
+    }
   }
 
-  if (App.paddle_dash_down) {
-    App.dash_memory = true
-  }
+  let dot_request = App.paddle_dot_down || App.dot_memory
+  let dash_request = App.paddle_dash_down || App.dash_memory
 
-  if (!App.dot_memory && !App.dash_memory) {
+  if (!dot_request && !dash_request) {
     App.is_iambic_keying = false
     App.last_iambic_sent = null
 
@@ -343,7 +348,7 @@ App.iambic_loop = () => {
 
   let send_type = null
 
-  if (App.dot_memory && App.dash_memory) {
+  if (dot_request && dash_request) {
     if (App.iambic_mode === `ultimatic`) {
       send_type = App.last_paddle_pressed
     }
@@ -374,10 +379,10 @@ App.iambic_loop = () => {
       send_type = `dot`
     }
   }
-  else if (App.dot_memory) {
+  else if (dot_request) {
     send_type = `dot`
   }
-  else if (App.dash_memory) {
+  else if (dash_request) {
     send_type = `dash`
   }
 
@@ -402,17 +407,6 @@ App.iambic_loop = () => {
     App.trigger_up(true)
 
     App.iambic_timeout = setTimeout(() => {
-      // Clear memory natively for all modes except B to prevent extra element injection
-      if (App.iambic_mode !== `b`) {
-        if (!App.paddle_dot_down) {
-          App.dot_memory = false
-        }
-
-        if (!App.paddle_dash_down) {
-          App.dash_memory = false
-        }
-      }
-
       App.iambic_loop()
     }, App.unit_duration)
   }, active_duration)
