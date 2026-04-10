@@ -290,3 +290,7 @@ App.create_particle_texture = (theme) => {
 
   return new THREE.CanvasTexture(particle_canvas)
 }
+
+App.change_particle_size = (size) => {
+  App.particles_material.size = THREE.MathUtils.lerp(App.particles_material.size, size, App.zoom_speed)
+}

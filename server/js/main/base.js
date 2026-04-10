@@ -95,8 +95,8 @@ App.create_debouncers = () => {
 
   App.zoom_debouncer = Shared.create_debouncer(() => {
     App.target_z = 40
-    App.particle_mesh.material.size = App.particle_size_small
     App.zoom_speed = App.zoom_speed_release
+    App.change_particle_size(App.particle_size_small)
   }, 1 * 400)
 }
 
