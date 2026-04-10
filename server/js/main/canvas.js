@@ -1,3 +1,5 @@
+App.material_cache = {}
+
 App.setup_canvas = () => {
   App.canvas = DOM.el(`#glcanvas`)
   App.renderer = new THREE.WebGLRenderer({canvas: App.canvas, antialias: true, alpha: true})
@@ -114,10 +116,20 @@ App.create_text_texture = (text, is_word = false, is_sequence = false, force_wor
 }
 
 App.spawn_sprite = (text, type) => {
-  let texture = App.create_text_texture(text, type === `word`, type === `sequence`)
-  let theme = App.get_theme(App.zone)
-  let blend_mode = theme.is_dark ? THREE.AdditiveBlending : THREE.NormalBlending
-  let material = new THREE.SpriteMaterial({map: texture, transparent: true, blending: blend_mode})
+  let cache_key = `${text}_${type}`
+  let material
+
+  if (App.material_cache[cache_key]) {
+    material = App.material_cache[cache_key]
+  }
+  else {
+    let texture = App.create_text_texture(text, type === `word`, type === `sequence`)
+    let theme = App.get_theme(App.zone)
+    let blend_mode = theme.is_dark ? THREE.AdditiveBlending : THREE.NormalBlending
+    material = new THREE.SpriteMaterial({map: texture, transparent: true, blending: blend_mode})
+    App.material_cache[cache_key] = material
+  }
+
   let sprite = new THREE.Sprite(material)
 
   if (type === `sequence`) {
@@ -149,7 +161,7 @@ App.spawn_sprite = (text, type) => {
       life: 1.0,
       decay_rate: type === `word` ? 0.25 : 0.35,
       growth: type === `word` ? 2 : 10,
-    },
+    }
 
     App.sprites.push(sprite)
   }
@@ -159,8 +171,6 @@ App.spawn_sprite = (text, type) => {
   while (App.sprites.length > 40) {
     let old_sprite = App.sprites.shift()
     App.scene.remove(old_sprite)
-    old_sprite.material.map.dispose()
-    old_sprite.material.dispose()
   }
 
   return sprite
