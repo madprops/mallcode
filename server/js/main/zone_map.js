@@ -32,8 +32,18 @@ App.update_zone_map_styles = () => {
 }
 
 App.setup_zone_map = () => {
+  let template = DOM.el(`#zone-map-template`)
+  let clone = template.content.cloneNode(true)
+  let c = DOM.el(`#zone-map-container`, clone)
+
   App.msg_zone_map = Msg.factory({
     after_show: () => {
+      let active_btn = DOM.el(`[data-zone="${App.zone}"]`, c)
+
+      if (active_btn) {
+        active_btn.scrollIntoView({behavior: `instant`, block: `center`, inline: `center`})
+      }
+
       App.zone_refresh_interval = setInterval(() => {
         if (App.zone_map_updates >= App.max_zone_map_updates) {
           App.msg_zone_map.close()
@@ -49,9 +59,6 @@ App.setup_zone_map = () => {
     },
   })
 
-  let template = DOM.el(`#zone-map-template`)
-  let clone = template.content.cloneNode(true)
-  let c = DOM.el(`#zone-map-container`, clone)
   App.msg_zone_map.set(c)
   App.zone_map_grid_el = DOM.el(`#zone-map-grid`, c)
   App.zone_map_has_dragged = false
@@ -137,14 +144,6 @@ App.setup_zone_map = () => {
     clearInterval(App.zone_refresh_interval)
     App.msg_zone_map.close()
   })
-
-  setTimeout(() => {
-    let active_btn = DOM.el(`[data-zone="${App.zone}"]`, c)
-
-    if (active_btn) {
-      active_btn.scrollIntoView({behavior: `instant`, block: `center`, inline: `center`})
-    }
-  }, 10)
 }
 
 App.show_zone_map = () => {
