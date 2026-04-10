@@ -21,7 +21,7 @@ App.setup_canvas = () => {
   let theme = App.get_theme(App.zone, true)
   let texture = App.create_particle_texture(theme)
   let blend_mode = theme.is_dark ? THREE.AdditiveBlending : THREE.NormalBlending
-  App.particles_material = new THREE.PointsMaterial({size: 0.15, color: new THREE.Color(theme.particles), map: texture, transparent: true, opacity: 0.6, blending: blend_mode, depthWrite: false})
+  App.particles_material = new THREE.PointsMaterial({size: App.particle_size_small, color: new THREE.Color(theme.particles), map: texture, transparent: true, opacity: 0.6, blending: blend_mode, depthWrite: false})
   App.particle_mesh = new THREE.Points(App.particles_geometry, App.particles_material)
   App.particle_mesh.visible = App.animation
   App.scene.add(App.particle_mesh)
@@ -181,7 +181,6 @@ App.update_sequence_display = () => {
 
 App.animate = () => {
   requestAnimationFrame(App.animate)
-  // Call update before getting delta
   App.timer.update()
   let delta = App.timer.getDelta()
 

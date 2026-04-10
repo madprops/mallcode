@@ -219,7 +219,7 @@ App.trigger_down = (is_local = true, event_time = null) => {
     App.play_beep(App.current_user)
   }
 
-  App.particle_mesh.material.size = 0.5
+  App.particle_mesh.material.size = App.particle_size_big
   clearTimeout(App.max_press_timeout)
 
   App.max_press_timeout = setTimeout(() => {
@@ -258,7 +258,6 @@ App.trigger_up = (is_local = true, event_time = null) => {
   }
 
   App.stop_beep()
-  App.particle_mesh.material.size = 0.15
 }
 
 App.resolve_local_letter = (is_local = true) => {

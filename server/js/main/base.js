@@ -57,6 +57,8 @@ App.colorlib = ColorLib()
 App.theme_cache = null
 App.script = Shared.default_script
 App.iambic_mode = `b`
+App.particle_size_big = 0.5
+App.particle_size_small = 0.25
 
 App.create_debouncers = () => {
   App.username_debouncer = Shared.create_debouncer(() => {
@@ -90,6 +92,7 @@ App.create_debouncers = () => {
 
   App.zoom_debouncer = Shared.create_debouncer(() => {
     App.target_z = 40
+    App.particle_mesh.material.size = App.particle_size_small
   }, 1 * 400)
 }
 
