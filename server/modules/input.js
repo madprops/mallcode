@@ -278,7 +278,7 @@ module.exports = (App) => {
         App.zone_data[zone].words.shift()
       }
 
-      App.get_zone_echo(zone)
+      App.check_zone_echo(zone)
       App.zone_data_changed = true
       App.update_zone_activity(zone, true)
       App.broadcast_zone_words(zone)
