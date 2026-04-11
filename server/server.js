@@ -41,7 +41,6 @@ App.max_connections_per_ip = 3
 App.max_info_per_minute = 20
 App.max_echo_length = 1024
 App.echo_chance = 20
-App.jammer_chance = 100
 
 App.messages = [
   {

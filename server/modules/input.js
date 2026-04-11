@@ -271,19 +271,24 @@ module.exports = (App) => {
         App.zone_data[zone] = {words: []}
       }
 
-      App.zone_data[zone].words = App.zone_data[zone].words.filter(w => w !== word)
-      App.zone_data[zone].words.push(word)
+      let is_jammer_word = App.attack_jammer(zone, word, ws)
 
-      if (App.zone_data[zone].words.length > App.max_words) {
-        App.zone_data[zone].words.shift()
+      if (!is_jammer_word) {
+        App.zone_data[zone].words = App.zone_data[zone].words.filter(w => w !== word)
+        App.zone_data[zone].words.push(word)
+
+        if (App.zone_data[zone].words.length > App.max_words) {
+          App.zone_data[zone].words.shift()
+        }
+
+        App.check_zone_echo(zone)
+        App.broadcast_zone_words(zone)
+        App.check_anomaly(word)
+        App.check_jammer(zone)
       }
 
-      App.check_zone_echo(zone)
       App.zone_data_changed = true
       App.update_zone_activity(zone, true)
-      App.broadcast_zone_words(zone)
-      App.check_anomaly(word)
-      App.check_jammer(zone)
     }
   }
 
