@@ -41,7 +41,7 @@ module.exports = (App) => {
     let jammer = App.zone_data[zone] && App.zone_data[zone].jammer
 
     if (jammer) {
-      let damage = App.shared.random_int({min: 1, max: 100}) * 10
+      let damage = App.shared.random_int({min: 1, max: 10}) * 10
       jammer.health -= damage
       App.zone_data_changed = true
       let username = ws ? ws.username : `Someone`
