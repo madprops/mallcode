@@ -4,7 +4,8 @@ App.on_jammer = (data) => {
   App.jammer = data.jammer || null
 
   if (App.jammer) {
-    App.show_update(`Jammer ${App.jammer.name} has appeared! HP: ${App.jammer.health}`)
+    App.show_update(`🤖 ${App.jammer.name} controls this zone.`)
+    App.show_update(`Attack with: boom, pulse, shock, flare, crash`)
   } else {
     // Jammer defeated or disappeared
   }
