@@ -269,7 +269,7 @@ module.exports = (App) => {
     App.check_messages(ws, word)
     let is_jammer_word = App.is_jammer_word(word)
 
-    if ((word.length >= App.min_word_length)) {
+    if (word.length >= App.min_word_length) {
       if (App.word_match(word)) {
         if (!App.zone_data[zone]) {
           App.zone_data[zone] = {words: []}
