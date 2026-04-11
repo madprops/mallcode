@@ -1,6 +1,6 @@
 module.exports = (App) => {
   App.anomaly_hours = 2
-  App.anomaly_speed = 7
+  App.anomaly_speed = 6
   App.anomaly_chance = 1
   App.max_anomalies = 6
 
