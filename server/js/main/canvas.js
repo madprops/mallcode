@@ -206,11 +206,16 @@ App.animate = () => {
     App.target_z = 40
   }
 
+  if (App.target_particle_size === undefined) {
+    App.target_particle_size = App.particle_size_small
+  }
+
   if (App.is_pressed !== App.was_pressed) {
     if (App.is_pressed) {
       App.zoom_speed = App.zoom_speed_press
       App.zoom_debouncer.cancel()
       App.target_z = 35
+      App.target_particle_size = App.particle_size_big
     }
     else {
       App.zoom_debouncer.call()
@@ -221,9 +226,11 @@ App.animate = () => {
 
   if (App.animation) {
     App.camera.position.z = THREE.MathUtils.lerp(App.camera.position.z, App.target_z, App.zoom_speed)
+    App.particles_material.size = THREE.MathUtils.lerp(App.particles_material.size, App.target_particle_size, App.zoom_speed)
   }
   else {
     App.camera.position.z = 40
+    App.particles_material.size = App.particle_size_small
   }
 
   for (let i = App.sprites.length - 1; i >= 0; i--) {
@@ -299,8 +306,4 @@ App.create_particle_texture = (theme) => {
   }
 
   return new THREE.CanvasTexture(particle_canvas)
-}
-
-App.change_particle_size = (size) => {
-  App.particles_material.size = THREE.MathUtils.lerp(App.particles_material.size, size, App.zoom_speed)
 }
