@@ -117,19 +117,20 @@ App.create_text_texture = (text, is_word = false, is_sequence = false, force_wor
 
 App.spawn_sprite = (text, type) => {
   let cache_key = `${text}_${type}`
-  let material
+  let base_material
 
   if (App.material_cache[cache_key]) {
-    material = App.material_cache[cache_key]
+    base_material = App.material_cache[cache_key]
   }
   else {
     let texture = App.create_text_texture(text, type === `word`, type === `sequence`)
     let theme = App.get_theme(App.zone)
     let blend_mode = theme.is_dark ? THREE.AdditiveBlending : THREE.NormalBlending
-    material = new THREE.SpriteMaterial({map: texture, transparent: true, blending: blend_mode})
-    App.material_cache[cache_key] = material
+    base_material = new THREE.SpriteMaterial({map: texture, transparent: true, blending: blend_mode})
+    App.material_cache[cache_key] = base_material
   }
 
+  let material = base_material.clone()
   let sprite = new THREE.Sprite(material)
 
   if (type === `sequence`) {
@@ -171,6 +172,7 @@ App.spawn_sprite = (text, type) => {
   while (App.sprites.length > 40) {
     let old_sprite = App.sprites.shift()
     App.scene.remove(old_sprite)
+    old_sprite.material.dispose()
   }
 
   return sprite
@@ -179,7 +181,6 @@ App.spawn_sprite = (text, type) => {
 App.update_sequence_display = () => {
   if (App.active_sequence_sprite) {
     App.scene.remove(App.active_sequence_sprite)
-    App.active_sequence_sprite.material.map.dispose()
     App.active_sequence_sprite.material.dispose()
     App.active_sequence_sprite = null
   }
@@ -253,7 +254,6 @@ App.animate = () => {
 
     if (s.userData.life <= 0) {
       App.scene.remove(s)
-      s.material.map.dispose()
       s.material.dispose()
       App.sprites.splice(i, 1)
     }
