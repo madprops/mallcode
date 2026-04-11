@@ -13,15 +13,12 @@ App.server = http.createServer(App.app)
 App.wss = new WebSocket.Server({server: App.server})
 App.shared = require(`./js/main/shared.js`)
 App.actions = require(`./actions.js`)
-require(`./modules/spam.js`)(App)
-require(`./modules/data.js`)(App)
-require(`./modules/zones.js`)(App)
-require(`./modules/sockets.js`)(App)
-require(`./modules/input.js`)(App)
-require(`./modules/anomalies.js`)(App)
-require(`./modules/markov.js`)(App)
-require(`./modules/bundler.js`)(App)
-require(`./modules/jammers.js`)(App)
+
+App.i.fs.readdirSync(App.i.path.join(__dirname, `modules`)).forEach(file => {
+  if (file.endsWith(`.js`)) {
+    require(`./modules/${file}`)(App)
+  }
+})
 
 App.zone_states = {}
 App.next_client_id = 1
