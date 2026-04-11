@@ -112,7 +112,7 @@ App.show_dial_menu = (type, anchor_el) => {
     row_size = 2
   }
   else if (type === `speed`) {
-    row_size = 3
+    row_size = 1
   }
 
   let row = null
