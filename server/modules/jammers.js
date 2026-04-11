@@ -1,5 +1,6 @@
 module.exports = (App) => {
-  App.jammer_chance = 20
+  App.jammer_chance = 10
+  App.jammer_heal_amount = 25
 
   App.jammer_words = [
     `boom`,
@@ -8,6 +9,10 @@ module.exports = (App) => {
     `flare`,
     `crash`,
   ]
+
+  App.is_jammer_word = (word) => {
+    return App.jammer_words.includes(word.toLowerCase())
+  }
 
   App.check_jammer = (zone) => {
     if (!App.zone_data[zone] || App.zone_data[zone].jammer) {
@@ -29,6 +34,22 @@ module.exports = (App) => {
         }
       })
     }
+  }
+
+  App.heal_jammer = (zone) => {
+    let jammer = App.zone_data[zone] && App.zone_data[zone].jammer
+
+    if (!jammer) {
+      return
+    }
+
+    jammer.health += App.jammer_heal_amount
+
+    if (jammer.health > 100) {
+      jammer.health = 100
+    }
+
+    App.zone_data_changed = true
   }
 
   App.attack_jammer = (zone, word, ws) => {

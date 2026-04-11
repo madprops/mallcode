@@ -1,4 +1,6 @@
 module.exports = (App) => {
+  App.min_word_length = 3
+
   App.on_down = (ws, data, z_state) => {
     if (z_state.is_pressed) {
       return
@@ -265,30 +267,38 @@ module.exports = (App) => {
     }
 
     App.check_messages(ws, word)
+    let is_jammer_word = App.is_jammer_word(word)
 
-    if ((word.length >= 3) && App.word_match(word)) {
-      if (!App.zone_data[zone]) {
-        App.zone_data[zone] = {words: []}
-      }
-
-      let is_jammer_word = App.attack_jammer(zone, word, ws)
-
-      if (!is_jammer_word) {
-        App.zone_data[zone].words = App.zone_data[zone].words.filter(w => w !== word)
-        App.zone_data[zone].words.push(word)
-
-        if (App.zone_data[zone].words.length > App.max_words) {
-          App.zone_data[zone].words.shift()
+    if ((word.length >= App.min_word_length)) {
+      if (App.word_match(word)) {
+        if (!App.zone_data[zone]) {
+          App.zone_data[zone] = {words: []}
         }
 
-        App.check_zone_echo(zone)
-        App.broadcast_zone_words(zone)
-        App.check_anomaly(word)
-        App.check_jammer(zone)
+        if (is_jammer_word) {
+          App.attack_jammer(zone, word, ws)
+        }
+        else {
+          App.zone_data[zone].words = App.zone_data[zone].words.filter(w => w !== word)
+          App.zone_data[zone].words.push(word)
+
+          if (App.zone_data[zone].words.length > App.max_words) {
+            App.zone_data[zone].words.shift()
+          }
+
+          App.check_zone_echo(zone)
+          App.broadcast_zone_words(zone)
+          App.check_anomaly(word)
+          App.check_jammer(zone)
+        }
+
+        App.zone_data_changed = true
+        App.update_zone_activity(zone, true)
       }
 
-      App.zone_data_changed = true
-      App.update_zone_activity(zone, true)
+      if (!is_jammer_word) {
+        App.heal_jammer(zone)
+      }
     }
   }
 
