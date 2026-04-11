@@ -283,6 +283,7 @@ module.exports = (App) => {
       App.update_zone_activity(zone, true)
       App.broadcast_zone_words(zone)
       App.check_anomaly(word)
+      App.check_jammer(zone)
     }
   }
 

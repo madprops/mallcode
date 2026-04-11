@@ -78,7 +78,8 @@ module.exports = (App) => {
     // If the user is already in this zone, just acknowledge and return
     if (old_zone === zone) {
       let echo = App.zone_data[ws.zone] && App.zone_data[ws.zone].echo ? App.zone_data[ws.zone].echo : ``
-      ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username, version: App.version, echo, speed}))
+      let jammer = App.zone_data[ws.zone] && App.zone_data[ws.zone].jammer ? App.zone_data[ws.zone].jammer : null
+      ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username, version: App.version, echo, speed, jammer}))
       App.broadcast_zone_words(ws.zone, ws)
       return
     }
@@ -86,7 +87,8 @@ module.exports = (App) => {
     App.force_release(ws, old_zone)
     App.set_zone(ws, zone)
     let echo = App.zone_data[ws.zone] && App.zone_data[ws.zone].echo ? App.zone_data[ws.zone].echo : ``
-    ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username, version: App.version, echo, speed}))
+    let jammer = App.zone_data[ws.zone] && App.zone_data[ws.zone].jammer ? App.zone_data[ws.zone].jammer : null
+    ws.send(JSON.stringify({type: `ZONE`, zone: ws.zone, username: ws.username, version: App.version, echo, speed, jammer}))
 
     if (old_zone) {
       App.broadcast_zone_update(old_zone, ws.username, `leave`)

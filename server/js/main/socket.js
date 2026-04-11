@@ -61,6 +61,9 @@ App.setup_socket = () => {
     else if (data.type === `ANOMALY`) {
       App.announce_anomaly(data)
     }
+    else if (data.type === `JAMMER`) {
+      App.on_jammer(data)
+    }
   }
 
   App.ws.onclose = () => {
@@ -232,6 +235,8 @@ App.on_zone = (data) => {
 
   App.set_css_var(`zone_color`, theme.particles)
   App.refresh_sound_icon()
+
+  App.on_jammer({ jammer: data.jammer || null })
 }
 
 App.on_zones_info = (data) => {

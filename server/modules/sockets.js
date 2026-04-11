@@ -310,6 +310,7 @@ module.exports = (App) => {
           last_activity: App.zone_data[z].last_activity,
           user_count: 0,
           latest_word: words.length > 0 ? words[words.length - 1] : ``,
+          has_jammer: !!App.zone_data[z].jammer,
         }
       }
     }
@@ -327,6 +328,7 @@ module.exports = (App) => {
             last_activity: App.zone_data[z] ? App.zone_data[z].last_activity : 0,
             user_count: 0,
             latest_word: words.length > 0 ? words[words.length - 1] : ``,
+            has_jammer: !!(App.zone_data[z] && App.zone_data[z].jammer),
           }
         }
       }
@@ -352,6 +354,7 @@ module.exports = (App) => {
             last_activity: App.zone_data[z].last_activity,
             user_count: 0,
             latest_word: words.length > 0 ? words[words.length - 1] : ``,
+            has_jammer: !!App.zone_data[z].jammer,
           }
         }
       }
@@ -369,6 +372,7 @@ module.exports = (App) => {
               last_activity: 0,
               user_count: 0,
               latest_word: words.length > 0 ? words[words.length - 1] : ``,
+              has_jammer: !!(App.zone_data[client.zone] && App.zone_data[client.zone].jammer),
             }
           }
 

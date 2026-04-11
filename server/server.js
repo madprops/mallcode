@@ -21,6 +21,7 @@ require(`./modules/input.js`)(App)
 require(`./modules/anomalies.js`)(App)
 require(`./modules/markov.js`)(App)
 require(`./modules/bundler.js`)(App)
+require(`./modules/jammers.js`)(App)
 
 App.zone_states = {}
 App.next_client_id = 1
@@ -40,6 +41,7 @@ App.max_connections_per_ip = 3
 App.max_info_per_minute = 20
 App.max_echo_length = 1024
 App.echo_chance = 20
+App.jammer_chance = 100
 
 App.messages = [
   {
