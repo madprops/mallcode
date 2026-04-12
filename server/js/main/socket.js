@@ -189,6 +189,7 @@ App.on_zone = (data) => {
   App.update_sequence_display()
 
   App.zone = data.zone
+  App.update_title()
   App.update_url()
   App.clear_updates()
   App.username = data.username

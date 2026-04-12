@@ -153,3 +153,7 @@ App.update_url = () => {
 
   window.history.replaceState({}, ``, url)
 }
+
+App.update_title = () => {
+  document.title = `Mall Code - ${App.zone}`
+}
