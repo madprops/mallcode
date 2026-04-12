@@ -165,3 +165,9 @@ Trying to hack and patch this for sport can be part of the fun.
 Finding ways to automate messages without doing morse code / effort (cheating).
 
 And detecting and understanding the exploits to patch them.
+
+---
+
+The combat mechanic adds another target to practice morse code.
+
+This can be expanded more.
