@@ -208,6 +208,12 @@ App.get_about_text = () => {
 
 App.load_fonts = () => {
   document.fonts.load(`1em piss_font`)
+  document.fonts.load(`1em morse_arabic`)
+  document.fonts.load(`1em morse_hebrew`)
+  document.fonts.load(`1em morse_devanagari`)
+  document.fonts.load(`1em morse_jp`)
+  document.fonts.load(`1em morse_kr`)
+  document.fonts.load(`1em morse_thai`)
 }
 
 App.announce_anomaly = (data) => {

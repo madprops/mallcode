@@ -38,7 +38,7 @@ App.create_text_texture = (text, is_word = false, is_sequence = false, force_wor
   let ctx = text_canvas.getContext(`2d`)
   ctx.clearRect(0, 0, text_canvas.width, text_canvas.height)
   let theme = App.get_theme(App.zone)
-  let is_cjk = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f\uac00-\ud7af]/.test(text)
+  let is_cjk = /[\u3040-\u30ff\u3130-\u318f\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f\uac00-\ud7af]/.test(text)
 
   if (is_word) {
     let font_size = is_cjk ? 110 : 80
