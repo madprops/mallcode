@@ -21,7 +21,7 @@ App.scripts = {
     title: `International Morse Code with extensions for Esperanto letters with diacritics`,
   },
   devanagari: {
-    title: `Morse code mapped to the Devanagari script (used for Hindi, Marathi, etc.)`,
+    title: `Morse code mapped to the Devanagari script (used for Hindi, Marathi, etc)`,
   },
   korean: {
     title: `SKATS (Standard Korean Alphabet Transliteration System) for Hangul`,
