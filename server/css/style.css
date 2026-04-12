@@ -3,12 +3,35 @@
   src: url("../fonts/NotoSans-Regular.ttf") format("truetype");
 }
 
-@font-face { font-family: "morse_latin"; src: url("../fonts/NotoSansArabic-Regular.ttf") format("truetype"); }
-@font-face { font-family: "morse_arabic"; src: url("../fonts/NotoSansDevanagari-Regular.ttf") format("truetype"); }
-@font-face { font-family: "morse_hebrew"; src: url("../fonts/NotoSansHebrew-Regular.ttf") format("truetype"); }
-@font-face { font-family: "morse_devanagari"; src: url("../fonts/NotoSansJP-Regular.ttf") format("truetype"); }
-@font-face { font-family: "morse_thai"; src: url("../fonts/NotoSansKR-Regular.ttf") format("truetype"); }
-@font-face { font-family: "morse_jp"; src: url("../fonts/NotoSansThai-Regular.ttf") format("truetype"); }
+@font-face {
+    font-family: "morse_latin";
+    src: url("../fonts/NotoSansArabic-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "morse_arabic";
+    src: url("../fonts/NotoSansDevanagari-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "morse_hebrew";
+    src: url("../fonts/NotoSansHebrew-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "morse_devanagari";
+    src: url("../fonts/NotoSansJP-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "morse_thai";
+    src: url("../fonts/NotoSansKR-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "morse_jp";
+    src: url("../fonts/NotoSansThai-Regular.ttf") format("truetype");
+}
 
 @font-face {
   font-family: "piss_font";
@@ -523,5 +546,5 @@ a.clean-link:hover {
 }
 
 .Msg-titlebar {
-    user-select: none!;
+    user-select: none !important;
 }
