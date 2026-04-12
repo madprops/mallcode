@@ -1,36 +1,36 @@
 App.scripts = {
   latin: {
-    title: `Standard International Morse Code for the Latin alphabet`
+    title: `Standard International Morse Code for the Latin alphabet`,
   },
   greek: {
-    title: `Morse code mapped to the Greek alphabet`
+    title: `Morse code mapped to the Greek alphabet`,
   },
   cyrillic: {
-    title: `Morse code mapped to the Cyrillic alphabet (used for Russian and others)`
+    title: `Morse code mapped to the Cyrillic alphabet (used for Russian and others)`,
   },
   hebrew: {
-    title: `Morse code mapped to the Hebrew alphabet`
+    title: `Morse code mapped to the Hebrew alphabet`,
   },
   arabic: {
-    title: `Morse code mapped to the Arabic alphabet`
+    title: `Morse code mapped to the Arabic alphabet`,
   },
   persian: {
-    title: `Morse code mapped to the Persian alphabet`
+    title: `Morse code mapped to the Persian alphabet`,
   },
   esperanto: {
-    title: `International Morse Code with extensions for Esperanto letters with diacritics`
+    title: `International Morse Code with extensions for Esperanto letters with diacritics`,
   },
   devanagari: {
-    title: `Morse code mapped to the Devanagari script (used for Hindi, Marathi, etc.)`
+    title: `Morse code mapped to the Devanagari script (used for Hindi, Marathi, etc.)`,
   },
   korean: {
-    title: `SKATS (Standard Korean Alphabet Transliteration System) for Hangul`
+    title: `SKATS (Standard Korean Alphabet Transliteration System) for Hangul`,
   },
   wabun: {
-    title: `Japanese Morse code used to transmit kana characters`
+    title: `Japanese Morse code used to transmit kana characters`,
   },
   thai: {
-    title: `Morse code mapped to the Thai alphabet`
+    title: `Morse code mapped to the Thai alphabet`,
   },
 }
 
@@ -203,7 +203,6 @@ App.make_settings_msg = (items, title, action) => {
     let item = DOM.create(`div`, `settings-picker-item`)
     item.textContent = value
     item.title = items[value].title
-
 
     DOM.ev(item, `click`, () => {
       action(value)
