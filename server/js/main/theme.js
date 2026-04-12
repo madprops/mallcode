@@ -82,7 +82,7 @@ App.get_theme = (zone, force = false) => {
   let text_val = App.get_color(App.text_color)
   App.set_css_var(`text_color`, text_val)
 
-  App.border_color = App.colorlib.get_lighter_or_darker(text_val, 0.6)
+  App.border_color = App.colorlib.get_lighter_or_darker(text_val, 0.55)
   App.set_css_var(`border_color`, App.border_color)
 
   App.highlight_color = App.colorlib.get_lighter_or_darker(bg_val, 0.1)
