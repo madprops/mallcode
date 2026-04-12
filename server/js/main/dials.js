@@ -178,7 +178,7 @@ App.show_dial_menu = (type, anchor_el) => {
     left_pos = window.innerWidth - menu_width - 10
   }
 
-  App.dial_menu_el.style.top = `${rect.bottom + 5}px`
+  App.dial_menu_el.style.top = `${rect.bottom + 10}px`
   App.dial_menu_el.style.left = `${left_pos}px`
   App.dial_menu_el.style.minWidth = `${menu_width}px`
 
