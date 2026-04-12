@@ -19,6 +19,7 @@ Shared.speeds = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 Shared.default_speed = 6
 Shared.default_sekrit_speed = 6
 Shared.default_script = `latin`
+Shared.default_iambic = `b`
 
 Shared.prosigns = {
   "...-.": `SN`,

@@ -1,25 +1,59 @@
-App.scripts = [
-  `latin`,
-  `greek`,
-  `cyrillic`,
-  `hebrew`,
-  `arabic`,
-  `persian`,
-  `esperanto`,
-  `devanagari`,
-  `korean`,
-  `wabun`,
-  `thai`,
-]
+App.scripts = {
+  latin: {
+    title: `Standard International Morse Code for the Latin alphabet`
+  },
+  greek: {
+    title: `Morse code mapped to the Greek alphabet`
+  },
+  cyrillic: {
+    title: `Morse code mapped to the Cyrillic alphabet (used for Russian and others)`
+  },
+  hebrew: {
+    title: `Morse code mapped to the Hebrew alphabet`
+  },
+  arabic: {
+    title: `Morse code mapped to the Arabic alphabet`
+  },
+  persian: {
+    title: `Morse code mapped to the Persian alphabet`
+  },
+  esperanto: {
+    title: `International Morse Code with extensions for Esperanto letters with diacritics`
+  },
+  devanagari: {
+    title: `Morse code mapped to the Devanagari script (used for Hindi, Marathi, etc.)`
+  },
+  korean: {
+    title: `SKATS (Standard Korean Alphabet Transliteration System) for Hangul`
+  },
+  wabun: {
+    title: `Japanese Morse code used to transmit kana characters`
+  },
+  thai: {
+    title: `Morse code mapped to the Thai alphabet`
+  },
+}
 
-App.iambic_modes = [
-  `b`,
-  `a`,
-  `ultimatic`,
-  `bug`,
-  `single`,
-  `manual`,
-]
+App.iambic_modes = {
+  b: {
+    title: `Alternates dots and dashes when both held. Adds an extra opposite element upon release`,
+  },
+  a: {
+    title: `Alternates dots and dashes when both held. Stops immediately upon release`,
+  },
+  ultimatic: {
+    title: `Holding both paddles repeats the element of the last pressed paddle`,
+  },
+  bug: {
+    title: `Semi-automatic keyer. Automatic repeating dots, manual straight-key dashes`,
+  },
+  single: {
+    title: `Emulates a single paddle. No squeeze alternating`,
+  },
+  manual: {
+    title: `Dual-lever straight key. Elements require individual presses and do not auto-repeat`,
+  },
+}
 
 App.get_settings = () => {
   return [
@@ -165,9 +199,11 @@ App.make_settings_msg = (items, title, action) => {
 
   let lc = DOM.create(`div`, `flex-column-center settings-picker`)
 
-  for (let value of items) {
+  for (let value of Object.keys(items)) {
     let item = DOM.create(`div`, `settings-picker-item`)
     item.textContent = value
+    item.title = items[value].title
+
 
     DOM.ev(item, `click`, () => {
       action(value)

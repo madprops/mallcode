@@ -42,8 +42,16 @@ App.load_storage = async () => {
         if (App.storage.script !== undefined) {
           App.script = App.storage.script
 
-          if (!App.scripts.includes(App.script)) {
-            App.script = Shared.default_lang
+          if (!Object.keys(App.scripts).includes(App.script)) {
+            App.script = Shared.default_script
+          }
+        }
+
+        if (App.storage.iambic_mode !== undefined) {
+          App.iambic_mode = App.storage.iambic_mode
+
+          if (!Object.keys(App.iambic_modes).includes(App.iambic_mode)) {
+            App.iambic_mode = Shared.default_iambic
           }
         }
 
@@ -56,10 +64,6 @@ App.load_storage = async () => {
 
         if (App.storage.background !== undefined) {
           App.background = App.storage.background
-        }
-
-        if (App.storage.iambic_mode !== undefined) {
-          App.iambic_mode = App.storage.iambic_mode
         }
 
         resolve()

@@ -54,7 +54,7 @@ module.exports = (App) => {
         z_state.current_script = data.script
       }
 
-      let msg_up = JSON.stringify({type: `UP`, username: ws.username, sequence: z_state.current_sequence, script: z_state.current_script || Shared.default_lang})
+      let msg_up = JSON.stringify({type: `UP`, username: ws.username, sequence: z_state.current_sequence, script: z_state.current_script || Shared.default_script})
 
       App.wss.clients.forEach((client) => {
         if ((client !== ws) && (client.readyState === WebSocket.OPEN) && (client.zone === ws.zone)) {

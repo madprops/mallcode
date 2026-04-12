@@ -56,7 +56,7 @@ App.ticker_speed = 69
 App.colorlib = ColorLib()
 App.theme_cache = null
 App.script = Shared.default_script
-App.iambic_mode = `b`
+App.iambic_mode = Shared.default_iambic
 App.particle_size_big = 0.5
 App.particle_size_small = 0.25
 App.zoom_speed_press = 0.15
@@ -221,7 +221,7 @@ App.go_to_zone = (zone) => {
 }
 
 App.get_script = () => {
-  return App.script || Shared.default_lang
+  return App.script || Shared.default_script
 }
 
 App.start = () => {
