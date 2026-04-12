@@ -337,6 +337,13 @@ App.iambic_loop = () => {
   let dot_request = App.paddle_dot_down || App.dot_memory
   let dash_request = App.paddle_dash_down || App.dash_memory
 
+  // Manual mode requires individual presses. By ignoring the physical down
+  // state and only reading memory, the element will not auto-repeat.
+  if (App.iambic_mode === `manual`) {
+    dot_request = App.dot_memory
+    dash_request = App.dash_memory
+  }
+
   if (!dot_request && !dash_request) {
     App.is_iambic_keying = false
     App.last_iambic_sent = null
